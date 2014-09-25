@@ -1,0 +1,17 @@
+[
+    {% for catnode in categorytreenode_list %}
+    {
+	"has_children": {{ catnode.has_children|lower }},
+	"label": "{{ catnode.label }}",
+        {% if catnode.label_children %}"label_children": "{{ catnode.label_children }}",{% endif %}
+	"is_category": {{ catnode.is_category|lower }},
+	{% if catnode.is_category %}
+	"name": "{{ catnode.content_object.name }}",
+	"num_objects": {{ catnode.num_objects }},
+	{% else %}
+	"text": "{{ catnode.content_object.html|safe }}",
+	{% endif %}
+	"level": {{ catnode.level }}
+    }{% if forloop.last %}{% else %},{% endif %}
+    {% endfor %}
+]

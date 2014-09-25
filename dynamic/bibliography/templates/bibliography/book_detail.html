@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<table>
+<tr>
+  <th>isbn</th>
+  <td>{{ book.isbn_ced }}-{{ book.isbn_book }}</td>
+</tr>
+{% for rel in book.bookauthorrelation_set.all %}
+<tr>
+  <th>{{ rel.author_role }}</th>
+  <td>{{ rel.author }}</td>
+</tr>
+{% endfor %}
+<tr><th>title</th><td>{{ book.title }}</td></tr>
+<tr><th>year</th><td>{{ book.year }}</td></tr>
+<tr><th>publisher</th><td>{{ book.publisher }}</td></tr>
+</table>
+
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

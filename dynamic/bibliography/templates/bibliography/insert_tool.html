@@ -1,0 +1,445 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<a href="" class="button" id="repostbutton">Update</a>
+
+<div id="tabs">
+ <ul>
+   <li><a href="#tabs-data">Data</a></li>
+   <li><a href="#tabs-newbooks">New Books</a></li>
+   <li><a href="#tabs-publishers">Publishers</a></li>
+   <li><a href="#tabs-authors">Authors</a></li>
+ </ul>
+
+<div id="tabs-data">
+<h2>ISBN Input</h2>
+
+{% for isbn in isbn_list %}
+<p>{{ isbn }}</p>
+{% endfor %}
+
+<p>Unseparable:
+{% for isbn in unseparable %}
+{{ isbn }}
+{% endfor %}
+</p>
+
+<h2>Old Books</h2>
+
+<table id="oldbooks">
+  
+  <tr><th colspan="2">ISBN</th><th>authors</th><th>title</th><th>year</th><th>publisher</th></tr>
+
+  {% for book in old_book_list %}
+  <tr>
+    <td>{{ book.isbn_ced }}</td>
+    <td>{{ book.isbn_book }}</td>
+    <td>{% if book.authors %}{% for rel in book.authors %}{{ rel.author.cache.long_name }}{% if forloop.last %}{% else %}, {% endif %}{% endfor %}{% endif %}</td>
+    <td>{{ book.title }}</td>
+    <td>{{ book.year }}</td>
+    <td>{% if book.publisher %}{{ book.publisher }}{% endif %}</td>
+  </tr>
+  {% endfor %}
+
+</table>
+
+<h2>Suspended Books</h2>
+
+<table>
+  
+  <tr><th colspan="3">ISBN</th><th>title</th><th>year</th><th>publisher</th><th>authors</th></tr>
+
+  {% for book in suspended_book_list %}
+  <tr>
+    <td>{{ book.isbn_10 }}</td>
+    <td>{{ book.isbn_ced }}</td>
+    <td>{{ book.isbn_book }}</td>
+    <td>{{ book.title }}</td>
+    <td>{{ book.year }}</td>
+    <td>{% if book.publisher %}{{ book.publisher }}{% endif %}</td>
+    <td>{% if book.authors %}{{ book.authors }}{% endif %}</td>
+  </tr>
+  {% endfor %}
+
+</table>
+
+</div>
+
+<div id="tabs-publishers">
+
+<h2>Publishers</h2>
+
+<table id="oldpublishers">
+  <tr><th>isbn</th><th>publisher</th><th>address</th></tr>
+    {% for pub in old_publisher_list %}
+  <tr>
+    <td>{{ pub.isbn_ced }}</td>
+    <td>{{ pub.name }}</td><td>{% for adr in pub.addresses %}{% if forloop.first %}{% else %}, {% endif %}{{ adr }}{% endfor %}</td>
+  </tr>
+{% endfor %}
+</table>
+
+{% for pubid,name,form,address_formset in new_publisher_list %}
+<div class="newpublisher form" id="newpublisher{{ pubid }}">
+<h1>New publisher: {{ name }}</h1>
+
+<a href="" class="newpublisher" data-target_id="newpublisher{{ pubid }}">Add {{ name }}</a>
+
+<p>{{ form.alias }} {{ form.alias.label }}</p>
+
+<table>
+<tr>
+  <th>{{ form.isbn.label }}</th>
+  <td>{{ form.isbn }}</td>
+</tr>
+<tr>
+  <th>{{ form.name.label }}</th>
+  <td>{{ form.name }}</td>
+</tr>
+<tr>
+  <td>{{ form.full_name.label }}</td>
+  <td>{{ form.full_name }}</td>
+</tr>
+<tr>
+  <td>{{ form.url.label }}</td>
+  <td>{{ form.url }}</td>
+</tr>
+<tr>
+  <td>{{ form.note.label }}</td>
+  <td>{{ form.note }}</td>
+</tr>
+<tr>
+</tr>
+</table>
+
+{{ address_formset.management_form }}
+<table>
+  <tr><th rowspan="2">Pos</th><th rowspan="2">existing address</th><th colspan="3">new address</th></tr>
+  <tr><th>city</th><th>existing state</th><th>new state</th></tr>
+  
+  {% for aform in address_formset %}
+  <tr><td>{{ forloop.counter0 }}</td>
+    <td>
+      {{ aform.address }}
+    </td>
+    <td>
+      {{ aform.city_name }}
+    </td>
+    <td>
+      {{ aform.state }}
+    </td>
+    <td>
+      {{ aform.state_name }}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+
+{% endfor %}
+
+</div>
+
+<div id="tabs-authors">
+
+<h2>Authors</h2>
+
+<table id="oldauthors">
+    {% for author in old_author_list %}
+    <tr>
+    <td>{{ author.cache.long_name }}</td>
+    </tr>
+    {% endfor %}
+</table>  
+
+{% for autid,name,form,name_formset in new_author_list %}
+<div class="newauthor form" id="newauthor{{ autid }}">
+<h1>New author: {{ name }}</h1>
+
+<a href="" class="newauthor" data-target_id="newauthor{{ autid }}">Add {{ name }}</a>
+
+<table>
+<tr>
+  <th>{{ form.format_collection.label }}</th>
+  <td>{{ form.format_collection }}</td>
+</tr>
+</table>
+
+{{ name_formset.management_form }}
+<table>
+  <tr><th>name type</th><th>value</th></tr>
+  {% for aform in name_formset %}
+  <tr><td>{{ forloop.counter0 }}</td>
+	<td>
+	  {{ aform.name_type }}
+	</td>
+	<td>
+	  {{ aform.value }}
+	</td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+
+{% endfor %}
+
+</div>
+
+<div id="tabs-newbooks">
+
+
+<h2>New Books</h2>
+
+{% for bookid,name,form,author_formset in new_book_list %}
+<div class="newbook form" id="newbook{{ bookid }}">
+<h1>New book: {{ name }}</h1>
+
+<a href="" class="newbook" data-target_id="newbook{{ bookid }}">Add: <i>{{ name }}</i></a>
+
+<p>{{ form.alias }} {{ form.alias.label }}</p>
+
+<table>
+<tr>
+  <th>{{ form.isbn_ced.label }}</th>
+  <td>{{ form.isbn_ced }}</td>
+</tr>
+<tr>
+  <th>{{ form.isbn_book.label }}</th>
+  <td>{{ form.isbn_book }}</td>
+</tr>
+<tr>
+  <th>{{ form.title.label }}</th>
+  <td>{{ form.title }}</td>
+</tr>
+<tr>
+  <td>{{ form.year.label }}</td>
+  <td>{{ form.year }}</td>
+</tr>
+<tr>
+  <td>{{ form.publisher.label }}</td>
+  <td>{{ form.publisher }}</td>
+</tr>
+</table>
+
+{{ author_formset.management_form }}
+<table>
+  <tr><th></th><th>author</th><th>author role</th></tr>
+  
+  {% for aform in author_formset %}
+  <tr><td>{{ forloop.counter0 }}</td>
+    <td>
+      {{ aform.author }}
+    </td>
+    <td>
+      {{ aform.author_role }}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+
+{% endfor %}
+
+</div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+$( "#tabs" ).tabs();
+
+$("#repostbutton").click(function(event){
+    event.preventDefault();
+    var elenco="";
+    elenco+="{% for isbn in isbn_list %} {{ isbn }}{% endfor %}";
+    var html='<form action="" method="post">\n';
+    html+="{% csrf_token %}";
+    html+='<textarea id="id_elenco" name="elenco">'+elenco+'</textarea>';
+    html+='</form>';
+    console.log(html);
+    var form = $(html);
+    $('body').append(form);
+    form.hide();
+    $(form).submit(); 
+});
+
+
+/** new publisher **/
+
+$("a.newpublisher").click(function(event){
+    event.preventDefault();
+    var url="/bibliography/json/publisher/create/";
+    var data;
+    var target_id=$(this).data("target_id");
+
+    var isbn=$("#id_"+target_id+"-isbn").val();
+
+    data={
+	"isbn": $("#id_"+target_id+"-isbn").val(),
+	"name": $("#id_"+target_id+"-name").val(),
+	"full_name": $("#id_"+target_id+"-full_name").val(),
+	"url": $("#id_"+target_id+"-url").val(),
+	"note": $("#id_"+target_id+"-note").val(),
+	"alias": $("#id_"+target_id+"-alias").val(),
+	"address-TOTAL_FORMS": $("#id_"+target_id+"-address-TOTAL_FORMS").val(),
+	"address-INITIAL_FORMS": $("#id_"+target_id+"-address-INITIAL_FORMS").val(),
+	"address-MAX_NUM_FORMS": $("#id_"+target_id+"-address-MAX_NUM_FORMS").val()
+    };
+
+    /*** verificare perche' non prende i dati giusti ***/
+
+    var total_forms=$("#id_"+target_id+"-address-TOTAL_FORMS").val();
+
+    for(n=0;n<total_forms;n++) {
+	data["address-"+n+"-address"]=$("#id_"+target_id+"-address-"+n+"-address").val();
+	data["address-"+n+"-city_name"]=$("#id_"+target_id+"-address-"+n+"-city_name").val();
+	data["address-"+n+"-state"]=$("#id_"+target_id+"-address-"+n+"-state").val();
+	data["address-"+n+"-state_name"]=$("#id_"+target_id+"-address-"+n+"-state_name").val();
+    }
+
+    console.log(url);
+    console.log(target_id);
+    console.log(data);
+
+    $.post(url,data)
+	.done( function(obj) {
+	    console.log("ok");
+	    var html=$("#oldpublishers").html();
+	    html+='<tr>';
+	    html+='<td>'+isbn+'</td>';
+	    html+='<td>'+obj["name"]+'</td>';
+	    html+='<td>';
+	    for(i=0;i<obj["addresses"].length;i++){
+		if (i>0) html+=", ";
+		html+=obj["addresses"][i];
+	    };
+	    html+="</td></tr>";
+	    $("#oldpublishers").html(html);
+	    console.log(obj);
+	    $("#"+target_id).remove();
+	})
+	.fail( function(data) {
+	    console.log("fail");
+	    console.log(data);
+	    console.log(data.responseText);
+	    alert(data.responseText);
+	});
+
+});
+
+/** new author **/
+
+$("a.newauthor").click(function(event){
+    event.preventDefault();
+    var url="/bibliography/json/author/create/";
+    var data;
+    var target_id=$(this).data("target_id");
+
+    data={
+	"format_collection": $("#id_"+target_id+"-format_collection").val(),
+	"name-TOTAL_FORMS": $("#id_"+target_id+"-name-TOTAL_FORMS").val(),
+	"name-INITIAL_FORMS": $("#id_"+target_id+"-name-INITIAL_FORMS").val(),
+	"name-MAX_NUM_FORMS": $("#id_"+target_id+"-name-MAX_NUM_FORMS").val()
+    };
+
+    /*** verificare perche' non prende i dati giusti ***/
+
+    var total_forms=$("#id_"+target_id+"-name-TOTAL_FORMS").val();
+
+    for(n=0;n<total_forms;n++) {
+	data["name-"+n+"-name_type"]=$("#id_"+target_id+"-name-"+n+"-name_type").val();
+	data["name-"+n+"-value"]=$("#id_"+target_id+"-name-"+n+"-value").val();
+    }
+
+    console.log(url);
+    console.log(target_id);
+    console.log(data);
+
+    $.post(url,data)
+	.done( function(obj) {
+	    console.log("ok");
+	    var html=$("#oldauthors").html();
+	    html+='<tr><td>'+obj.long_name+'</td></tr>';
+	    $("#oldauthors").html(html);
+	    console.log(obj);
+	    $("#"+target_id).remove();
+	})
+	.fail( function(data) {
+	    console.log("fail");
+	    console.log(data);
+	    console.log(data.responseText);
+	    alert(data.responseText);
+	});
+
+	
+});
+
+/** new book **/
+
+$("a.newbook").click(function(event){
+    event.preventDefault();
+    var url="/bibliography/json/book/create/";
+    var data;
+    var target_id=$(this).data("target_id");
+
+    data={
+	"isbn_ced": $("#id_"+target_id+"-isbn_ced").val(),
+	"isbn_book": $("#id_"+target_id+"-isbn_book").val(),
+	"title": $("#id_"+target_id+"-title").val(),
+	"year": $("#id_"+target_id+"-year").val(),
+	"publisher": $("#id_"+target_id+"-publisher").val(),
+	"author-TOTAL_FORMS": $("#id_"+target_id+"-author-TOTAL_FORMS").val(),
+	"author-INITIAL_FORMS": $("#id_"+target_id+"-author-INITIAL_FORMS").val(),
+	"author-MAX_NUM_FORMS": $("#id_"+target_id+"-author-MAX_NUM_FORMS").val()
+    };
+
+    /*** verificare perche' non prende i dati giusti ***/
+
+    var total_forms=$("#id_"+target_id+"-author-TOTAL_FORMS").val();
+
+    for(n=0;n<total_forms;n++) {
+	data["author-"+n+"-author_role"]=$("#id_"+target_id+"-author-"+n+"-author_role").val();
+	data["author-"+n+"-author"]=$("#id_"+target_id+"-author-"+n+"-author").val();
+    }
+
+    console.log(url);
+    console.log(target_id);
+    console.log(data);
+
+    $.post(url,data)
+	.done( function(obj) {
+	    console.log("ok");
+	    var html=$("#oldbooks").html();
+	    html+='<tr>';
+	    html+='<td>'+obj["isbn_ced"]+'</td>';
+	    html+='<td>'+obj["isbn_book"]+'</td>';
+	    html+="<td>";
+	    console.log(obj["authors"]);
+	    for(i=0;i<obj["authors"].length;i++){
+		if (i>0) html+=", ";
+		html+=obj["authors"][i]["author"]["long_name"];
+	    };
+	    html+="</td>";
+	    html+='<td>'+obj["title"]+'</td>';
+	    html+='<td>'+obj["year"]+'</td>';
+	    html+='<td>'+obj["publisher"]+'</td>';
+	    html+='</tr>';
+
+	    $("#oldbooks").html(html);
+	    console.log(obj);
+	    $("#"+target_id).remove();
+	})
+	.fail( function(data) {
+	    console.log("fail");
+	    console.log(data);
+	    console.log(data.responseText);
+	    alert(data.responseText);
+	});
+
+	
+});
+
+
+{% endblock %}

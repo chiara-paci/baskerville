@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<a href="./categorizer/">categorizer</a>
+
+<table id="categories">
+{% for catnode in categorytreenode_list %}
+<tr class="sc-tree-data" data-level="{{ catnode.level }}" data-downloaded="false" 
+    data-has_children="{{ catnode.has_children|lower }}"
+    data-label="catroot{{ catnode.label }}"
+    {% if catnode.label_children %}data-label_children="catroot{{ catnode.label_children }}"{% endif %}>
+{% if catnode.is_category %}<td data-label="rif">{{ catnode.content_object.name }}</td><td> ({{ catnode.num_objects }})</td>
+{% else %}<td data-label="rif" colspan="2">{{ catnode.content_object.html|safe }}</td>{% endif %}
+</tr>
+{% endfor %}
+</table>
+{% endblock %}
+
+{% block script %}
+
+$("#categories").sc_treeview({
+    click_pre: function (event,target) { 
+	var label_children=target.data("label_children").replace(/^catroot_/,"");
+	var level=target.data("level")+1;
+	var status=target.data("status");
+	var downloaded=target.data("downloaded");
+	if (status=="open") return;
+	if (downloaded) return
+
+	var url="/bibliography/json/categories/treenode/"+label_children+"/"+level+"/";
+
+	console.log("/bibliography/json/categories/treenode/"+label_children+"/"+level+"/",status,downloaded);
+
+	$.get(url)
+	    .done(function( data ) {
+		var html="";
+		var catnode;
+		var obj=target;
+		for (ind in data) {
+		    catnode=data[ind]
+		    html='<tr class="sc-tree-data" data-level="'+catnode.level+'" data-downloaded="false"'; 
+		    html+=' data-has_children="'+catnode.has_children+'"';
+		    html+=' data-label="catroot'+catnode.label+'"';
+		    if (catnode.label_children)
+			html+=' data-label_children="catroot'+catnode.label_children+'"';
+		    html+=">";
+		    if (catnode.is_category)
+			html+='<td data-label="rif">'+catnode.name+'</td><td> ('+catnode.num_objects+')</td>';
+		    else
+			html+='<td data-label="rif" colspan="2">'+catnode.text+'</td>';
+		    html+='</tr>\n';
+		    obj.after(html);
+		    obj=obj.next();
+		    $("#categories").sc_treeview("set_logic_on_row",obj);
+		    obj.show();
+		}
+		target.data("downloaded",true);
+	    })
+	    .fail(function(ret){
+		console.log("F",ret);
+	    });
+
+    },
+    title_column: "rif",
+    first_label: "catroot"
+});
+			     
+{% endblock %}

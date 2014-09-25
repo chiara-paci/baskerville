@@ -1,0 +1,7 @@
+{
+    "id": {{ category.id }},
+    "name": "{{ category.name }}",
+    "label": "{{ category.label }}",
+    "fathers": "{{ category.fathers }}",
+    "children": "{{ category.children }}"
+}

@@ -1,0 +1,15 @@
+{
+    "max_level": {{ max_level }},
+    "num_branch": {{ num_branch }},
+    "max_num_objects": {{ max_num_objects }},
+    "nodes": [
+	{% for cat,group,branch in category_list %}
+	{"name": "{{ cat.name }}","level": {{ cat.min_level }},"group":{{ group }},"branch": "{{ branch }}","num_objects": {{ cat.num_objects }} }{% if forloop.last %}{% else %},{% endif %}
+	{% endfor %}
+    ],
+    "links": [
+	{% for source,target,group in rel_list %}
+	{"source":{{ source }},"target":{{ target }},"group":{{ group }}}{% if forloop.last %}{% else %},{% endif %}
+	{% endfor %}
+    ]
+}

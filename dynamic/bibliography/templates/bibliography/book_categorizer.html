@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include "includes/pagination.html" %}
+
+<form>
+<table>
+{% for book in book_list %}
+<tr><td>{{ book.get_authors }}</td><td>{{ book }}</td><td>
+    <input size="300" type="text" class="categorizer" id="cat{{ book.id }}" value="{{ book.get_categories }}"/></td>
+  <td><a href="" class="button categorizer" data-book_id="{{ book.id }}" data-cats_input="cat{{ book.id }}">save</a></td>
+</tr>
+{% endfor %}
+</table>
+</form>
+
+
+{% include "includes/pagination.html" %}
+
+{% endblock content %}
+
+{% block script %}
+
+$("a.categorizer").click(function(event){
+    event.preventDefault();
+    var book_id=$(this).data("book_id");
+    var url="/bibliography/json/book/"+book_id+"/change_categories/";
+    var cats_input_id=$(this).data("cats_input");
+    var cats=$("#"+cats_input_id).val();
+
+    var data={
+	"categories": cats
+    }
+
+    $.post(url,data)	
+        .done( function(obj) {
+	    console.log("ok");
+	    console.log(obj);
+	    $("#"+cats_input_id).val(obj.categories);
+	    $("#"+cats_input_id).css({ "background": "white" });
+	})
+	.fail( function(data) {
+	    console.log("fail");
+	    console.log(data);
+	    console.log(data.responseText);
+	    alert(data.responseText);
+	});
+
+});
+
+
+$("input").change(function(event){
+    console.log($(this));
+    $(this).css({ "background": "red" });
+});
+
+
+
+{% endblock script %}

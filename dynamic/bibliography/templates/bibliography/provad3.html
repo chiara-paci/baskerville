@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+
+</style>
+</head>
+
+<body>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<script>
+
+var width = 2048, height = 2048;
+
+var color = d3.scale.category20();
+
+
+//var color = d3.interpolateRgb("#c0c0c0","000000");
+
+var force = d3.layout.force()
+    .charge(-120)
+    .linkDistance(30)
+    .size([width, height]);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+d3.json("/bibliography/json/categories/nodeslinks", function(error, jsonobj) {
+    var radius = d3.scale.linear()
+	.domain([0, jsonobj.max_num_objects])
+	.range([2,20]);
+
+    force
+	.nodes(jsonobj.nodes)
+	.links(jsonobj.links)
+	.start();
+    
+    var link = svg.selectAll(".link")
+	.data(jsonobj.links)
+	.enter().append("line")
+	.attr("class", "link")
+	.style({ "stroke-width": 1, "stroke": function(d) { return color(d.group); } });
+    
+    var node = svg.selectAll(".node")
+	.data(jsonobj.nodes)
+	.enter().append("circle")
+	.attr("class", "node")
+	.attr("r", function(d) { return radius(d.num_objects); })
+	.style("fill", function(d) { return color(d.group); })
+	.call(force.drag);
+
+//	.attr("r", function(d) { return jsonobj.max_level+1-d.level; })
+    
+    node.append("title")
+	.text(function(d) { return d.name+" ("+d.branch+")"; });
+    
+    force.on("tick", function() {
+	link.attr("x1", function(d) { return d.source.x; })
+            .attr("y1", function(d) { return d.source.y; })
+            .attr("x2", function(d) { return d.target.x; })
+            .attr("y2", function(d) { return d.target.y; });
+	
+	node.attr("cx", function(d) { return d.x; })
+            .attr("cy", function(d) { return d.y; });
+    });
+});
+
+</script>
+</body></html>
