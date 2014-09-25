@@ -22,7 +22,7 @@ while getopts "hw" opzione
 do
     case $opzione in
 	h) help;exit;;
-	w) HOST=172.17.78.254;;
+	w) HOST=%%SERVERIP%%;;
     esac
 done
 
