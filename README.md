@@ -6,15 +6,18 @@ Application for private libraries
 
 Definire questi due:
 
-*bskvctl filter=removeip
-*settings.py filter=cleansettings
+```
+  *bskvctl filter=removeip
+  *settings.py filter=cleansettings
+```
 
 E creare quattro script:
 
 addip
-    ```
+
+```
     sed 's/%%SERVERIP%%/<IP>/g'
-    ```
+```
 
 removeip
 
