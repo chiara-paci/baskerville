@@ -327,7 +327,7 @@ class CategoryManager(models.Manager):
         class CategoryQueryset(models.query.QuerySet):
             def all_in_branch(self,father_id):
                 father=Category.objects.get(id=int(father_id))
-                children_ids=[]
+                children_ids=[father.id]
                 for catnode in father.tree_nodes.all():
                     L=catnode.branch()
                     children_ids+=map(lambda x: x.object_id,list(L))
@@ -375,9 +375,12 @@ class Category(models.Model):
         return level
 
     def num_objects(self):
-        # un modo meno becero?
-        for node in self.tree_nodes.all():
-            return node.num_objects
+        node=self.tree_nodes.all().first()
+        return node.num_objects
+
+    def my_branch_depth(self):
+        node=self.tree_nodes.all().first()
+        return node.branch_depth()
 
     def my_branch_id(self):
         level=-1

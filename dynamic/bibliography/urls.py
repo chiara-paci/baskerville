@@ -10,7 +10,7 @@ from django.views.generic import TemplateView,ListView
 
 from bibliography.models import Author,CategoryTreeNode,Category,Publisher,Book
 from bibliography.views import CategoryTreeView,JsonTreeView,CategorizerView,BooksInsertView,PublisherCreateView,JsonPublisherCreateView
-from bibliography.views import AuthorCreateView,JsonAuthorCreateView,JsonCategoryChangeFathersView,CategoryChildrenView
+from bibliography.views import AuthorCreateView,JsonAuthorCreateView,JsonCategoryChangeFathersView,CategoryChildrenView,CategoryGraphView
 from bibliography.views import BookCreateView,JsonBookCreateView,JsonBookChangeCategoriesView,JsonCategoryNodesLinksView
 
 from santaclara_base.views import JsonDetailView
@@ -23,10 +23,17 @@ urlpatterns =patterns('',
                       ( r'^categories/?$',ListView.as_view(model=CategoryTreeNode,
                                                            queryset=CategoryTreeNode.objects.filter(level=0),
                                                            context_object_name="categorytreenode_list")),
-                      ( r'^categories/graph/?$',ListView.as_view(model=CategoryTreeNode,
-                                                                 template_name="bibliography/categorytreenode_graph.html",
-                                                                 queryset=CategoryTreeNode.objects.filter(level=0),
-                                                                 context_object_name="categorytreenode_list")),
+
+                      ( r'^categories/graph/(?P<pk>\d+)/?$',CategoryGraphView.as_view()),
+                      ( r'^categories/graph/?$',CategoryGraphView.as_view()),
+
+                      ( r'^categories/graph2/(?P<pk>\d+)/?$',CategoryGraphView.as_view(template_name="bibliography/provad3.html")),
+                      ( r'^categories/graph2/?$',CategoryGraphView.as_view(template_name="bibliography/provad3.html")),
+                      
+                      #( r'^categories/graph/?$',ListView.as_view(model=CategoryTreeNode,
+                      #                                           template_name="bibliography/categorytreenode_graph.html",
+                      #                                           queryset=CategoryTreeNode.objects.filter(level=0),
+                      #                                           context_object_name="categorytreenode_list")),
 
                       ( r'^categories/categorizer/(?P<pk>\d+)/?$',CategoryChildrenView.as_view()),
 
@@ -43,10 +50,13 @@ urlpatterns =patterns('',
                       ( r'^author/(?P<pk>\d+)/?$',DetailView.as_view(model=Author)),
                       ( r'^book/create/?$',BookCreateView.as_view()),
                       ( r'^book/(?P<pk>\d+)/?$',DetailView.as_view(model=Book)),
-                      ( r'^categories/provad3/?$',TemplateView.as_view(template_name="bibliography/provad3.html") ),
-
                       ( r'^json/categories/treenode/(?P<label_children>.+?)/(?P<level>\d+)/?$',JsonTreeView.as_view()),
+                      ( r'^json/categories/nodeslinks/(?P<pk>\d+)/?$',JsonCategoryNodesLinksView.as_view()),
                       ( r'^json/categories/nodeslinks/?$',JsonCategoryNodesLinksView.as_view()),
+                      ( r'^json/categories/nodeslinks2/(?P<pk>\d+)/?$',
+                        JsonCategoryNodesLinksView.as_view(template_name = "bibliography/category_nodes_links2.json")),
+                      ( r'^json/categories/nodeslinks2/?$',
+                        JsonCategoryNodesLinksView.as_view(template_name = "bibliography/category_nodes_links2.json")),
                       ( r'^json/publisher/create/?$',JsonPublisherCreateView.as_view()),
                       ( r'^json/publisher/(?P<pk>\d+)/?$',JsonDetailView.as_view(model=Publisher)),
                       ( r'^json/author/create/',JsonAuthorCreateView.as_view()),

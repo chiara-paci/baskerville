@@ -27,15 +27,26 @@ class JsonCategoryNodesLinksView(View):
         root_maps={}
 
         roots=list(CategoryTreeNode.objects.roots())
-        cats=list(Category.objects.all())
-
-        max_num_objects=0
-
         n=0
+        max_num_objects=0
         for root in roots:
             root_maps[root.node_id]=n
             max_num_objects=max(max_num_objects,root.num_objects)
             n+=1
+
+
+        if kwargs.has_key("pk"):
+            father=Category.objects.get(id=self.kwargs["pk"])
+            min_level=father.min_level()
+            max_level=father.my_branch_depth()
+            cats=Category.objects.all_in_branch(self.kwargs["pk"])
+            max_num_objects=father.num_objects()
+        else:
+            min_level=0
+            cats=Category.objects.all()
+            max_level=CategoryTreeNode.objects.max_level()
+
+        cats=list(cats)
 
         n=0
         category_list=[]
@@ -49,17 +60,21 @@ class JsonCategoryNodesLinksView(View):
 
         rel_list=[]
         for rel in cat_rel:
+            if not cat_maps.has_key(rel.father.id): continue
+            if not cat_maps.has_key(rel.child.id): continue
             source=cat_maps[rel.father.id]
             target=cat_maps[rel.child.id]
             branch=rel.father.my_branch_id()
-            rel_list.append( (source,target,root_maps[branch]) )
+            is_internal=(branch==rel.child.my_branch_id())
+            rel_list.append( (source,target,root_maps[branch],is_internal,rel.father.min_level()) )
 
         return render(request, self.template_name, 
                       {"category_list": category_list,
                        "rel_list": rel_list,
                        "num_branch": len(roots),
                        "max_num_objects": max_num_objects,
-                       "max_level": CategoryTreeNode.objects.max_level()},
+                       "min_level": min_level,
+                       "max_level": max_level },
                       content_type='application/json')
 
 class CategoryChildrenView(ListView):
@@ -91,6 +106,16 @@ class CategoryChildrenView(ListView):
         # print children_ids
         # print 100 in children_ids
         # return Category.objects.filter(id__in=children_ids)
+
+class CategoryGraphView(TemplateView):
+    template_name="bibliography/category_graph.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(CategoryGraphView, self).get_context_data(**kwargs)
+        if kwargs.has_key("pk"):
+            context["father_id"]=kwargs["pk"]
+        return context
+
 
 class CategoryTreeView(TemplateView):
     template_name="bibliography/category_tree.html"
