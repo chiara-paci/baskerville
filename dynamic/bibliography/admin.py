@@ -1,10 +1,12 @@
 from django.contrib import admin
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django import forms
 
 # Register your models here.
 
-from bibliography.models import NameFormat,NameType,Author,AuthorNameRelation,MigrAuthor,NameFormatCollection,AuthorCache
+from bibliography.models import Person,CategoryPersonRelation
+
+from bibliography.models import NameFormat,NameType,Author,PersonNameRelation,MigrAuthor,NameFormatCollection,PersonCache
 from bibliography.models import PublisherIsbn,Publisher,PublisherAddress,PublisherAddressPublisherRelation,MigrPublisherRiviste,PublisherState
 from bibliography.models import VolumeType,Publication,Volume,IssueType,Issue
 from bibliography.models import Category,CategoryRelation,BookSerieWithoutIsbn,CategoryTreeNode
@@ -12,14 +14,34 @@ from bibliography.models import Book,AuthorRole,BookAuthorRelation,TextsCdrom
 from bibliography.models import Article,ArticleAuthorRelation,AuthorRelation
 from bibliography.models import RepositoryCacheBook,RepositoryCacheAuthor,RepositoryFailedIsbn
 
-from bibliography.models import DateSystem,DateModifier,TimePoint,TimeSpan,CategoryTimeSpanRelation,BookTimeSpanRelation
+from bibliography.models import DateModifier,TimePoint,TimeSpan,CategoryTimeSpanRelation #,BookTimeSpanRelation
 
-admin.site.register(DateSystem)
-admin.site.register(DateModifier)
-admin.site.register(TimePoint)
-admin.site.register(TimeSpan)
+from bibliography.models import PlaceType,Place,AlternatePlaceName,PlaceRelation,CategoryPlaceRelation
+
+from bibliography.models import Language,LanguageFamily,LanguageFamilyRelation,LanguageFamilyFamilyRelation
+from bibliography.models import LanguageVarietyType,LanguageVariety,CategoryLanguageRelation
+
+
+class DateModifierAdmin(admin.ModelAdmin):
+    list_display=[ "anchor","name","pos","reverse" ]
+    list_editable=["name","pos","reverse"]
+
+    def anchor(self,obj):
+        U=unicode(obj).strip()
+        if U: return U
+        return "[default]"
+
+admin.site.register(DateModifier,DateModifierAdmin)
+
+class TimePointAdmin(admin.ModelAdmin):
+    list_display=["date","modifier","time_spans","begins","ends"]
+
+admin.site.register(TimePoint,TimePointAdmin)
+
 admin.site.register(CategoryTimeSpanRelation)
-admin.site.register(BookTimeSpanRelation)
+admin.site.register(CategoryPlaceRelation)
+admin.site.register(CategoryPersonRelation)
+admin.site.register(CategoryLanguageRelation)
 
 class BookSerieWithoutIsbnAdmin(admin.ModelAdmin):
     list_display=["isbn_ced","isbn_book_prefix","title","title_prefix","publisher"]
@@ -59,20 +81,141 @@ class RepositoryCacheAuthorAdmin(admin.ModelAdmin):
 
 admin.site.register(RepositoryCacheAuthor,RepositoryCacheAuthorAdmin)
 
+### language
+
+admin.site.register(LanguageFamilyRelation)
+admin.site.register(LanguageFamilyFamilyRelation)
+admin.site.register(LanguageVarietyType)
+
+class LanguageFamilyInline(admin.TabularInline):
+    model = LanguageFamilyRelation
+    extra = 0
+
+class LanguageVarietyInline(admin.TabularInline):
+    model = LanguageVariety
+    extra = 0
+
+class LanguageAdmin(admin.ModelAdmin):
+    list_display=[ "__unicode__","name","families","varieties" ]
+    list_editable=[ "name" ]
+    inlines = [LanguageFamilyInline,LanguageVarietyInline]
+
+admin.site.register(Language,LanguageAdmin)
+
+class LanguageFamilyChildrenInline(admin.TabularInline):
+    model = LanguageFamilyFamilyRelation
+    extra = 0
+    fk_name = "parent"
+    verbose_name = "child"
+    verbose_name_plural = "children"
+
+class LanguageFamilyParentsInline(admin.TabularInline):
+    model = LanguageFamilyFamilyRelation
+    extra = 0
+    fk_name = "child"
+    verbose_name = "parent"
+    verbose_name_plural = "parents"
+
+class LanguageFamilyAdmin(admin.ModelAdmin):
+    list_display=[ "__unicode__","name","parents","children","languages" ]
+    list_editable=[ "name" ]
+    inlines = [LanguageFamilyInline,LanguageFamilyChildrenInline,LanguageFamilyParentsInline]
+
+admin.site.register(LanguageFamily,LanguageFamilyAdmin)
+
+class LanguageVarietyAdmin(admin.ModelAdmin):
+    list_display=[ "__unicode__","name","type","language" ]
+    list_editable=[ "name" ]
+
+admin.site.register(LanguageVariety,LanguageVarietyAdmin)
+
+### place
+
+class PlaceTypeAdmin(admin.ModelAdmin):
+    list_display=["__unicode__","name"]
+    list_editable=["name"]
+
+
+admin.site.register(PlaceType,PlaceTypeAdmin)
+admin.site.register(PlaceRelation)
+admin.site.register(AlternatePlaceName)
+
+class PlacePlacesInline(admin.TabularInline):
+    model = PlaceRelation
+    extra = 0
+    fk_name = "area"
+    verbose_name = "place"
+    verbose_name_plural = "places"
+
+class PlaceAreasInline(admin.TabularInline):
+    model = PlaceRelation
+    extra = 0
+    fk_name = "place"
+    verbose_name = "area"
+    verbose_name_plural = "areas"
+
+class AlternatePlaceNameInline(admin.TabularInline):
+    model = AlternatePlaceName
+    extra = 0
+
+class PlaceAdmin(admin.ModelAdmin):
+    inlines=[AlternatePlaceNameInline,PlacePlacesInline,PlaceAreasInline]
+
+    list_display=["__unicode__","name","type","areas","places","alternate_names" ]
+    list_editable=["name"]
+    list_filter=["type"]
+
+admin.site.register(Place,PlaceAdmin)
+
+
 ### category
 class BookCategoryInline(admin.TabularInline):
     model = Book.categories.through
     extra = 0
 
-class CategoryFathersInline(admin.TabularInline):
+class CategoryParentsInline(admin.TabularInline):
     model = CategoryRelation
     extra = 0
     fk_name = "child"
+    verbose_name = "parent"
+    verbose_name_plural = "parents"
 
 class CategoryChildrenInline(admin.TabularInline):
     model = CategoryRelation
     extra = 0
-    fk_name = "father"
+    fk_name = "parent"
+    verbose_name = "child"
+    verbose_name_plural = "children"
+
+class CategoryTimeSpanRelationInline(admin.TabularInline):
+    model = CategoryTimeSpanRelation
+    extra = 0
+    verbose_name = "time span"
+    verbose_name_plural = "time spans"
+
+class TimeSpanAdmin(admin.ModelAdmin):
+    list_display=["__unicode__","begin","end","categories"]
+    inlines=[CategoryTimeSpanRelationInline]
+
+admin.site.register(TimeSpan,TimeSpanAdmin)
+
+class CategoryPlaceRelationInline(admin.TabularInline):
+    model = CategoryPlaceRelation
+    extra = 0
+    verbose_name = "place"
+    verbose_name_plural = "places"
+
+class CategoryPersonRelationInline(admin.TabularInline):
+    model = CategoryPersonRelation
+    extra = 0
+    verbose_name = "person"
+    verbose_name_plural = "people"
+
+class CategoryLanguageRelationInline(admin.TabularInline):
+    model = CategoryLanguageRelation
+    extra = 0
+    verbose_name = "language"
+    verbose_name_plural = "languages"
 
 class AlphabeticFilter(admin.SimpleListFilter):
     # Human-readable title which will be displayed in the
@@ -140,14 +283,68 @@ class CategoryTreeFilter(admin.SimpleListFilter):
         """
 
         if not self.value(): return queryset
-        print type(queryset)
-        return queryset.all().all_in_branch(self.value())
+        return Category.objects.query_set_branch(queryset,self.value())
+        # print type(queryset)
+        # return queryset.all().all_in_branch(self.value())
+
+class CategoryTreeRootFilter(admin.SimpleListFilter):
+    # Human-readable title which will be displayed in the
+    # right admin sidebar just above the filter options.
+    title = 'root'
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'category_root'
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples. The first element in each
+        tuple is the coded value for the option that will
+        appear in the URL query. The second element is the
+        human-readable name for the option that will appear
+        in the right sidebar.
+        """
+
+        cat_ids=CategoryTreeNode.objects.until_level(0).values("object_id").distinct()
+
+        qset = model_admin.get_queryset(request).filter(id__in=cat_ids)
+        t=map(lambda x: (x.id,x.name),list(qset))
+        return tuple(t)
+
+    def queryset(self, request, queryset):
+        """
+        Returns the filtered queryset based on the value
+        provided in the query string and retrievable via
+        `self.value()`.
+        """
+
+        if not self.value(): return queryset
+        return Category.objects.query_set_branch(queryset,self.value())
+        # print type(queryset)
+        # return queryset.all().all_in_branch(self.value())
 
 class CategoryAdmin(admin.ModelAdmin):
-    inlines=[CategoryFathersInline,CategoryChildrenInline,BookCategoryInline]
-    list_display=["__unicode__","name","fathers","children"]
+    inlines=[CategoryTimeSpanRelationInline,CategoryPlaceRelationInline,CategoryLanguageRelationInline,
+             CategoryPersonRelationInline,
+             CategoryParentsInline,CategoryChildrenInline,BookCategoryInline]
+    list_display=["__unicode__","name","num_books","parents","children","time_span","place","language","person"]
     list_editable=["name"]
-    list_filter=[ AlphabeticFilter, CategoryTreeFilter ]
+    list_filter=[ AlphabeticFilter, CategoryTreeRootFilter, CategoryTreeFilter ]
+    fields = ("name","x_tree_nodes","min_level","num_objects","my_branch_depth","my_branch_id")
+    readonly_fields = ("x_tree_nodes","min_level","num_objects","my_branch_depth","my_branch_id")
+    actions=["merge_categories"]
+
+    def x_tree_nodes(self,instance): 
+        ret="<ul>"
+        for node in instance.tree_nodes.all():
+            ret+="<li>"+str(node)+"</li>"
+        ret+="</ul>"
+        return ret
+    x_tree_nodes.allow_tags=True
+    x_tree_nodes.short_description = "tree nodes"
+
+    def merge_categories(self,request,queryset):
+        Category.objects.merge(queryset)
+    merge_categories.short_description="Merge selected categories"
 
     # def get_urls(self):
     #     urls = super(CategoryAdmin, self).get_urls()
@@ -163,9 +360,9 @@ class CategoryAdmin(admin.ModelAdmin):
 admin.site.register(Category,CategoryAdmin)
 
 class CategoryRelationAdmin(admin.ModelAdmin):
-    list_filter=["father","child"]
-    list_display=["__unicode__","father","child"]
-    list_editable=["father"]
+    list_filter=["parent","child"]
+    list_display=["__unicode__","parent","child"]
+    list_editable=["parent"]
 
 admin.site.register(CategoryRelation,CategoryRelationAdmin)
 
@@ -203,7 +400,7 @@ class ArticleAuthorRelationInline(admin.TabularInline):
     extra = 0
     
 admin.site.register(NameType)
-admin.site.register(AuthorNameRelation)
+admin.site.register(PersonNameRelation)
 
 class AuthorRelationAdmin(admin.ModelAdmin):
     list_display=["year","author","author_role","content_type"]
@@ -224,15 +421,14 @@ class NameFormatCollectionAdmin(admin.ModelAdmin):
 admin.site.register(NameFormatCollection,NameFormatCollectionAdmin)
 
 class AuthorNameInline(admin.TabularInline):
-    model = AuthorNameRelation
+    model = PersonNameRelation
     extra = 0
 
 class MigrAuthorInline(admin.TabularInline):
     model = MigrAuthor
     extra = 0
 
-
-class AuthorAlphabeticFilter(admin.SimpleListFilter):
+class PersonAlphabeticFilter(admin.SimpleListFilter):
     # Human-readable title which will be displayed in the
     # right admin sidebar just above the filter options.
     title = 'initial'
@@ -249,7 +445,7 @@ class AuthorAlphabeticFilter(admin.SimpleListFilter):
         in the right sidebar.
         """
 
-        qset = AuthorCache.objects.all()
+        qset = PersonCache.objects.all()
         L=qset.extra(select={"initial": "lower(substr(list_name,1,1))"},order_by=["initial"]).values("initial").distinct()
         t=[]
         for ch in map(lambda x: x["initial"],L):
@@ -266,10 +462,18 @@ class AuthorAlphabeticFilter(admin.SimpleListFilter):
         if not self.value(): return queryset
         return queryset.filter(cache__list_name__istartswith=self.value())
 
+class PersonAdmin(admin.ModelAdmin):
+    list_display= ['long_name','short_name','list_name','ordering_name']
+    list_filter=[ PersonAlphabeticFilter ]
+    inlines=(AuthorNameInline,)
+
+admin.site.register(Person,PersonAdmin)
+admin.site.register(PersonCache)
+
 class AuthorAdmin(admin.ModelAdmin):
     inlines=(AuthorNameInline,MigrAuthorInline,BookAuthorRelationInline,ArticleAuthorRelationInline)
     list_display= ['long_name','short_name','list_name','ordering_name']
-    list_filter=[ AuthorAlphabeticFilter ]
+    list_filter=[ PersonAlphabeticFilter ]
 
 admin.site.register(Author,AuthorAdmin)
 

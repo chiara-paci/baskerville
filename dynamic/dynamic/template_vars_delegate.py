@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.urlresolvers import resolve
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.importlib import import_module
+from importlib import import_module
 
 def app_delegate(request):
     """

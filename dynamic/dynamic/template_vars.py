@@ -84,14 +84,52 @@ class HomeTitle(object):
         self.img=settings.STATIC_URL+"bigicons/"+img
 
 def get_template_vars(request=None):
+
+    base_css_list=[
+        settings.STATIC_URL+"css/font-awesome.min.css",
+        settings.STATIC_URL+"css/commons.css",
+        "/css/base.css",
+
+        # settings.STATIC_URL+"css/creativecommons.css",
+        # settings.STATIC_URL+"css/font-sniglet.css",
+        # #settings.STATIC_URL+"css/font-didact-gothic.css",
+        # #settings.STATIC_URL+"css/font-libertine.css",
+        # settings.STATIC_URL+"santaclara_css/common.css",
+        # "/css/colors.css",
+        # "/css/contents.css",
+        # "/css/profiles.css",
+        # "/css/backgrounded.css",
+        # "/santaclara_css/equivalence.css",
+        ]
+
+    js_list=[
+        settings.STATIC_URL+"js/jquery-1.11.0.js",
+        settings.STATIC_URL+"js/jquery-ui-1.11.0.custom.js",
+        settings.STATIC_URL+"js/jcanvas-14.08.16.min.js",
+        settings.STATIC_URL+"santaclara_base/jquery-ui-santaclara-widgets.js",
+
+        #settings.STATIC_URL+"js/jquery.ui.touch-punch.min.js",
+        #settings.STATIC_URL+"js/jquery-santaclara.js",
+        ]
+
+    base_js_css_list=[
+        settings.STATIC_URL+"santaclara_base/jquery-ui-santaclara-widgets.css",
+        settings.STATIC_URL+"css/jquery-ui-1.11.0.bookcolor.css",
+        #settings.STATIC_URL+"css/jquery-ui-1.10.4.green.css",
+        #settings.STATIC_URL+"css/jquery-ui-1.10.4.blue.css",
+        #settings.STATIC_URL+"santaclara_base/jquery-ui-santaclara-widgets.css",
+        #"/css/santaclara/jquery-santaclara.css",
+        #"/css/applications.css",
+        ]
+
+
     T={
+        "BASE_CSS_LIST":    base_css_list,
+        "BASE_JS_CSS_LIST": base_js_css_list,
+        "JS_LIST":          js_list,
+
         "BACKGROUND":settings.STATIC_URL+"backgrounds/biblioteca.png",
-        "JQUERY":settings.STATIC_URL+"js/jquery-1.11.0.js",
-        "JQUERY_UI":settings.STATIC_URL+"js/jquery-ui-1.11.0.custom.js",
-        "JQUERY_CANVAS":settings.STATIC_URL+"js/jcanvas-14.08.16.min.js",
-        "JQUERY_UI_SANTACLARA_WIDGETS":settings.STATIC_URL+"santaclara_base/jquery-ui-santaclara-widgets.js",
-        "JQUERY_UI_SANTACLARA_CSS":settings.STATIC_URL+"santaclara_base/jquery-ui-santaclara-widgets.css",
-        "JQUERY_UI_CSS":settings.STATIC_URL+"css/jquery-ui-1.11.0.bookcolor.css",
+
         "BRAND": settings.STATIC_URL+"images/brand",
         "STATIC_IMG": settings.STATIC_URL+"images/img",
         "FONTS": settings.STATIC_URL+"fonts",
@@ -102,14 +140,17 @@ def get_template_vars(request=None):
                        ( MenuRow(_("Categories"),"/bibliography/categories/"), [] ),
                        ( MenuRow(_("Lists"),"/bibliography/"), [] ),
                        ( MenuRow(_("Tools"),""), 
-                         [ 
-                MenuRow(_("Insert"),"/bibliography/insert/"),
-                MenuRow(_("Create publisher"),"/bibliography/publisher/create/"),
-                MenuRow(_("Create author"),"/bibliography/author/create/"),
-                MenuRow(_("Create book"),"/bibliography/book/create/"),
-                MenuRow(_("Categorizer: category to category"),"/bibliography/categories/categorizer/"),
-                MenuRow(_("Categorizer: book to category"),"/bibliography/books/categorizer/"),
-                ] ),
+                         [ MenuRow(_("Insert"),"/bibliography/insert/"),
+                           MenuRow(_("Create publisher"),"/bibliography/publisher/create/"),
+                           MenuRow(_("Create author"),"/bibliography/author/create/"),
+                           MenuRow(_("Create book"),"/bibliography/book/create/"),
+                           MenuRow(_("Categorizer: category to category"),"/bibliography/categories/categorizer/"),
+                           MenuRow(_("Categorizer: book to category"),"/bibliography/books/categorizer/"),
+                           ] ),
+                       ( MenuRow(_("Foods"),""), 
+                         [ MenuRow(_("Diary formset"),"/foods/add_diaries/"),
+                           ]
+                         )
                        ]
 
     home_sections=[ ( HomeTitle("Bacheca","default_section.png"),

@@ -188,7 +188,7 @@ $.fn.filterByData = function(prop, val) {
 }
 
 {% if pk %}
-var width = 512, height = 512;
+var width = 512, height = 1024;
 {% else %}
 var width = 2048, height = 2048;
 {% endif %}
@@ -197,26 +197,7 @@ var color = d3.scale.category20();
 
 //var color = d3.interpolateRgb("#c0c0c0","000000");
 
-{% if pk %}
-var force = d3.layout.force()
-    .charge(function (node,index) { return -20*node.level; } )
-    .linkDistance(function (link,index) {
-	if (!link.is_internal)
-	    return 200;
-	return 50-2*link.father_level;
-    })
-    .size([width, height]);
-{% else %}
-var force = d3.layout.force()
-    .charge(function (node,index) { return -30*node.level; } )
-    //.charge(-120)
-    .linkDistance(function (link,index) {
-	if (!link.is_internal)
-	    return 200;
-	return 50-3*link.father_level;
-    })
-    .size([width, height]);
-{% endif %}
+var force;
 
 var svg = d3.select("#svg").append("svg")
     .attr("width", width)
@@ -253,7 +234,7 @@ var selected_colors={
     "no": "#ffffff",
     "first": "#ffff00",
     "second": "#00ffff",
-    "father": "#ff0000",
+    "parent": "#ff0000",
     "child": "#0000ff",
     "search": "#00ff00"
 };
@@ -319,50 +300,14 @@ function dragfixed(d) {
   d3.select(this).classed("fixed", d.fixed = true);
 }
 
-$(".commandsimulaction").click(function (event){
-    event.preventDefault();
-    var action=$(this).data("action");
-    switch (action) {
-    case "start":
-	svg.selectAll(".node").each(function (d) { d.fixed=false; });
-	force.start();
-	break;
-    case "stop":
-	force.stop();
-	svg.selectAll(".node").each(function (d) { d.fixed=true; });
-	break;
-    case "unhighlight":
-	$(".node").each(function(){
-	    $(this).data("highlight","no");
-	    $(this).data("selected","no");
-	    set_node_stroke($(this),selected_colors["no"],0);
-	});
-	selected_first=null;
-	selected_second=null;
-	redraw_command_box();
-	break;
-    case "search":
-	var search_name=$("#search").val();
-	console.log(search_name);
-	$(".node").filterByData("name",search_name)
-	    .each(function(){
-		console.log($(this));
-		$(this).data("highlight","search");
-		set_node_stroke($(this),selected_colors["search"],2);
-		var jq_text=$(this).find("text");
-		jq_text.show();
-	    });
-	break;
-    }
-});
 
-var highlight_neighbour = function(node,father_or_child){
+var highlight_neighbour = function(node,parent_or_child){
     var sel_vertex,other_vertex,label;
-    switch (father_or_child) {
-    case "father":
+    switch (parent_or_child) {
+    case "parent":
 	sel_vertex="target_id";
 	other_vertex="source_id";
-	label="father";
+	label="parent";
 	break;
     default:
 	sel_vertex="source_id";
@@ -404,12 +349,12 @@ $(".commandcategoryaction").click(function (event){
     switch (action) {
     case "highlight_first":
 	if (!selected_first) break;
-	highlight_neighbour(selected_first,"father");
+	highlight_neighbour(selected_first,"parent");
 	highlight_neighbour(selected_first,"child");
 	break;
     case "highlight_second":
 	if (!selected_second) break;
-	highlight_neighbour(selected_second,"father");
+	highlight_neighbour(selected_second,"parent");
 	highlight_neighbour(selected_second,"child");
 	break;
     case "invert":
@@ -434,10 +379,92 @@ $(".commandcategoryaction").click(function (event){
 });
 
 
-d3.json("/bibliography/json/categories/nodeslinks2/{{ father_id }}", function(error, jsonobj) {
+d3.json("/bibliography/json/categories/nodeslinks2/{{ parent_id }}", function(error, jsonobj) {
     var radius = d3.scale.linear()
 	.domain([0, jsonobj.max_num_objects])
 	.range([2,20]);
+
+    {% if pk %}
+    var force = d3.layout.force()
+	.charge(function (node,index) { 
+	    if (node.is_node_base)
+		return -20*node.level;
+	    return 0;
+	} )
+	.linkDistance(function (link,index) {
+	    if (!link.is_in_branch)
+		return 200;
+	    if (link.is_internal) {
+		console.log("L",link.num_objects,radius(link.num_objects));
+		return radius(link.num_objects)
+	    }
+	    return 2*link.parent_level+radius(link.num_objects)+10;
+	})
+	.size([width, height]);
+    {% else %}
+    var force = d3.layout.force()
+	.charge(function (node,index) { return -30*node.level; } )
+    //.charge(-120)
+	.linkDistance(function (link,index) {
+	    if (!link.is_in_branch)
+		return 200;
+	    if (link.is_internal) {
+		console.log("L",link.num_objects,radius(link.num_objects));
+		return radius(link.num_objects)
+	    }
+	    return 3*link.parent_level+radius(link.num_objects)+10;
+	})
+	.size([width, height]);
+    {% endif %}
+
+    $(".commandsimulaction").click(function (event){
+	event.preventDefault();
+	var action=$(this).data("action");
+	switch (action) {
+	case "start":
+	    svg.selectAll(".node").each(function (d) { d.fixed=false; });
+	    force.start();
+	    break;
+	case "stop":
+	    force.stop();
+	    svg.selectAll(".node").each(function (d) { d.fixed=true; });
+	    break;
+	case "unhighlight":
+	    $(".node").each(function(){
+		$(this).data("highlight","no");
+		$(this).data("selected","no");
+		set_node_stroke($(this),selected_colors["no"],0);
+	    });
+	    selected_first=null;
+	    selected_second=null;
+	    redraw_command_box();
+	    break;
+	case "search":
+	    var search_name=$("#search").val();
+	    console.log(search_name);
+	    $(".node").filterByData("name",search_name)
+		.each(function(){
+		    console.log($(this));
+		    $(this).data("highlight","search");
+		    set_node_stroke($(this),selected_colors["search"],2);
+		    var jq_text=$(this).find("text");
+		    jq_text.show();
+		});
+	    break;
+	}
+    });
+    
+    var n,ind;
+
+    for(n=0;n<jsonobj.nodes.length;n++){
+	console.log(n,jsonobj.nodes[n]);
+	if (jsonobj.nodes[n].is_node_base) {
+	    jsonobj.nodes[n].base_node=jsonobj.nodes[n];
+	    continue;
+	}
+	ind=jsonobj.nodes[n].base_index;
+	jsonobj.nodes[n].base_node=jsonobj.nodes[ind];
+    }
     
     force
 	.nodes(jsonobj.nodes)
@@ -449,31 +476,61 @@ d3.json("/bibliography/json/categories/nodeslinks2/{{ father_id }}", function(er
 	.enter()
 	.append("line")
 	.attr("class", "link")
-	.attr("marker-end", function(d) { return "url(#markerArrow"+String(d.group)+")"; })
-	.style({ "stroke-width": 1, "stroke": function(d) { return color(d.group); } });
+	.attr("marker-end", function(d) { 
+	    if (!d.is_internal)
+		return "url(#markerArrow"+String(d.group)+")";
+	    return "";
+	})
+	.style({ "stroke-width": 1, 
+		 "stroke": function(d) { 
+		     return color(d.group); 
+		 } });
     
     var node = svg.selectAll(".node")
 	.data(jsonobj.nodes)
 	.enter().append("g")
-	.attr("class", "node")
+	.attr("class", function(d) {
+	    if (d.is_node_base)
+		return "node nodebase";
+	    return "node nodeanchor";
+	})
 	.call(force.drag);
+
+    var dot_radius=2;
+
+    /* 
+       svg.selectAll("g.nodebase").append("rect")
+       .attr("x",function(d){ return -d.side; })
+       .attr("y",function(d){ return -d.side; })
+       .attr("width",function(d){ return dot_radius*d.side; })
+       .attr("height",function(d){ return dot_radius*d.side; })
+       .attr("opacity",.4)
+       .style({"stroke-width": 1,
+       "fill": "transparent",
+       "stroke": function(d) { return color(d.group); } });
+    */
 
     node.append("text")
 	.attr("dx", 0)
 	.attr("dy", 5)
-	.attr("font-size",function(d){ return 16+jsonobj.max_level-d.level;})
+	.attr("font-size",function(d){ return 10+jsonobj.max_level-d.level;})
 	.style("fill", function(d) { return color(d.group); })
 	.attr("class", function(d) { return "textlevel"+String(d.level); })
 	.text(function(d) { return d.name });
 
     node.append("circle")
-	.attr("r", function(d) { return Math.max(2,radius(d.num_objects)); })
+	.attr("r", function(d) { 
+	    if (d.is_node_base) {
+		return Math.max(dot_radius,radius(d.num_objects));
+	    }
+	    return dot_radius;
+	})
 	.attr("opacity",0.4)
 	.attr("class","evidentiable")
 	.style("fill", function(d) { return color(d.group); });
 	
-    node.append("circle")
-	.attr("r", 2)
+    svg.selectAll("g.nodeanchor").append("circle")
+	.attr("r", dot_radius)
 	.style("fill", function(d) { return color(d.group); });
 
     node.append("title")
@@ -486,6 +543,19 @@ d3.json("/bibliography/json/categories/nodeslinks2/{{ father_id }}", function(er
             .attr("x2", function(d) { return d.target.x; })
             .attr("y2", function(d) { return d.target.y; });
 
+	/*
+	node
+	    .attr("cx", function(d) { 
+		if (d.is_base_node)
+		    return d.x = Math.max(dot_radius, Math.min(width - dot_radius, d.x));
+		return d.x=d.base_node.x+d.posX*dot_radius;
+	    })
+            .attr("cy", function(d) { 
+		if (d.is_base_node)
+		    return d.y = Math.max(dot_radius, Math.min(height - dot_radius, d.y));
+		return d.y=d.base_node.y+d.posY*dot_radius;
+	    });
+	*/
 	node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 	/*node.attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });*/
@@ -499,12 +569,17 @@ d3.json("/bibliography/json/categories/nodeslinks2/{{ father_id }}", function(er
 	$(this).data({ 
 	    "cat_id": $(this)[0].__data__["cat_id"], 
 	    "name": $(this)[0].__data__["name"],
+	    "is_node_base": $(this)[0].__data__["is_node_base"],
 	    "level": $(this)[0].__data__["level"], 
 	    "branch": $(this)[0].__data__["branch"],
 	    "group": $(this)[0].__data__["group"],
 	    "num_objects": $(this)[0].__data__["num_objects"]
 	});
 	opt_search.push($(this).data("name"));
+	if ($(this).data("is_node_base")) return;
+	var jq_text=$(this).find("text");
+	jq_text.hide();
+
     });
 
     $("#search").autocomplete({ source: opt_search });
@@ -512,8 +587,9 @@ d3.json("/bibliography/json/categories/nodeslinks2/{{ father_id }}", function(er
     $(".link").each(function (){
 	$(this).data("highlighted","no");
 	$(this).data({
-	    "father_level": $(this)[0].__data__["father_level"],
+	    "parent_level": $(this)[0].__data__["parent_level"],
 	    "group": $(this)[0].__data__["group"],
+	    "is_in_branch": $(this)[0].__data__["is_in_branch"],
 	    "is_internal": $(this)[0].__data__["is_internal"],
 	    "source_id": $(this)[0].__data__["source"]["cat_id"],
 	    "target_id": $(this)[0].__data__["target"]["cat_id"],
@@ -526,14 +602,23 @@ d3.json("/bibliography/json/categories/nodeslinks2/{{ father_id }}", function(er
 	});
     }
 
+    var mouse_down_time;
 
-    $(".node").click(function(event){
+    $(".node").mousedown(function(event){
+	mouse_down_time=(new Date).getTime();
+    });
+
+    $(".node").mouseup(function(event){
 
 	var jq_circle=$(this).find("circle.evidentiable");
 
+	var ts=(new Date).getTime();
+
 	if (!event.shiftKey) {
-	    var jq_text=$(this).find("text");
-	    jq_text.toggle();
+	    if (ts-mouse_down_time<100) {
+		var jq_text=$(this).find("text");
+		jq_text.toggle();
+	    }
 	    return;
 	}
 

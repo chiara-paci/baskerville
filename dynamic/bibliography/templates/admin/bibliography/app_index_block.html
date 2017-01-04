@@ -1,0 +1,19 @@
+{% load i18n admin_static %}
+
+<div class="app-{{ app.app_label }} module">
+  <table>
+    <caption>
+      <a href="{{ app.app_url }}" class="section" 
+	 title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}</a>
+    </caption>
+
+    {% for sec_title,model_list in app.custom_models %}
+    <tr class="model"><th>{{ sec_title }}</th></tr>
+    {% for model in model_list %}
+    {% include "admin/mod_index_rows.html" %}
+    {% endfor %}
+    {% endfor %}
+
+
+  </table>
+</div>

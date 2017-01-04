@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from config import *
+#from config import *
 import urllib2
 import re
 
-from bibliography.models import PublisherAddress,AuthorCache,RepositoryCacheBook,RepositoryCacheAuthor
+from bibliography.models import PublisherAddress,PersonCache,RepositoryCacheBook,RepositoryCacheAuthor
 
 URL_CONVERSION = [
     ( ["+"]                 , " " ),
@@ -53,7 +53,7 @@ class BookRepository(object):
             t=filter(lambda x: bool(x),map(lambda x: x.strip(),aut.strip().split(" ")))
             aut=" ".join(t)
 
-            objs=AuthorCache.objects.filter(long_name=aut)
+            objs=PersonCache.objects.filter(long_name=aut)
             if objs:
                 aut_obj=objs[0].author
                 ret.append(("author",n,aut_obj))
@@ -97,7 +97,7 @@ class CacheRepository(BookRepository):
         for aut in obj.repositorycacheauthor_set.order_by("pos"):
             t=filter(lambda x: bool(x),map(lambda x: x.strip(),aut.name.strip().split(" ")))
             autname=" ".join(t)
-            objs=AuthorCache.objects.filter(long_name=autname)
+            objs=PersonCache.objects.filter(long_name=autname)
             if objs:
                 aut_obj=objs[0].author
                 authors.append( (aut.role,aut.pos,aut_obj) )

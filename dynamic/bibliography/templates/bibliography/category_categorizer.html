@@ -8,8 +8,8 @@
 <table>
 {% for child in child_list %}
 <tr><td>{{ child }}</td><td>
-    <input size="300" type="text" class="categorizer" id="father{{ child.id }}" value="{{ child.fathers }}"/></td>
-  <td><a href="" class="button categorizer" data-child_id="{{ child.id }}" data-fathers_input="father{{ child.id }}">save</a></td>
+    <input size="300" type="text" class="categorizer" id="parent{{ child.id }}" value="{{ child.parents }}"/></td>
+  <td><a href="" class="button categorizer" data-child_id="{{ child.id }}" data-parents_input="parent{{ child.id }}">save</a></td>
 </tr>
 {% endfor %}
 </table>
@@ -25,23 +25,23 @@
 $("a.categorizer").click(function(event){
     event.preventDefault();
     var child_id=$(this).data("child_id");
-    var url="/bibliography/json/category/"+child_id+"/change_fathers/";
-    var fathers_input_id=$(this).data("fathers_input");
-    var fathers=$("#"+fathers_input_id).val();
+    var url="/bibliography/json/category/"+child_id+"/change_parents/";
+    var parents_input_id=$(this).data("parents_input");
+    var parents=$("#"+parents_input_id).val();
 
     var data={
-	"categories": fathers
+	"categories": parents
     }
 
     $.post(url,data)	
         .done( function(obj) {
 	    console.log("ok");
 	    console.log(obj);
-	    $("#"+fathers_input_id).val(obj.fathers);
-            if (obj.fathers)
-		$("#"+fathers_input_id).css({ "background": "white" });
+	    $("#"+parents_input_id).val(obj.parents);
+            if (obj.parents)
+		$("#"+parents_input_id).css({ "background": "white" });
 	    else
-		$("#"+fathers_input_id).css({ "background": "blue" });
+		$("#"+parents_input_id).css({ "background": "blue" });
 	})
 	.fail( function(data) {
 	    console.log("fail");

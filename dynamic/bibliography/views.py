@@ -12,7 +12,7 @@ from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView,ListView,View,CreateView
 from bibliography.models import CategoryTreeNode,Category,CategoryRelation
 from bibliography.models import Publisher,PublisherAddress,PublisherState,PublisherIsbn,PublisherAddressPublisherRelation
-from bibliography.models import Author,NameType,AuthorNameRelation,NameFormatCollection
+from bibliography.models import Author,NameType,PersonNameRelation,NameFormatCollection
 from bibliography.models import Book,BookAuthorRelation,AuthorRole
 import bibliography.booksearch as booksearch
 
@@ -36,11 +36,11 @@ class JsonCategoryNodesLinksView(View):
 
 
         if kwargs.has_key("pk"):
-            father=Category.objects.get(id=self.kwargs["pk"])
-            min_level=father.min_level()
-            max_level=father.my_branch_depth()
+            parent=Category.objects.get(id=self.kwargs["pk"])
+            min_level=parent.min_level()
+            max_level=parent.my_branch_depth()
             cats=Category.objects.all_in_branch(self.kwargs["pk"])
-            max_num_objects=father.num_objects()
+            max_num_objects=parent.num_objects()
         else:
             min_level=0
             cats=Category.objects.all()
@@ -60,17 +60,197 @@ class JsonCategoryNodesLinksView(View):
 
         rel_list=[]
         for rel in cat_rel:
-            if not cat_maps.has_key(rel.father.id): continue
+            if not cat_maps.has_key(rel.parent.id): continue
             if not cat_maps.has_key(rel.child.id): continue
-            source=cat_maps[rel.father.id]
+            source=cat_maps[rel.parent.id]
             target=cat_maps[rel.child.id]
-            branch=rel.father.my_branch_id()
+            branch=rel.parent.my_branch_id()
             is_internal=(branch==rel.child.my_branch_id())
-            rel_list.append( (source,target,root_maps[branch],is_internal,rel.father.min_level()) )
+            rel_list.append( (source,target,root_maps[branch],is_internal,rel.parent.min_level()) )
 
         return render(request, self.template_name, 
                       {"category_list": category_list,
                        "rel_list": rel_list,
+                       "num_branch": len(roots),
+                       "max_num_objects": max_num_objects,
+                       "min_level": min_level,
+                       "max_level": max_level },
+                      content_type='application/json')
+
+
+
+class JsonCategoryNodesLinksView2(View): 
+    model = Category
+    template_name = "bibliography/category_nodes_links2.json"
+
+    def get(self, request, *args, **kwargs):
+
+        cat_maps={}
+        root_maps={}
+
+        roots=list(CategoryTreeNode.objects.roots())
+        n=0
+        max_num_objects=0
+        for root in roots:
+            root_maps[root.node_id]=n
+            max_num_objects=max(max_num_objects,root.num_objects)
+            n+=1
+
+
+        if kwargs.has_key("pk"):
+            parent=Category.objects.get(id=self.kwargs["pk"])
+            min_level=parent.min_level()
+            max_level=parent.my_branch_depth()
+            cats=Category.objects.all_in_branch(self.kwargs["pk"])
+            max_num_objects=parent.num_objects()
+        else:
+            min_level=0
+            cats=Category.objects.all()
+            max_level=CategoryTreeNode.objects.max_level()
+
+        cats=list(cats)
+
+        class Node(object):
+            def __init__(self,category,group,branch,is_node_base,node_type="base",node_rel=None):
+                self.category=category
+                self.group=group
+                self.branch=branch
+                self.is_node_base=is_node_base
+                self.node_type=node_type
+                self.children=[]
+                self.parents=[]
+                self.index=0
+                self.node_rel=node_rel
+                self.posX=0
+                self.posY=0
+                self.side=0
+                self.base_index=0
+
+            def new_parent(self,parent):
+                node=Node(self.category,self.group,self.branch,False,node_type="parent",node_rel=parent)
+                link=Link(self,node,self.group,True,True)
+                self.parents.append(node)
+                return node,link
+
+            def new_child(self,child):
+                node=Node(self.category,self.group,self.branch,False,node_type="child",node_rel=child)
+                link=Link(self,node,self.group,True,True)
+                self.children.append(node)
+                return node,link
+
+            def name(self):
+                name=self.category.name
+                if not self.node_rel:
+                    return name
+                lab=self.node_type[0].upper()
+                name+=" "+lab+":"+self.node_rel.category.name
+                return name
+
+            def calculate_positions(self):
+                num_tot=len(self.parents)+len(self.children)
+                sep=4
+                positions=[]
+                if num_tot==1:
+                    positions=[ (0,sep) ]
+                    self.side=2*sep
+                elif num_tot==2:
+                    positions=[ (0,sep),(0,-sep) ]
+                    self.side=2*sep
+                elif num_tot==3:
+                    positions=[ (0,sep),(sep,0),(0,-sep) ]
+                    self.side=2*sep
+                elif num_tot==4:
+                    positions=[ (0,sep),(sep,0),(0,-sep),(-sep,0) ]
+                    self.side=2*sep
+                else:
+                    side_num=int(num_tot/4)+int(bool(num_tot%4))
+                    self.side=side_num*sep+sep
+                    y=self.side/2.0
+                    for n in range(0,side_num):
+                        x=-self.side/2.0+sep+n*sep
+                        positions.append( (x,y) )
+                    x=self.side/2.0
+                    for n in range(0,side_num):
+                        y=self.side/2.0-sep-n*sep
+                        positions.append( (x,y) )
+                    y=-self.side/2.0
+                    for n in range(0,side_num):
+                        x=self.side/2.0-sep-n*sep
+                        positions.append( (x,y) )
+                    x=-self.side/2.0
+                    for n in range(0,side_num):
+                        y=-self.side/2.0+sep+n*sep
+                        positions.append( (x,y) )
+                n=0
+                for node in self.parents:
+                    node.posX=positions[n][0]
+                    node.posY=positions[n][1]
+                    n+=1
+                for node in self.children:
+                    node.posX=positions[n][0]
+                    node.posY=positions[n][1]
+                    n+=1
+
+        class Link(object):
+            def __init__(self,parent_node,child_node,group,is_in_branch,is_internal):
+                self.parent_node=parent_node
+                self.child_node=child_node
+                self.group=group
+                self.is_in_branch=is_in_branch
+                self.parent_level=self.parent_node.category.min_level()
+                self.is_internal=is_internal
+                self.num_objects=self.parent_node.category.num_objects()
+
+        n=0
+        base_nodes=[]
+        base_nodes_by_catid={}
+        for cat in cats:
+            cat_maps[cat.id]=n
+            branch=cat.my_branch_id()
+            node=Node(cat,root_maps[branch],branch,True)
+            base_nodes.append(node)
+            base_nodes_by_catid[cat.id]=node
+            n+=1
+
+        cat_rel=CategoryRelation.objects.all()
+
+        links=[]
+        for rel in cat_rel:
+            if not cat_maps.has_key(rel.parent.id): continue
+            if not cat_maps.has_key(rel.child.id): continue
+            source_base_node=base_nodes_by_catid[rel.parent.id]
+            target_base_node=base_nodes_by_catid[rel.child.id]
+
+            branch=rel.parent.my_branch_id()
+            is_in_branch=(branch==rel.child.my_branch_id())
+            source,s_link=source_base_node.new_child(target_base_node)
+            target,t_link=target_base_node.new_parent(source_base_node)
+            links.append(s_link)
+            links.append(t_link)
+            links.append( Link(source,target,root_maps[branch],is_in_branch,False) )
+
+        nodes=[]
+        n=0
+        for bnode in base_nodes:
+            bnode.index=n
+            bnode.base_index=bnode.index
+            bnode.calculate_positions()
+            nodes.append(bnode)
+            n+=1
+            for node in bnode.parents:
+                node.index=n
+                node.base_index=bnode.index
+                nodes.append(node)
+                n+=1
+            for node in bnode.children:
+                node.index=n
+                node.base_index=bnode.index
+                nodes.append(node)
+                n+=1
+
+        return render(request, self.template_name, 
+                      {"nodes": nodes,
+                       "links": links,
                        "num_branch": len(roots),
                        "max_num_objects": max_num_objects,
                        "min_level": min_level,
@@ -89,14 +269,14 @@ class CategoryChildrenView(ListView):
             return qset
         if not self.kwargs["pk"]:
             return qset
-        father_id=self.kwargs["pk"]
-        print father_id
-        return Category.objects.all_in_branch(father_id)
+        parent_id=self.kwargs["pk"]
+        print parent_id
+        return Category.objects.all_in_branch(parent_id)
         
-        # father=Category.objects.get(pk=father_id)
+        # parent=Category.objects.get(pk=parent_id)
 
         # children_ids=[]
-        # for catnode in father.tree_nodes.all():
+        # for catnode in parent.tree_nodes.all():
         #     print catnode
         #     L=catnode.branch()
         #     for cn in L:
@@ -113,7 +293,7 @@ class CategoryGraphView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(CategoryGraphView, self).get_context_data(**kwargs)
         if kwargs.has_key("pk"):
-            context["father_id"]=kwargs["pk"]
+            context["parent_id"]=kwargs["pk"]
         return context
 
 
@@ -132,19 +312,20 @@ class ImmutableWidget(forms.widgets.HiddenInput):
         return mark_safe(U+value)
 
 class CategorizerForm(forms.ModelForm):
-    fathers = forms.CharField(required=False,widget=forms.widgets.TextInput(attrs={"size":100}))
+    parents = forms.CharField(required=False,widget=forms.widgets.TextInput(attrs={"size":100}))
 
     def __init__(self, initial=None, instance=None, *args, **kwargs):
         if instance:
             initial = initial or {}
-            initial['fathers'] = instance.fathers()
+            initial['parents'] = instance.parents()
 
         super(CategorizerForm, self).__init__(initial=initial,instance=instance, *args, **kwargs)
 
     class Meta:
         model = Category
+        fields = "__all__"
         widgets = {
-            'name': ImmutableWidget()
+            'name': ImmutableWidget(),
             }
 
     def save(self,commit=True):
@@ -153,23 +334,23 @@ class CategorizerForm(forms.ModelForm):
             return " ".join(filter(bool,map(lambda x: x.strip(),S.split(" "))))
             
         super(CategorizerForm, self).save(commit=commit)
-        new_fathers_names=map(remove_dup_space,self.cleaned_data["fathers"].split(","))
+        new_parents_names=map(remove_dup_space,self.cleaned_data["parents"].split(","))
         deleted=[]
         unchanged=[]
-        for old_rels in self.instance.father_set.all():
-            f_name=unicode(old_rels.father.name)
-            if not f_name in new_fathers_names:
+        for old_rels in self.instance.parent_set.all():
+            f_name=unicode(old_rels.parent.name)
+            if not f_name in new_parents_names:
                 deleted.append(f_name)
             else:
                 unchanged.append(f_name)
-        added=filter(lambda x: x not in unchanged, new_fathers_names)
+        added=filter(lambda x: x not in unchanged, new_parents_names)
         print self.instance,deleted,added
         for del_name in deleted:
             del_cat=Category.objects.get(name=del_name)
-            CategoryRelation.objects.filter(father=del_cat,child=self.instance).delete()
+            CategoryRelation.objects.filter(parent=del_cat,child=self.instance).delete()
         for add_name in added:
             add_cat,created=Category.objects.get_or_create(name=add_name)
-            CategoryRelation.objects.get_or_create(father=add_cat,child=self.instance)
+            CategoryRelation.objects.get_or_create(parent=add_cat,child=self.instance)
 
 
 CategorizerFormset=modelformset_factory(Category, extra=0, 
@@ -186,12 +367,12 @@ class CategorizerView(ListView):
             return qset
         if not self.kwargs["pk"]:
             return qset
-        father_id=self.kwargs["pk"]
-        print father_id
-        father=Category.objects.get(pk=father_id)
+        parent_id=self.kwargs["pk"]
+        print parent_id
+        parent=Category.objects.get(pk=parent_id)
 
         children_ids=[]
-        for catnode in father.tree_nodes.all():
+        for catnode in parent.tree_nodes.all():
             print catnode
             L=catnode.branch()
             for cn in L:
@@ -366,6 +547,7 @@ class JsonPublisherCreateView(PublisherCreateView):
 
 class AuthorForm(forms.ModelForm):
     class Meta:
+        fields = "__all__"
         model = Author
 
 class AuthorNameForm(forms.Form):
@@ -410,7 +592,7 @@ class AuthorCreateView(CreateView):
             name_type=row_data["name_type"]
             value=row_data["value"]
             if name_type:
-                name_obj,created=AuthorNameRelation.objects.get_or_create(author=author_obj,name_type=name_type,value=value)
+                name_obj,created=PersonNameRelation.objects.get_or_create(author=author_obj,name_type=name_type,value=value)
         author_obj.update_cache()
 
         return author_obj
@@ -448,6 +630,7 @@ class JsonAuthorCreateView(AuthorCreateView):
 
 class BookForm(forms.ModelForm):
     class Meta:
+        fields = "__all__"
         model = Book
 
 class BookAuthorForm(forms.Form):
@@ -572,7 +755,7 @@ class JsonBookChangeCategoriesView(View):
                       {"book": book_obj},
                       content_type='application/json')
 
-class JsonCategoryChangeFathersView(View):
+class JsonCategoryChangeParentsView(View):
     template_name_response="bibliography/category_detail.json"
 
     def post(self, request, *args, **kwargs):
@@ -589,11 +772,11 @@ class JsonCategoryChangeFathersView(View):
         child_id=self.kwargs['pk']
         child_obj=Category.objects.get(id=child_id)
 
-        fathers_txt=form.cleaned_data["categories"].strip()
-        fathers=map(lambda x: x.strip().replace('.','.*'),fathers_txt.split(";"))
-        fathers_objects=[]
+        parents_txt=form.cleaned_data["categories"].strip()
+        parents=map(lambda x: x.strip().replace('.','.*'),parents_txt.split(";"))
+        parents_objects=[]
 
-        for cat in fathers:
+        for cat in parents:
             cat=cat.strip()
             if not cat: continue
             L=Category.objects.filter(name__iregex='^'+cat+'$')
@@ -601,18 +784,18 @@ class JsonCategoryChangeFathersView(View):
                 cat_obj=Category.objects.create(name=cat)
             else:
                 cat_obj=L[0]
-            fathers_objects.append(cat_obj)
+            parents_objects.append(cat_obj)
 
-        print fathers,fathers_objects
+        print parents,parents_objects
         
-        for rel_obj in child_obj.father_set.all():
+        for rel_obj in child_obj.parent_set.all():
             print rel_obj
-            if rel_obj.father in fathers_objects: continue
+            if rel_obj.parent in parents_objects: continue
             print rel_obj
             rel_obj.delete()
 
-        for cat_obj in fathers_objects:
-            CategoryRelation.objects.get_or_create(child=child_obj,father=cat_obj)
+        for cat_obj in parents_objects:
+            CategoryRelation.objects.get_or_create(child=child_obj,parent=cat_obj)
 
         return render(request, self.template_name_response, 
                       {"category": child_obj},
@@ -723,7 +906,7 @@ class BooksInsertView(View):
                     ini["name_type"]=NameType.objects.get(label=ini["name_type"])
                 autform=AuthorForm(prefix="newauthor"+str(n),initial={"format_collection":format_collection})
                 autnamesformset=AuthorNameFormSet(prefix="newauthor"+str(n)+"-name",initial=initial)
-                new_author_list.append( (str(n),aut,autform, autnamesformset) )
+                new_author_list.append( (str(n),aut,autform,autnamesformset) )
                 n+=1
 
             params["new_book_list"]=new_book_list

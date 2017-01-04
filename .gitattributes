@@ -1,0 +1,2 @@
+*bskvctl filter=removeip
+*settings.py filter=cleansettings

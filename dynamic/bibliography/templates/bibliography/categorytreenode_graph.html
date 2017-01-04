@@ -78,8 +78,8 @@ var Hbox;
 
 var Wchildren;
 var Hchildren;
-var Wfathers;
-var Hfathers;
+var Wparents;
+var Hparents;
 
 var W;
 var H;
@@ -145,8 +145,8 @@ Hinfo=canvas.measureText(catnodeid+'info').height;
 Wchildren=border;
 Hchildren=Math.max(num_children*border,Htext+Hinfo);
 
-Wfathers=Wchildren;
-Hfathers=Hchildren;
+Wparents=Wchildren;
+Hparents=Hchildren;
 
 Wbox=Math.max(Wtext, Winfo)+4*border;
 Hbox=Hchildren+2*border; 
