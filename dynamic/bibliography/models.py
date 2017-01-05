@@ -1295,6 +1295,11 @@ class Book(CategorizedObject):
         return ", ".join(map(lambda x: unicode(x.author.long_name()), 
                              self.bookauthorrelation_set.filter(author_role__cover_name=True).order_by("pos")))
 
+    def get_absolute_url(self):
+        U=u"/bibliography/book/%d" % self.pk
+        print U
+        return U
+
     def get_secondary_authors(self):
         L=list(self.bookauthorrelation_set.filter(author_role__cover_name=False).order_by("author_role__pos","pos"))
         ret=""
@@ -1391,6 +1396,7 @@ class BookAuthorRelation(AuthorRelation,PositionAbstract):
     def _title(self): return unicode(self.book.title)
 
     def html(self): return self.book.html()
+    def get_absolute_url(self): return self.book.get_absolute_url()
 
     class Meta:
         ordering=["pos"]

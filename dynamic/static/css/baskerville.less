@@ -1,0 +1,309 @@
+@textforecolor: #000000;
+@textbackcolor: #ffffff;
+
+@import "baskerville-colors.less";
+
+
+/*** functions ***/
+
+.outshadow(@x;@y;@blur;@spread;@color) {
+    box-shadow: @x @y @blur @spread @color;
+    -moz-box-shadow: @x @y @blur @spread  @color;
+    -webkit-box-shadow: @x @y @blur @spread  @color;
+}
+
+.inshadow(@x;@y;@blur;@spread;@color) {
+    box-shadow: inset @x @y @blur @spread @color, inset -@x -@y @blur @spread @color;
+    -moz-box-shadow: inset @x @y @blur @spread @color, inset -@x -@y @blur @spread @color;
+    -webkit-box-shadow: inset @x @y @blur @spread @color, inset -@x -@y @blur @spread @color;
+}
+
+.borderradius(@radius){
+    border-radius: @radius;
+    -moz-border-radius: @radius;
+    -webkit-border-radius: @radius;
+}
+
+.textshadow(@x;@y;@blur;@color) {
+    text-shadow: @x @y @blur @color;
+    -moz-text-shadow: @x @y @blur @color;
+    -webkit-text-shadow: @x @y @blur @color;
+}
+
+.columned(@num) {
+    -webkit-column-count: @num; /* Chrome, Safari, Opera */
+    -moz-column-count: @num; /* Firefox */
+    column-count: @num;
+}
+
+/*** commons ***/
+
+.shadow-prim {
+    .outshadow(1px;1px;3px;3px;@prim4)
+}
+
+.removed {
+    display: none;
+}
+
+/*** MAIN ***/
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+    font-family: Liberation Sans, sans-serif;
+    font-size: 12pt;
+    background: @textbackcolor;
+    color: @textforecolor;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+header {
+    background: @seca0;
+    color: @seca2;
+
+    * {
+	display: inline-block;
+	vertical-align: bottom;
+	height: 100px;
+	line-height: 100px;
+    }
+
+    img {
+	float: left;
+	padding-right: 1em;
+	padding-left: 20px;
+    }
+
+    div {
+	font: 4em Sniglet, 'Comic Sans MS', serif;
+	line-height: 100px;
+	.textshadow(2px;2px;4px;@secahard4);
+    }
+
+}
+
+
+nav {
+    background-color: @secahard4;
+    color: @seca2;
+    left: 0;
+    right: 0;
+    margin-bottom: .5em;
+    height: 2em;
+    line-height: 2em;
+    padding: 1em;
+    padding-top: .5em;
+    padding-bottom: .5em;
+
+    * {
+	display: inline-block;
+	vertical-align: top;
+    }
+    
+    a {
+	color: @seca2;
+	.borderradius(1em);
+	padding-left: 1em;
+	padding-right: 1em;
+	text-decoration: none;
+    }
+    
+    a:hover {
+	background-color: @seca2;
+	color: @secahard4;
+    }
+    
+    .right {
+	float: right;
+    }
+    
+    .left {
+	float: left;
+    }
+
+    .submenu {
+	background-color: @secahard4;
+	color: @seca2;
+	z-index: 100;
+	h1 {
+	    font-size: 1em;
+	    font-weight: normal;
+	    .borderradius(1em);
+	    padding-left: 1em;
+	    padding-right: 1em;
+	}
+
+	h1:hover {
+	    background-color: @seca2;
+	    color: @secahard4;
+	}
+
+	.items {
+	    padding: .5em;
+	    display: none;
+	    position: relative;
+	}
+
+    }
+
+    .submenu:hover {
+	.items {
+	    display: block;
+	}
+
+	h1 {
+	    background-color: @seca2;
+	    color: @secahard4;
+	}
+	
+    }
+
+}
+
+main {
+
+    padding: 1em;
+    
+    h1 {
+	color: @primhard4;
+	background-color: @prim2;
+	font-size: 1.5em;
+	padding-top: .5em;
+	padding-bottom: .5em;
+	padding-left: 1em;
+	border: 1px solid @primhard4;
+	.borderradius(1em);
+	margin-bottom: 1em;
+	margin-top: 1em;
+    }
+
+    :first-child { 
+     	margin-top: 0;
+    }
+
+    nav.paginator {
+	background-color: @secbhard4;
+	color: @secb2;
+	height: 1em;
+	line-height: 1em;
+
+	* {
+	    display: inline-block;
+	    vertical-align: center;
+	}
+	
+	a {
+	    color: @secb2;
+	}
+
+	a, .current {	
+	    .borderradius(.5em);
+	    padding-left: .5em;
+	    padding-right: .5em;
+	    text-decoration: none;
+	}
+	
+	a:hover, .current {
+	    background-color: @secb2;
+	    color: @secbhard4;
+	}
+
+	.disabled {
+	    display: none;
+	}
+
+    }
+
+    nav.tabmenu {
+	.columned(3);
+	display: inline-block;
+	padding: 0;
+	height: auto;
+	line-height: auto;
+	background: none;
+	color: @textforecolor;
+	font-size: .9em;
+
+	* {
+	    display: auto;
+	}
+
+	a {
+	    color: @primhard4;
+	    background-color: @prim2;
+	    border: 1px solid @primhard4;
+	    .borderradius(1em);
+	    padding-left: 1em;
+	    padding-right: 1em;
+	    padding-top: .2em;
+	    padding-bottom: .2em;
+	    margin-top: .1em;
+	    margin-bottom: .1em;
+	    text-decoration: none;
+	    display: block;
+	    height: 1em;
+	    line-height: 1em;
+	}
+	
+	a:hover {
+	    background-color: @secb2;
+	    color: @secbhard4;
+	    border: 1px solid @secbhard4;
+	}
+	
+    }
+
+    th {
+	padding: .5em;
+	font-weight: 600;
+    }
+
+    td {
+	padding-left: .5em;
+    }
+
+    tbody:nth-child(even) {
+	background: @secb1;
+	th {
+	    background: @secb2;
+	    color: @secbhard4;
+	    a {
+		background: @secb2;
+		color: @secbhard4;
+		text-decoration: none;
+	    }
+	    a:hover {
+		background: @secbhard4;
+		color: @secb2;
+	    }
+	}
+
+    }
+    
+    tbody:nth-child(odd) {
+	background: @prim1;
+	th {
+	    background: @prim2;
+	    color: @primhard4;
+	}
+	a {
+	    background: @prim2;
+	    color: @primhard4;
+	    text-decoration: none;
+	}
+	a:hover {
+	    background: @primhard4;
+	    color: @prim2;
+	}
+
+    }
+
+}
+

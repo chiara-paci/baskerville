@@ -1,12 +1,12 @@
 {% if is_paginated %}
-<div class="paginator">
+<nav class="paginator">
 {% if page_obj.has_previous %}
 <a href="?page={{ page_obj.previous_page_number }}"><i class="fa fa-angle-left"></i></a>
 {% else %}
 <span class="disabled"><i class="fa fa-angle-left"></i></span>
 {% endif %}
 {% for p in page_obj.paginator.page_range %}
-{% if p = page_obj.number %}
+{% if p == page_obj.number %}
 <span class="current">{{ p }}</span>
 {% else %}
 <a href="?page={{ p }}">{{ p }}</a>
@@ -17,5 +17,5 @@
 {% else %}
 <span class="disabled"><i class="fa fa-angle-right"></i></span>
 {% endif %}
-</div>
+</nav>
 {% endif %}

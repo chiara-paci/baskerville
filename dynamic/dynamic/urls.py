@@ -171,14 +171,11 @@ admin.sites.site=admin.site
 urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', RedirectView.as_view(url='/bibliography/catalog',permanent=False)),
+    url(r'^$', RedirectView.as_view(url='/bibliography/catalog',permanent=False),name="home"),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
 
 urlpatterns += [
-    #url(r'^css/',         include('include-urls.urls-css')),
-    #url(r'^css/',         include('santaclara_css.urls',app_name='santaclara_css',namespace="santaclara_css")),
     url(r'^bibliography/',include('bibliography.urls')),
-    #url(r'^foods/',include('foods.urls')),
 ]

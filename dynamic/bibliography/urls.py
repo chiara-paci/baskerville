@@ -7,63 +7,76 @@ from django.views.generic import DetailView,ListView,UpdateView,CreateView
 #from santaclara_base.decorators import staff_or_404,permission_or_404
 
 from django.views.generic import TemplateView,ListView
-
-from bibliography.models import Author,Person,CategoryTreeNode,Category,Publisher,Book
-from bibliography.views import CategoryTreeView,JsonTreeView,CategorizerView,BooksInsertView,PublisherCreateView,JsonPublisherCreateView
-from bibliography.views import AuthorCreateView,JsonAuthorCreateView,JsonCategoryChangeParentsView,CategoryChildrenView,CategoryGraphView
-from bibliography.views import BookCreateView,JsonBookCreateView,JsonBookChangeCategoriesView,JsonCategoryNodesLinksView,JsonCategoryNodesLinksView2
-
 from santaclara_base.views import JsonDetailView
 
+from . import models,views
+
+# from bibliography.models import Author,Person,CategoryTreeNode,Category,Publisher,Book
+
+# from bibliography.views import CategoryTreeView,JsonTreeView,CategorizerView,BooksInsertView,PublisherCreateView,JsonPublisherCreateView
+# from bibliography.views import AuthorCreateView,JsonAuthorCreateView,JsonCategoryChangeParentsView,CategoryChildrenView,CategoryGraphView
+# from bibliography.views import BookCreateView,JsonBookCreateView,JsonBookChangeCategoriesView,JsonCategoryNodesLinksView,JsonCategoryNodesLinksView2
+
+
+app_name="bibliography"
+
 urlpatterns = [
-    url( r'^$',TemplateView.as_view(template_name="bibliography/index.html") ),
-    url( r'^catalog/?$',ListView.as_view(model=Author,
-                                      paginate_by=63,
-                                      context_object_name="author_list")),
-    url( r'^categories/?$',ListView.as_view(model=CategoryTreeNode,
-                                         queryset=CategoryTreeNode.objects.filter(level=0),
-                                         context_object_name="categorytreenode_list")),
+    url( r'^$',TemplateView.as_view(template_name="bibliography/index.html"),name="index" ),
+    url( r'^catalog/?$',
+         ListView.as_view(model=models.Author,
+                          paginate_by=63,
+                          context_object_name="author_list"),
+         name="catalog"),
+    url( r'^categories/?$',
+         ListView.as_view(model=models.CategoryTreeNode,
+                          queryset=models.CategoryTreeNode.objects.filter(level=0),
+                          context_object_name="categorytreenode_list"),
+         name="categories"),
     
-    url( r'^categories/graph/(?P<pk>\d+)/?$',CategoryGraphView.as_view()),
-    url( r'^categories/graph/?$',CategoryGraphView.as_view()),
+    url( r'^categories/graph/(?P<pk>\d+)/?$',views.CategoryGraphView.as_view()),
+    url( r'^categories/graph/?$',views.CategoryGraphView.as_view()),
     
-    url( r'^categories/graph2/(?P<pk>\d+)/?$',CategoryGraphView.as_view(template_name="bibliography/provad3.html")),
-    url( r'^categories/graph2/?$',CategoryGraphView.as_view(template_name="bibliography/provad3.html")),
+    url( r'^categories/graph2/(?P<pk>\d+)/?$',views.CategoryGraphView.as_view(template_name="bibliography/provad3.html")),
+    url( r'^categories/graph2/?$',views.CategoryGraphView.as_view(template_name="bibliography/provad3.html")),
     
     #url( r'^categories/graph/?$',ListView.as_view(model=CategoryTreeNode,
     #                                           template_name="bibliography/categorytreenode_graph.html",
     #                                           queryset=CategoryTreeNode.objects.filter(level=0),
     #                                           context_object_name="categorytreenode_list")),
     
-    url( r'^categories/categorizer/(?P<pk>\d+)/?$',CategoryChildrenView.as_view()),
+    url( r'^categories/categorizer/(?P<pk>\d+)/?$',views.CategoryChildrenView.as_view()),
     
-    url( r'^categories/categorizer/?$',CategoryChildrenView.as_view()),
-    url( r'^books/categorizer/',ListView.as_view(model=Book,
-                                              paginate_by=100,
-                                              context_object_name="book_list",
-                                              template_name="bibliography/book_categorizer.html")),
+    url( r'^categories/categorizer/?$',views.CategoryChildrenView.as_view(),name="categories-categorizer"),
+    url( r'^books/categorizer/',
+         ListView.as_view(model=models.Book,
+                          paginate_by=100,
+                          context_object_name="book_list",
+                          template_name="bibliography/book_categorizer.html"),
+         name="books-categorizer"),
     
-    url( r'^insert/',BooksInsertView.as_view()),
-    url( r'^publisher/create/?$',PublisherCreateView.as_view()),
-    url( r'^publisher/(?P<pk>\d+)/?$',DetailView.as_view(model=Publisher)),
-    url( r'^author/create/?$',AuthorCreateView.as_view()),
-    url( r'^author/(?P<pk>\d+)/?$',DetailView.as_view(model=Author)),
-    url( r'^book/create/?$',BookCreateView.as_view()),
-    url( r'^book/(?P<pk>\d+)/?$',DetailView.as_view(model=Book)),
-    url( r'^json/categories/treenode/(?P<label_children>.+?)/(?P<level>\d+)/?$',JsonTreeView.as_view()),
-    url( r'^json/categories/nodeslinks/(?P<pk>\d+)/?$',JsonCategoryNodesLinksView.as_view()),
-    url( r'^json/categories/nodeslinks/?$',JsonCategoryNodesLinksView.as_view()),
+    url( r'^insert/',views.BooksInsertView.as_view(),name="insert"),
+    url( r'^publisher/create/?$',views.PublisherCreateView.as_view(),name="publisher-create"),
+    url( r'^publisher/(?P<pk>\d+)/?$',DetailView.as_view(model=models.Publisher),name="publisher-detail"),
+    url( r'^author/create/?$',views.AuthorCreateView.as_view(),name="author-create"),
+    url( r'^author/(?P<pk>\d+)/?$',DetailView.as_view(model=models.Author),name="author-detail"),
+    url( r'^book/create/?$',views.BookCreateView.as_view(),name="book-create"),
+    url( r'^book/(?P<pk>\d+)/?$',DetailView.as_view(model=models.Book),name="book-detail"),
+
+
+    url( r'^json/categories/treenode/(?P<label_children>.+?)/(?P<level>\d+)/?$',views.JsonTreeView.as_view()),
+    url( r'^json/categories/nodeslinks/(?P<pk>\d+)/?$',views.JsonCategoryNodesLinksView.as_view()),
+    url( r'^json/categories/nodeslinks/?$',views.JsonCategoryNodesLinksView.as_view()),
     url( r'^json/categories/nodeslinks2/(?P<pk>\d+)/?$',
-      JsonCategoryNodesLinksView2.as_view()),
+      views.JsonCategoryNodesLinksView2.as_view()),
     url( r'^json/categories/nodeslinks2/?$',
-      JsonCategoryNodesLinksView2.as_view()),
-    url( r'^json/publisher/create/?$',JsonPublisherCreateView.as_view()),
-    url( r'^json/publisher/(?P<pk>\d+)/?$',JsonDetailView.as_view(model=Publisher)),
-    url( r'^json/author/create/',JsonAuthorCreateView.as_view()),
-    url( r'^json/author/(?P<pk>\d+)/?$',JsonDetailView.as_view(model=Author)),
-    url( r'^json/book/create/?$',JsonBookCreateView.as_view()),
-    url( r'^json/book/(?P<pk>\d+)/?$',JsonDetailView.as_view(model=Book)),
-    url( r'^json/book/(?P<pk>\d+)/change_categories/?$',JsonBookChangeCategoriesView.as_view()),
-    url( r'^json/category/(?P<pk>\d+)/change_parents/?$',JsonCategoryChangeParentsView.as_view()),
+      views.JsonCategoryNodesLinksView2.as_view()),
+    url( r'^json/publisher/create/?$',views.JsonPublisherCreateView.as_view()),
+    url( r'^json/publisher/(?P<pk>\d+)/?$',JsonDetailView.as_view(model=models.Publisher)),
+    url( r'^json/author/create/',views.JsonAuthorCreateView.as_view()),
+    url( r'^json/author/(?P<pk>\d+)/?$',JsonDetailView.as_view(model=models.Author)),
+    url( r'^json/book/create/?$',views.JsonBookCreateView.as_view()),
+    url( r'^json/book/(?P<pk>\d+)/?$',JsonDetailView.as_view(model=models.Book)),
+    url( r'^json/book/(?P<pk>\d+)/change_categories/?$',views.JsonBookChangeCategoriesView.as_view()),
+    url( r'^json/category/(?P<pk>\d+)/change_parents/?$',views.JsonCategoryChangeParentsView.as_view()),
 ]
 
