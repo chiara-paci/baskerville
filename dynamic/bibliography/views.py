@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+from django.urls import reverse
 
-# Create your views here.
-from django import forms
-from django.forms import extras
-from django.forms.models import inlineformset_factory,modelformset_factory,BaseModelFormSet
-from django.forms.formsets import BaseFormSet,formset_factory
-from django.utils.safestring import mark_safe
+from . import forms
 
-from django.views.generic import TemplateView,ListView,View,CreateView
+from django.views.generic import TemplateView,ListView,View,CreateView,DetailView
+from django.views.generic.detail import SingleObjectMixin
+
 from bibliography.models import CategoryTreeNode,Category,CategoryRelation
 from bibliography.models import Publisher,PublisherAddress,PublisherState,PublisherIsbn,PublisherAddressPublisherRelation
 from bibliography.models import Author,NameType,PersonNameRelation,NameFormatCollection
-from bibliography.models import Book,BookAuthorRelation,AuthorRole
-import bibliography.booksearch as booksearch
+from bibliography.models import Book,BookAuthorRelation,AuthorRole,Publication,Issue,IssueAuthorRelation
+
+from . import booksearch
 
 import json
 
@@ -306,56 +305,6 @@ class CategoryTreeView(TemplateView):
         context["category_tree"]=map(lambda x: x.get_desc("catroot"),obj_list)
         return context
 
-class ImmutableWidget(forms.widgets.HiddenInput):
-    def render(self,name,value,attrs=None): 
-        U=super(ImmutableWidget,self).render(name,value,attrs=attrs)
-        return mark_safe(U+value)
-
-class CategorizerForm(forms.ModelForm):
-    parents = forms.CharField(required=False,widget=forms.widgets.TextInput(attrs={"size":100}))
-
-    def __init__(self, initial=None, instance=None, *args, **kwargs):
-        if instance:
-            initial = initial or {}
-            initial['parents'] = instance.parents()
-
-        super(CategorizerForm, self).__init__(initial=initial,instance=instance, *args, **kwargs)
-
-    class Meta:
-        model = Category
-        fields = "__all__"
-        widgets = {
-            'name': ImmutableWidget(),
-            }
-
-    def save(self,commit=True):
-        def remove_dup_space(S):
-            S=S.strip()
-            return " ".join(filter(bool,map(lambda x: x.strip(),S.split(" "))))
-            
-        super(CategorizerForm, self).save(commit=commit)
-        new_parents_names=map(remove_dup_space,self.cleaned_data["parents"].split(","))
-        deleted=[]
-        unchanged=[]
-        for old_rels in self.instance.parent_set.all():
-            f_name=unicode(old_rels.parent.name)
-            if not f_name in new_parents_names:
-                deleted.append(f_name)
-            else:
-                unchanged.append(f_name)
-        added=filter(lambda x: x not in unchanged, new_parents_names)
-        print self.instance,deleted,added
-        for del_name in deleted:
-            del_cat=Category.objects.get(name=del_name)
-            CategoryRelation.objects.filter(parent=del_cat,child=self.instance).delete()
-        for add_name in added:
-            add_cat,created=Category.objects.get_or_create(name=add_name)
-            CategoryRelation.objects.get_or_create(parent=add_cat,child=self.instance)
-
-
-CategorizerFormset=modelformset_factory(Category, extra=0, 
-                                        can_delete=True, 
-                                        form=CategorizerForm)
 
 class CategorizerView(ListView):
     model = Category
@@ -384,18 +333,16 @@ class CategorizerView(ListView):
         return Category.objects.filter(id__in=children_ids)
 
     def get(self, request, *args, **kwargs):
-        formset = CategorizerFormset(queryset=self.get_queryset())
+        formset = forms.CategorizerFormset(queryset=self.get_queryset())
         return render(request, self.template_name, {'formset': formset})
 
     def post(self, request, *args, **kwargs):
-        formset = CategorizerFormset(request.POST,request.FILES,queryset=self.get_queryset())
+        formset = forms.CategorizerFormset(request.POST,request.FILES,queryset=self.get_queryset())
         if formset.is_valid():
             formset.save()
-            formset = CategorizerFormset(queryset=self.get_queryset())
+            formset = forms.CategorizerFormset(queryset=self.get_queryset())
             return render(request, self.template_name, {'formset': formset})
         return render(request, self.template_name, {'formset': formset})
-
-
 
 class JsonTreeView(ListView): 
     model = CategoryTreeNode
@@ -426,39 +373,20 @@ class JsonTreeView(ListView):
 
 ### Create Publisher
 
-class PublisherForm(forms.ModelForm):
-    isbn = forms.CharField()
-    class Meta:
-        model = Publisher
-        exclude = [ "addresses", "isbns" ]
-
-class PublisherAddressForm(forms.Form):
-    address = forms.ModelChoiceField(queryset=PublisherAddress.objects.all(),required=False)
-    city_name = forms.CharField(required=False)
-    state = forms.ModelChoiceField(queryset=PublisherState.objects.all(),required=False)
-    state_name = forms.CharField(required=False)
-    
-class RequiredFormSet(BaseFormSet):
-    def __init__(self, *args, **kwargs):
-        super(RequiredFormSet, self).__init__(*args, **kwargs)
-        self.forms[0].empty_permitted = False
-
-PublisherAddressFormSet = formset_factory(PublisherAddressForm,extra=2,formset=RequiredFormSet)
-
 class PublisherCreateView(CreateView):
-    form_class=PublisherForm
+    form_class=forms.PublisherForm
     model=Publisher
     template_name="bibliography/publisher_form.html"
     template_name_response="bibliography/publisher_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super(PublisherCreateView, self).get_context_data(**kwargs)
-        context['address_formset'] = PublisherAddressFormSet(prefix="address")
+        context['address_formset'] = forms.PublisherAddressFormSet(prefix="address")
         return context
 
     def post(self, request, *args, **kwargs):
-        form = PublisherForm(request.POST)
-        address_formset = PublisherAddressFormSet(request.POST,prefix="address")
+        form = forms.PublisherForm(request.POST)
+        address_formset = forms.PublisherAddressFormSet(request.POST,prefix="address")
 
         if not form.is_valid():
             return render(request, self.template_name, 
@@ -516,14 +444,14 @@ class PublisherCreateView(CreateView):
 
 
 class JsonPublisherCreateView(PublisherCreateView):
-    form_class=PublisherForm
+    form_class=forms.PublisherForm
     model=Publisher
     template_name="bibliography/publisher_form.html"
     template_name_response="bibliography/publisher_detail.json"
 
     def post(self, request, *args, **kwargs):
-        form = PublisherForm(request.POST)
-        address_formset = PublisherAddressFormSet(request.POST,prefix="address")
+        form = forms.PublisherForm(request.POST)
+        address_formset = forms.PublisherAddressFormSet(request.POST,prefix="address")
 
         data={}
         if not form.is_valid():
@@ -545,31 +473,20 @@ class JsonPublisherCreateView(PublisherCreateView):
 
 ### Create Author
 
-class AuthorForm(forms.ModelForm):
-    class Meta:
-        fields = "__all__"
-        model = Author
-
-class AuthorNameForm(forms.Form):
-    name_type = forms.ModelChoiceField(queryset=NameType.objects.all(),required=False)
-    value = forms.CharField(required=False)
-
-AuthorNameFormSet = formset_factory(AuthorNameForm,extra=2,formset=RequiredFormSet)
-
 class AuthorCreateView(CreateView):
-    form_class=AuthorForm
+    form_class=forms.AuthorForm
     model=Author
     template_name="bibliography/author_form.html"
     template_name_response="bibliography/author_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super(AuthorCreateView, self).get_context_data(**kwargs)
-        context['name_formset'] = AuthorNameFormSet(prefix="name")
+        context['name_formset'] = forms.AuthorNameFormSet(prefix="name")
         return context
 
     def post(self, request, *args, **kwargs):
-        form = AuthorForm(request.POST)
-        name_formset = AuthorNameFormSet(request.POST,prefix="name")
+        form = forms.AuthorForm(request.POST)
+        name_formset = forms.AuthorNameFormSet(request.POST,prefix="name")
 
         if not form.is_valid():
             return render(request, self.template_name, 
@@ -592,20 +509,20 @@ class AuthorCreateView(CreateView):
             name_type=row_data["name_type"]
             value=row_data["value"]
             if name_type:
-                name_obj,created=PersonNameRelation.objects.get_or_create(author=author_obj,name_type=name_type,value=value)
+                name_obj,created=PersonNameRelation.objects.get_or_create(person=author_obj,name_type=name_type,value=value)
         author_obj.update_cache()
 
         return author_obj
 
 class JsonAuthorCreateView(AuthorCreateView):
-    form_class=AuthorForm
+    form_class=forms.AuthorForm
     model=Author
     template_name="bibliography/author_form.html"
     template_name_response="bibliography/author_detail.json"
 
     def post(self, request, *args, **kwargs):
-        form = AuthorForm(request.POST)
-        name_formset = AuthorNameFormSet(request.POST,prefix="name")
+        form = forms.AuthorForm(request.POST)
+        name_formset = forms.AuthorNameFormSet(request.POST,prefix="name")
 
         data={}
         if not form.is_valid():
@@ -628,31 +545,20 @@ class JsonAuthorCreateView(AuthorCreateView):
 
 ### Create Book
 
-class BookForm(forms.ModelForm):
-    class Meta:
-        fields = "__all__"
-        model = Book
-
-class BookAuthorForm(forms.Form):
-    author = forms.ModelChoiceField(queryset=Author.objects.all(),required=False)
-    author_role = forms.ModelChoiceField(queryset=AuthorRole.objects.all(),required=False)
-
-BookAuthorFormSet = formset_factory(BookAuthorForm,extra=2)
-
 class BookCreateView(CreateView):
-    form_class=BookForm
+    form_class=forms.BookForm
     model=Book
     template_name="bibliography/book_form.html"
     template_name_response="bibliography/book_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super(BookCreateView, self).get_context_data(**kwargs)
-        context['author_formset'] = BookAuthorFormSet(prefix="author")
+        context['author_formset'] = forms.BookAuthorFormSet(prefix="author")
         return context
 
     def post(self, request, *args, **kwargs):
-        form = BookForm(request.POST)
-        author_formset = BookAuthorFormSet(request.POST,prefix="author")
+        form = forms.BookForm(request.POST)
+        author_formset = forms.BookAuthorFormSet(request.POST,prefix="author")
 
         if not form.is_valid():
             return render(request, self.template_name, 
@@ -685,14 +591,14 @@ class BookCreateView(CreateView):
         return book_obj
 
 class JsonBookCreateView(BookCreateView):
-    form_class=BookForm
+    form_class=forms.BookForm
     model=Book
     template_name="bibliography/book_form.html"
     template_name_response="bibliography/book_detail.json"
 
     def post(self, request, *args, **kwargs):
-        form = BookForm(request.POST)
-        author_formset = BookAuthorFormSet(request.POST,prefix="author")
+        form = forms.BookForm(request.POST)
+        author_formset = forms.BookAuthorFormSet(request.POST,prefix="author")
 
         data={}
         if not form.is_valid():
@@ -712,14 +618,11 @@ class JsonBookCreateView(BookCreateView):
                       {"book": book_obj},
                       content_type='application/json')
 
-class CategoriesForm(forms.Form):
-    categories = forms.CharField(required=False)
-
 class JsonBookChangeCategoriesView(View):
     template_name_response="bibliography/book_detail.json"
 
     def post(self, request, *args, **kwargs):
-        form = CategoriesForm(request.POST)
+        form = forms.CategoriesForm(request.POST)
 
         data={}
         if not form.is_valid():
@@ -759,7 +662,7 @@ class JsonCategoryChangeParentsView(View):
     template_name_response="bibliography/category_detail.json"
 
     def post(self, request, *args, **kwargs):
-        form = CategoriesForm(request.POST)
+        form = forms.CategoriesForm(request.POST)
 
         data={}
         if not form.is_valid():
@@ -805,120 +708,411 @@ class JsonCategoryChangeParentsView(View):
 
 
 ### Insert
-class IsbnForm(forms.Form):
-    elenco = forms.CharField(widget=forms.Textarea(attrs={"height":"200px","width":50}))
-
 class BooksInsertView(View): 
     template_name_isbn = "bibliography/isbn_form.html"
     template_name_insert = "bibliography/insert_tool.html"
 
     def get(self, request, *args, **kwargs):
-        form = IsbnForm()
+        form = forms.IsbnForm()
         return render(request, self.template_name_isbn, {'form': form})
 
     def post(self, request, *args, **kwargs):
-        form = IsbnForm(request.POST)
-        if form.is_valid():
-            elenco=form.cleaned_data["elenco"].strip()
-            isbn_list=[]
-            for r in elenco.split("\n"):
-                r=r.strip()
-                t=r.split(" ")
-                isbn_list+=t
-            params=booksearch.look_for(isbn_list)
-            
-            new_publisher_list=[]
-            old_publisher_list=[]            
-            n=0
-            for pub in params["publisher_list"]:
-                if pub.indb:
-                    old_publisher_list.append(pub)
-                    continue
-                initial={ "isbn": pub.isbn_ced, "name": pub.name, "full_name": pub.name }
-                pubform=PublisherForm(prefix="newpublisher"+str(n),initial=initial)
-                initial=[]
-                if pub.addresses_indb:
-                    for adr in pub.addresses:
-                        initial.append({"address":adr})
-                else:
-                    for adr in pub.addresses:
-                        initial.append({"city_name":adr})
-                pubadrsformset=PublisherAddressFormSet(prefix="newpublisher"+str(n)+"-address",initial=initial)
-                new_publisher_list.append( (str(n),pub.name,pubform, pubadrsformset) )
-                n+=1
+        form = forms.IsbnForm(request.POST)
+        if not form.is_valid():
+            return render(request, self.template_name_isbn, {'form': form})
 
-            suspended_book_list=[]
-            new_book_list=[]
-            old_book_list=[]
-            new_author_list=[]
-            temp_author_list=[]
-            old_author_list=[]
+        elenco=form.cleaned_data["elenco"].strip()
 
-            n=0
-            for book in params["book_list"]:
-                if book.indb:
-                    old_book_list.append(book)
-                    continue
-                suspended=False
-                for role,pos,aut in book.authors:
-                    if type(aut) not in [unicode,str]:
-                        old_author_list.append(aut)
-                        continue
-                    temp_author_list.append(aut)
-                    suspended=True
-                if suspended:
-                    suspended_book_list.append(book)
-                    continue
-                if type(book.publisher)!=Publisher:
-                    suspended_book_list.append(book)
-                    continue
-                initial={ "isbn_ced": book.isbn_ced, "isbn_book": book.isbn_book, 
-                          "title": book.title, "year": book.year, "publisher": book.publisher }
-                bookform=BookForm(prefix="newbook"+str(n),initial=initial)
-                initial=[]
-                lauts=map(lambda x: (x[1],(x[0],x[2])),book.authors)
-                lauts.sort()
-                for pos,(role,author) in lauts:
-                    aut_role=AuthorRole.objects.get(label=role)
-                    initial.append({"author":author,"author_role":aut_role})
-                bookauthorformset=BookAuthorFormSet(prefix="newbook"+str(n)+"-author",initial=initial)
-                new_book_list.append( (str(n),book.isbn_10().replace("-","")+" "+book.title,bookform, bookauthorformset) )
-                n+=1
-            n=0
-            for aut in temp_author_list:
-                t=filter(lambda x: bool(x),map(lambda x: x.strip(),aut.strip().split(" ")))
-                print t,len(t)
-                initial=[]
-                if len(t)==1:
-                    lab_format="onename"
-                    initial=[ {"name_type": "name", "value": t[0] } ]
-                elif len(t)==2:
-                    lab_format="western_twonames"
-                    initial=[ {"name_type": "name", "value": t[0] },
-                              {"name_type": "surname", "value": t[1] } ]
-                else:
-                    lab_format="western_threenames"
-                    initial=[ {"name_type": "name", "value": t[0] },
-                              {"name_type": "middle_name", "value": t[1] },
-                              {"name_type": "surname", "value": " ".join(t[2:]) } ]
-                format_collection=NameFormatCollection.objects.get(label=lab_format)
-                for ini in initial:
-                    ini["name_type"]=NameType.objects.get(label=ini["name_type"])
-                autform=AuthorForm(prefix="newauthor"+str(n),initial={"format_collection":format_collection})
-                autnamesformset=AuthorNameFormSet(prefix="newauthor"+str(n)+"-name",initial=initial)
-                new_author_list.append( (str(n),aut,autform,autnamesformset) )
-                n+=1
+        isbn_list=[]
+        for r in elenco.split("\n"):
+            r=r.strip()
+            t=r.split(" ")
+            isbn_list+=t
 
-            params["new_book_list"]=new_book_list
-            params["suspended_book_list"]=suspended_book_list
-            params["old_book_list"]=old_book_list
-            params["new_author_list"]=new_author_list
-            params["old_author_list"]=old_author_list
-            params["new_publisher_list"]=new_publisher_list
-            params["old_publisher_list"]=old_publisher_list
+        ## quello che viene ritornato, arrichito da quello che segue sotto
+        params=booksearch.look_for(isbn_list)
 
-            return render(request, self.template_name_insert, params)
-        return render(request, self.template_name_isbn, {'form': form})
+        ## publisher da creare [ (str(n),pub.name,pubform,pubadrsformset) ]
+        new_publisher_list=[]
+
+        ## publisher che esistono già [pub]
+        old_publisher_list=[]            
+
+        n=0
+        for pub in params["publisher_list"]:
+            if pub.indb:
+                old_publisher_list.append(pub)
+                continue
+            initial={ "isbn": pub.isbn_ced, "name": pub.name, "full_name": pub.name }
+            pubform=forms.PublisherForm(prefix="newpublisher"+str(n),initial=initial)
+            initial=[]
+            if pub.addresses_indb:
+                for adr in pub.addresses:
+                    initial.append({"address":adr})
+            else:
+                for adr in pub.addresses:
+                    initial.append({"city_name":adr})
+            pubadrsformset=forms.PublisherAddressFormSet(prefix="newpublisher"+str(n)+"-address",initial=initial)
+            new_publisher_list.append( (str(n),pub.name,pubform, pubadrsformset) )
+            n+=1
+
+        # book il cui publisher/author non esiste [ book ]
+        suspended_book_list=[]
+
+        # book da creare [ (str(n),book.isbn_10().replace("-","")+" "+book.title,bookform, bookauthorformset) ]
+        new_book_list=[]
+
+        # book che esistono già [ book ]
+        old_book_list=[]
+
+        # author da creare [ (str(n),aut,autform,autnamesformset) ]
+        new_author_list=[]
+
+        # author che esistono già [ aut ]
+        old_author_list=[]
+
+        temp_author_list=[]
+        n=0
+        for book in params["book_list"]:
+            if book.indb:
+                old_book_list.append(book)
+                continue
+            suspended=False
+            for role,pos,aut in book.authors:
+                if type(aut) not in [unicode,str]:
+                    old_author_list.append(aut)
+                    continue
+                temp_author_list.append(aut)
+                suspended=True
+            if suspended:
+                suspended_book_list.append(book)
+                continue
+            if type(book.publisher)!=Publisher:
+                suspended_book_list.append(book)
+                continue
+            initial={ "isbn_ced": book.isbn_ced, "isbn_book": book.isbn_book, 
+                      "title": book.title, "year": book.year, "publisher": book.publisher }
+            bookform=forms.BookForm(prefix="newbook"+str(n),initial=initial)
+            initial=[]
+            lauts=map(lambda x: (x[1],(x[0],x[2])),book.authors)
+            lauts.sort()
+            for pos,(role,author) in lauts:
+                aut_role=AuthorRole.objects.get(label=role)
+                initial.append({"author":author,"author_role":aut_role})
+            bookauthorformset=forms.BookAuthorFormSet(prefix="newbook"+str(n)+"-author",initial=initial)
+            new_book_list.append( (str(n),book.isbn_10().replace("-","")+u" "+unicode(book.title),bookform, bookauthorformset) )
+            n+=1
+        n=0
+        for aut in temp_author_list:
+            t=filter(lambda x: bool(x),map(lambda x: x.strip(),aut.strip().split(" ")))
+            print t,len(t)
+            initial=[]
+            if len(t)==1:
+                lab_format="onename"
+                initial=[ {"name_type": "name", "value": t[0] } ]
+            elif len(t)==2:
+                lab_format="western_twonames"
+                initial=[ {"name_type": "name", "value": t[0] },
+                          {"name_type": "surname", "value": t[1] } ]
+            else:
+                lab_format="western_threenames"
+                initial=[ {"name_type": "name", "value": t[0] },
+                          {"name_type": "middle_name", "value": t[1] },
+                          {"name_type": "surname", "value": " ".join(t[2:]) } ]
+            format_collection=NameFormatCollection.objects.get(label=lab_format)
+            for ini in initial:
+                ini["name_type"]=NameType.objects.get(label=ini["name_type"])
+            autform=forms.AuthorForm(prefix="newauthor"+str(n),initial={"format_collection":format_collection})
+            autnamesformset=forms.AuthorNameFormSet(prefix="newauthor"+str(n)+"-name",initial=initial)
+            new_author_list.append( (str(n),aut,autform,autnamesformset) )
+            n+=1
+
+        params["new_book_list"]=new_book_list
+        params["suspended_book_list"]=suspended_book_list
+        params["old_book_list"]=old_book_list
+        params["new_author_list"]=new_author_list
+        params["old_author_list"]=old_author_list
+        params["new_publisher_list"]=new_publisher_list
+        params["old_publisher_list"]=old_publisher_list
+
+        return render(request, self.template_name_insert, params)
+
+#### publication
+
+class AuthorSearchView(View):
+    template_name="bibliography/author_search.html"
+    template_name_list="bibliography/author_list.html"
+    template_name_not_found="bibliography/author_not_found.html"
+
+    def get(self,request, *args,**kwargs):
+        form = forms.SimpleSearchForm()
+        return render(request, self.template_name, {'form': form})
+
+    def render_not_found(self,request,form):
+        return render(request,self.template_name_not_found,{"form": form})
+        
+    def post(self,request,*args,**kwargs):
+        form = forms.SimpleSearchForm(request.POST)
+        if not form.is_valid():
+            return render(request, self.template_name, {'form': form})
+        search=form.cleaned_data["search"]
+        L=list(Author.objects.filter_by_name(search))
+        if not L:
+            return self.render_not_found(request,form)
+        if len(L)==1:
+            print type(L[0])
+            return redirect(L[0])
+        return render(request,self.template_name_list,{"object_list":L})
+
+class AuthorInsertView(AuthorSearchView):
+    template_name_not_found="bibliography/author_form.html"
+
+    def render_not_found(self,request,form):
+        search=form.cleaned_data["search"]
+        format_c,names=NameFormatCollection.objects.get_format_for_name(search)
+        field_names=format_c.fields
+        print format_c,field_names,names
+        initial=[]
+        for n in range(0,len(field_names)):
+            name_type,created=NameType.objects.get_or_create(label=field_names[n])
+            if len(names)>n:
+                initial.append( {"value": names[n],"name_type": name_type.pk})
+            else:
+                initial.append( {"name_type": name_type.pk})
+        print initial
+        name_formset = forms.AuthorName0FormSet(prefix="name",initial=initial)
+        author_form = forms.AuthorForm(initial={"format_collection": format_c})
+        return render(request, self.template_name_not_found, 
+                      {'form': author_form, 'name_formset': name_formset, 
+                       "action": reverse("bibliography:author-create")})
+
+class PublicationDetailView(DetailView): 
+    model=Publication
+    context_object_name="publication"
+
+    def get_context_data(self, **kwargs):
+        form = forms.SimpleSearchForm()
+        context = super(PublicationDetailView, self).get_context_data(**kwargs)
+        context["add_author_form"]=form
+        return context
+
+class PublicationIssuesAuthorChoiceView(View,SingleObjectMixin):
+    template_name = "bibliography/publication_issues_author_choice.html"
+    template_name_add = "bibliography/publication_issues_author_add.html"
+    model=Publication
+    context_object_name="publication"
+
+    def get(self, request, *args, **kwargs):
+        publication=self.get_object()
+        form = forms.AuthorChoiceForm()
+        return render(request, self.template_name, {self.context_object_name: publication,
+                                                    'form': form})
+        
+    def post(self,request,*args,**kwargs):
+        publication=self.get_object()
+        print request.POST
+
+        form = forms.AuthorChoiceForm(request.POST)
+
+        if not form.is_valid():
+            print "Invalid form"
+            return render(request, self.template_name, {self.context_object_name: publication,'form': form})
+        author=form.cleaned_data["author"]
+        form = forms.IssueAuthorForm(prefix="author",initial={"author": author.pk})
+        formset = forms.IssueChoiceFormset(prefix="issues",queryset=Issue.objects.by_publication(publication))
+        return render(request, self.template_name_add, {self.context_object_name: publication,
+                                                        'author_form': form,
+                                                        'issues_formset': formset,
+                                                        'action': reverse("bibliography:publication-issues-author-add",
+                                        kwargs={"pk":publication.id})})
+
+class PublicationIssuesAuthorCreateView(View,SingleObjectMixin):
+    template_name = "bibliography/author_form.html"
+    template_name_add = "bibliography/publication_issues_author_add.html"
+    model=Publication
+    context_object_name="publication"
+
+    def get(self, request, *args, **kwargs):
+        publication=self.get_object()
+        author_form = forms.AuthorForm()
+        name_formset = forms.AuthorNameFormSet(request.POST,prefix="name")
+        return render(request, self.template_name, 
+                      {'form': author_form, 
+                       'name_formset': name_formset, 
+                       "action": reverse("bibliography:publication-issues-author-create",
+                                        kwargs={"pk":publication.id})})
+        
+    def post(self, request, *args, **kwargs):
+        publication=self.get_object()
+
+        author_form = forms.AuthorForm(request.POST)
+        name_formset = forms.AuthorNameFormSet(request.POST,prefix="name")
+
+        if not author_form.is_valid():
+            return render(request, self.template_name, 
+                          {'form': author_form, 
+                           'name_formset': name_formset, 
+                           "action": reverse("bibliography:publication-issues-author-create",
+                                        kwargs={"pk":publication.id})})
+
+        if not name_formset.is_valid():
+            return render(request, self.template_name, 
+                          {'form': author_form, 
+                           'name_formset': name_formset, 
+                           "action": reverse("bibliography:publication-issues-author-create",
+                                        kwargs={"pk":publication.id})})
+
+        author=self.create_author(author_form,name_formset)
+        form = forms.IssueAuthorForm(prefix="author",initial={"author": author.pk})
+        formset = forms.IssueChoiceFormset(prefix="issues",queryset=Issue.objects.by_publication(publication))
+        return render(request, self.template_name_add, {self.context_object_name: publication,
+                                                        'author_form': form,
+                                                        'issues_formset': formset,
+                                                        'action': reverse("bibliography:publication-issues-author-add",
+                                        kwargs={"pk":publication.id})})
+        
+    def create_author(self,form,name_formset):
+        format_collection=form.cleaned_data["format_collection"]
+        author_obj=Author(format_collection=format_collection)
+        author_obj.save()
+
+        for row_data in name_formset.cleaned_data:
+            if not row_data: continue
+            name_type=row_data["name_type"]
+            value=row_data["value"]
+            if name_type:
+                name_obj,created=PersonNameRelation.objects.get_or_create(person=author_obj,name_type=name_type,value=value)
+        author_obj.update_cache()
+
+        return author_obj
+
+
+        
+
+class PublicationIssuesAuthorSearchView(View,SingleObjectMixin):
+    template_name = "bibliography/publication_issues_author_add.html"
+    model=Publication
+    context_object_name="publication"
+
+    template_name_not_found="bibliography/author_form.html"
+    template_name_multiple_found="bibliography/author_form_choice.html"
+    template_name_choice = "bibliography/publication_issues_author_choice.html"
+    template_name_create = "bibliography/author_form.html"
+
+    ### questa pagina deve consentire di scegliere un autore tra object list e render
+    ### qualcosa che poi si comporti così:
+    # author=quello_scelto_dall_utente
+    # publication=self.get_object()
+    # form = forms.IssueAuthorForm(prefix="author",initial={"author": author.pk})
+    # formset = forms.IssueChoiceFormset(prefix="issues",queryset=Issue.objects.by_publication(publication))
+    # return render(request, self.template_name, {self.context_object_name: publication,
+    #                                             'author_form': form,
+    #                                             'issues_formset': formset,
+    #                                             'action': reverse("bibliography:publication-issues-author-add")})
+
+    def render_multiple_found(self,request,object_list):
+        publication=self.get_object()
+        form = forms.AuthorChoiceForm()
+        form.fields["author"].queryset=object_list
+        return render(request, self.template_name_choice, 
+                      {self.context_object_name: publication,
+                       'form': form,
+                       'action':reverse("bibliography:publication-issues-author-choice",
+                                        kwargs={"pk":publication.id})})
+
+        
+    ### questa pagina deve consentire di creare un nuovo autore e render
+    ### qualcosa che poi si comporti così:
+    # author=quello_scelto_dall_utente
+    # publication=self.get_object()
+    # form = forms.IssueAuthorForm(prefix="author",initial={"author": author.pk})
+    # formset = forms.IssueChoiceFormset(prefix="issues",queryset=Issue.objects.by_publication(publication))
+    # return render(request, self.template_name, {self.context_object_name: publication,
+    #                                             'author_form': form,
+    #                                             'issues_formset': formset,
+    #                                             'action': reverse("bibliography:publication-issues-author-add")})
+
+    def render_not_found(self,request,form):
+        search=form.cleaned_data["search"]
+        format_c,names=NameFormatCollection.objects.get_format_for_name(search)
+        field_names=format_c.fields
+        initial=[]
+        for n in range(0,len(field_names)):
+            name_type,created=NameType.objects.get_or_create(label=field_names[n])
+            if len(names)>n:
+                initial.append( {"value": names[n],"name_type": name_type.pk})
+            else:
+                initial.append( {"name_type": name_type.pk})
+        name_formset = forms.AuthorName0FormSet(prefix="name",initial=initial)
+        author_form = forms.AuthorForm(initial={"format_collection": format_c})
+        publication=self.get_object()
+
+        return render(request, self.template_name_create, 
+                      {'form': author_form, 
+                       'name_formset': name_formset, 
+                       "action": reverse("bibliography:publication-issues-author-create",
+                                        kwargs={"pk":publication.id})})
+
+    def post(self,request,*args,**kwargs):
+        form = forms.SimpleSearchForm(request.POST)
+        if not form.is_valid():
+            return render(request, self.template_name, {'form': form})
+        search=form.cleaned_data["search"]
+        L=Author.objects.filter_by_name(search)
+        if L.count()==0:
+            return self.render_not_found(request,form)
+        if L.count()>1:
+            return self.render_multiple_found(request,L)
+
+        author=L.first()
+        publication=self.get_object()
+        form = forms.IssueAuthorForm(prefix="author",initial={"author": author.pk})
+        formset = forms.IssueChoiceFormset(prefix="issues",queryset=Issue.objects.by_publication(publication))
+        return render(request, self.template_name, {self.context_object_name: publication,
+                                                    'author_form': form,
+                                                    'issues_formset': formset,
+                                                    'action': reverse("bibliography:publication-issues-author-add",
+                                        kwargs={"pk":publication.id})})
+
+class PublicationIssuesAuthorAddView(View,SingleObjectMixin):
+    template_name = "bibliography/publication_issues_author_add.html"
+    model=Publication
+    context_object_name="publication"
+
+    def get(self, request, *args, **kwargs):
+        publication=self.get_object()
+        form = forms.IssueAuthorForm(prefix="author")
+        formset = forms.IssueChoiceFormset(prefix="issues",queryset=Issue.objects.by_publication(publication))
+        return render(request, self.template_name, {self.context_object_name: publication,
+                                                    'author_form': form,
+                                                    'issues_formset': formset})
+
+    def post(self, request, *args, **kwargs):
+        publication=self.get_object()
+        author_form = forms.IssueAuthorForm(request.POST,prefix="author")
+        formset = forms.IssueChoiceFormset(request.POST,prefix="issues",
+                                           queryset=Issue.objects.by_publication(publication))
+        if not author_form.is_valid():
+            return render(request, self.template_name, {self.context_object_name: publication,
+                                                        'author_form': author_form,
+                                                        'issues_formset': formset})
+        if not formset.is_valid():
+            return render(request, self.template_name, {self.context_object_name: publication,
+                                                        'author_form': author_form,
+                                                        'issues_formset': formset})
+        # per ogni oggetto nella formset, bisogna creare una issueauthorrel con i valori passati
+
+        author=author_form.cleaned_data["author"]
+        author_role=author_form.cleaned_data["author_role"]
+        author_pos=author_form.cleaned_data["pos"]
+
+        for form in formset:
+            if not form.cleaned_data["selected"]: continue
+            obj,created=IssueAuthorRelation.objects.get_or_create(author=author,author_role=author_role,
+                                                                  issue=form.instance,defaults={"pos": author_pos})
+        # tornare alla publication
+        return redirect(publication)
+
 
 #### category graph
 

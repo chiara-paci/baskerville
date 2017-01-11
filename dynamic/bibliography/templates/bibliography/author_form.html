@@ -6,7 +6,7 @@
 {% block content %}
 <h1>{% trans "New author" %}</h1>
 
-<form method="post" action="">
+<form method="post" action="{{ action }}">
 {% csrf_token %}
 
 {% if form.non_field_errors %}
@@ -48,6 +48,9 @@
 	  {{ aform.state.errors }}
 	  {{ aform.state_name.errors }}
 	</td>
+	{% if formset.can_delete %}
+	<td>{{ aform.DELETE }}</td>
+	{% endif %}
       </tr>
       {% endfor %}
     </table>

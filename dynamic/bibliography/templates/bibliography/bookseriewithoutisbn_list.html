@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<table>
+<thead>
+<tr>
+  <th colspan=2>isbn</th>
+  <th>title</th>
+  <th>title prefix</th>
+  <th>publisher</th>
+</tr>
+</thead>
+
+{% for serie in object_list %}
+<tbody>
+<tr>
+  <td class="top">{{ serie.isbn_ced }}</td>
+  <td class="top">{{ serie.isbn_book_prefix }}-</td>
+  <td class="top">{{ serie.title }}</td>
+  <td class="top">{{ serie.title_prefix }}</td>
+  <td class="top">{{ serie.publisher }}</td>
+</tr>
+</tbody>
+{% endfor %}
+</table>
+
+{% endblock %}
+

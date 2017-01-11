@@ -62,6 +62,7 @@ body {
 
 table {
     border-collapse: collapse;
+    font-size: .8em;
 }
 
 header {
@@ -131,7 +132,6 @@ nav {
     .submenu {
 	background-color: @secahard4;
 	color: @seca2;
-	z-index: 100;
 	h1 {
 	    font-size: 1em;
 	    font-weight: normal;
@@ -149,6 +149,7 @@ nav {
 	    padding: .5em;
 	    display: none;
 	    position: relative;
+	    background-color: @secahard4;
 	}
 
     }
@@ -156,12 +157,15 @@ nav {
     .submenu:hover {
 	.items {
 	    display: block;
+	    z-index: 200;
 	}
 
 	h1 {
 	    background-color: @seca2;
 	    color: @secahard4;
 	}
+
+	z-index: 200;
 	
     }
 
@@ -269,25 +273,29 @@ main {
 	padding-left: .5em;
     }
 
-    tbody:nth-child(even) {
-	background: @secb1;
-	th {
-	    background: @secb2;
-	    color: @secbhard4;
-	    a {
-		background: @secb2;
-		color: @secbhard4;
-		text-decoration: none;
-	    }
-	    a:hover {
-		background: @secbhard4;
-		color: @secb2;
-	    }
-	}
 
+    tbody:nth-of-type(even), thead {
+	background: @seca1;
+	th {
+	    background: @seca2;
+	    color: @secahard4;
+	}
+	a {
+	    background: @seca2;
+	    color: @secahard4;
+	    text-decoration: none;
+	}
+	a:hover {
+	    background: @secahard4;
+	    color: @seca2;
+	}
+    }
+
+    thead th {
+	border-bottom: 1px solid @secahard4;
     }
     
-    tbody:nth-child(odd) {
+    tbody:nth-of-type(odd) {
 	background: @prim1;
 	th {
 	    background: @prim2;

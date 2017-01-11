@@ -84,8 +84,6 @@ def custom_model_list(model_list):
     
     return xret
 
-RE_NAME_SEP=re.compile("('| |-)")
-
 class LabeledAbstract(models.Model):
     label = models.SlugField(unique=True)
     description = models.CharField(max_length=1024)
@@ -298,16 +296,104 @@ class NameFormat(LabeledAbstract):
 
 class NameType(LabeledAbstract): pass
 
+RE_NAME_SEP=re.compile("('| |-)")
+
+VONS=["von","di","da","del","della","dell","dello","dei","degli","delle","de","d","la","lo",
+      "dal","dalla","dall","dallo","dai","dagli","dalle","al","ibn"]
+
+ROMANS=["I","II","III","IV","V","VI","VII","VIII","IX","X",
+        "XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX",
+        "XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII","XXVIII","XXIX","XXX",
+        "XXXI","XXXII","XXXIII","XXXIV","XXXV","XXXVI","XXXVII","XXXVIII","XXXIX","XL",
+        "XLI","XLII","XLIII","XLIV","XLV","XLVI","XLVII","XLVIII","XLIX","L"]
+
+
+class NameFormatCollectionManager(models.Manager):
+    def get_preferred(self,num_fields):
+        preferred_list=self.all().filter(preferred=True)
+        for format_c in preferred_list:
+            fields=format_c.fields
+            if len(fields)==num_fields: 
+                return format_c
+        format_max_num=-1
+        format_max=None
+        for format_c in self.all():
+            fields=format_c.fields
+            if len(fields)==num_fields: 
+                return format_c
+            if len(fields)>format_max_num:
+                format_max_num=len(fields)
+                format_max=format_c
+        return format_max
+
+    def get_format_for_name(self,search):
+        if not search:
+            return self.get_preferred(0),[]
+        if search.lower().replace(".","") in [ "av","aavv" ]:
+            return self.get_preferred(0),[]
+
+        t=RE_NAME_SEP.split(search)        
+        names=[]
+        t_vons=""
+        for n in range(0,len(t)):
+            if not t[n]: continue
+            if t[n] in [ " ","'" ]:
+                if t_vons:
+                    t_vons+=t[n]
+                continue
+            if t[n]=="-":
+                if t_vons:
+                    t_vons+="-"
+                else:
+                    names[-1]+="-"
+                continue
+            if t[n].lower() not in VONS:
+                if names and names[-1].endswith("-"):
+                    names[-1]+=t[n].capitalize()
+                else:
+                    names.append(t_vons+t[n].capitalize())
+                t_vons=""
+                continue
+            t_vons+=t[n]
+        return self.get_preferred(len(names)),names
+
 class NameFormatCollection(LabeledAbstract):
     long_format = models.ForeignKey(NameFormat,related_name='long_format_set')
     short_format = models.ForeignKey(NameFormat,related_name='short_format_set')
     list_format = models.ForeignKey(NameFormat,related_name='list_format_set')
     ordering_format = models.ForeignKey(NameFormat,related_name='ordering_format_set')
 
+    preferred = models.BooleanField(default=False)
+
+    objects = NameFormatCollectionManager()
+
     def save(self, *args, **kwargs):
         super(NameFormatCollection, self).save(*args, **kwargs)
         for person in self.person_set.all():
             person.update_cache()
+
+    @property
+    def fields(self):
+        L=["name","surname"]
+        long_name=unicode(self.long_format.pattern)
+        short_name=unicode(self.short_format.pattern)
+        list_name=unicode(self.list_format.pattern)
+        ordering_name=unicode(self.ordering_format.pattern)
+
+        for s in "VALURNIC":
+            long_name=long_name.replace("{{"+s+"|","{{")
+            short_name=short_name.replace("{{"+s+"|","{{")
+            list_name=list_name.replace("{{"+s+"|","{{")
+            ordering_name=ordering_name.replace("{{"+s+"|","{{")
+        
+        names=[]
+        for f in [long_name,short_name,list_name,ordering_name]:
+            L=map(lambda x: x.replace("{{","").replace("}}",""),
+                  re.findall(r'{{.*?}}',f))
+            for name in L:
+                if name in names: continue
+                names.append(name)
+        return names
 
     ### Sintassi dei formati
     #   {{<name_type>}}: <name_type> 
@@ -321,14 +407,6 @@ class NameFormatCollection(LabeledAbstract):
     #   {{I|<name_type>}}: iniziali (Gian Uberto => G. U.)
 
     def apply_formats(self,names):
-        vons=["von","di","da","del","della","dell","dello","dei","degli","delle","de","d",
-              "dal","dalla","dall","dallo","dai","dagli","dalle","al","ibn"]
-        romans=["I","II","III","IV","V","VI","VII","VIII","IX","X",
-                "XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX",
-                "XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII","XXVIII","XXIX","XXX",
-                "XXXI","XXXII","XXXIII","XXXIV","XXXV","XXXVI","XXXVII","XXXVIII","XXXIX","XL",
-                "XLI","XLII","XLIII","XLIV","XLV","XLVI","XLVII","XLVIII","XLIX","L"]
-
         long_name=unicode(self.long_format.pattern)
         short_name=unicode(self.short_format.pattern)
         list_name=unicode(self.list_format.pattern)
@@ -340,7 +418,7 @@ class NameFormatCollection(LabeledAbstract):
             vons_t=[]
             norm_t=[]
             for x in t:
-                if x.lower() in vons:
+                if x.lower() in VONS:
                     vons_t.append(x.lower())
                 else:
                     if len(x)==1 and x.isalpha():
@@ -362,7 +440,7 @@ class NameFormatCollection(LabeledAbstract):
             val_f["V"]="".join(vons_t)
 
             if val.isdigit():
-                val_f["R"]=romans[int(val)-1]
+                val_f["R"]=ROMANS[int(val)-1]
                 val_f["A"]="%3.3d" % int(val)
             else:
                 val_f["R"]=""
@@ -394,25 +472,48 @@ class PersonCache(models.Model):
     def __unicode__(self): return self.list_name
 
 class PersonManager(models.Manager):
+
+    def search_names(self,names):
+        qset=self.all()
+        if len(names)==0: return qset
+        D=[]
+        for name in names:
+            if name.endswith("."):
+                name=name[:-1]
+                S=set(map(lambda x: x.person.id,PersonNameRelation.objects.filter(value__istartswith=name)))
+            elif len(name)==1:
+                S=set(map(lambda x: x.person.id,PersonNameRelation.objects.filter(value__istartswith=name)))
+            else:
+                S=set(map(lambda x: x.person.id,PersonNameRelation.objects.filter(value__iexact=name)))
+            D.append(S)
+        for id_set in D:
+            qset=qset.filter(id__in=list(id_set))
+        if qset.count()>0: return qset
+        if len(names)==1: return qset
+        if len(names)==2:
+            newnames=[ " ".join(names) ]
+            return self.search_names(newnames)
+        L=len(names)
+        for n in range(0,L-1):
+            newnames=names[0:n] + [ " ".join(names[n:n+2])] + names[n+2:L]
+            qset=self.search_names(newnames)
+            if qset.count()>0: return qset
+        return qset
+        
     
     def filter_by_name(self,search):
-        t=search.lower().split(" ")
-        if len(t)==0: return self.all()
-        #query="select p.id,a0.value,a1.value from bibliography_person as p,bibliography_personnamerelation as a0, bibliography_personnamerelation as a1 where a0.value='Bazin' and a0.person_id=a1.person_id  and a0.person_id=p.id and a0.id!=a1.id;"
+        search=search.replace(" , "," ")
+        search=search.replace(", "," ")
+        search=search.replace(" ,"," ")
+        search=search.replace(","," ")
 
-        query="select person.id,person.format_collection_id,person.cache_id from bibliography_person as person"
-        for n in range(0,len(t)):
-            query+=", bibliography_personnamerelation as pnr"+str(n)
-        query+=" where pnr0.person_id=person.id"
-        for n in range(0,len(t)):
-            if n!=0:
-                query+=" and pnr0.person_id=pnr"+str(n)+".person_id"
-            query+=" and lower(pnr"+str(n)+'.value)=%s'
-            if n==len(t)-1: continue
-            for m in range(n+1,len(t)):
-                query+=" and pnr"+str(n)+".id!=pnr"+str(m)+".id"
-        return self.raw(query,t)
+        if search.lower() in [ "--","","- -","-","aavv","aa.vv.","aa. vv."]:
+            format_c=NameFormatCollection.objects.get(label="aavv")
+            qset=self.all().filter(format_collection=format_c)
+            return qset
 
+        t_name=search.lower().split(" ")
+        return self.search_names(t_name)
 
 class Person(models.Model):
     format_collection = models.ForeignKey(NameFormatCollection)
@@ -967,6 +1068,9 @@ class Author(Person):
             L.append( (rel.year,rel.author_role,rel.actual()) )
         return L
 
+    def get_absolute_url(self):
+        return "/bibliography/author/%d" % self.pk
+
 class AuthorRole(LabeledAbstract): 
     cover_name = models.BooleanField(default=False)
     action = models.CharField(default="",max_length=1024,blank=True)
@@ -1001,6 +1105,10 @@ class AuthorRelation(models.Model):
     def save(self,*args, **kwargs):
         if (not self.content_type):
             self.content_type = ContentType.objects.get_for_model(self.__class__)
+        try:
+            self.year=self.actual()._year()
+        except:
+            self.year=self._year()
         super(AuthorRelation, self).save(*args, **kwargs)
 
     def clean(self,*args,**kwargs):
@@ -1034,9 +1142,14 @@ class PublisherAddress(models.Model):
     class Meta:
         ordering = ["city"]
 
+class PublisherIsbnManager(models.Manager):
+    def isbn_alpha(self):
+        return self.all().filter(isbn__iregex=r'^[a-z].*')
+
 class PublisherIsbn(models.Model):
     isbn = models.CharField(max_length=4096,unique=True)
     preferred = models.ForeignKey("Publisher",editable=False,blank=True)
+    objects = PublisherIsbnManager()
 
     class Meta:
         ordering = ["isbn"]
@@ -1086,6 +1199,10 @@ class Publisher(models.Model):
     def address(self):
         return " - ".join(map(lambda x: unicode(x.address.city),self.publisheraddresspublisherrelation_set.order_by("pos")))
 
+    def show_name(self):
+        if self.full_name: return self.full_name
+        return self.name
+
     def html(self):
         H=self.name
         adrs=self.address()
@@ -1113,12 +1230,20 @@ class MigrPublisherRiviste(models.Model):
 class VolumeType(LabeledAbstract): 
     read_as = models.CharField(max_length=1024,default="")
 
+class PublicationManager(models.Manager):
+    def issn_alpha(self):
+        return self.all().filter(issn_crc='Y')
+
 class Publication(models.Model):
     issn = models.CharField(max_length=128)
     issn_crc = models.CharField(max_length=1,editable=False,default="Y")
     publisher = models.ForeignKey(Publisher)
     title = models.CharField(max_length=4096)
     volume_type = models.ForeignKey(VolumeType)
+    date_format = models.CharField(max_length=4096,default="%Y-%m-%d")
+    objects=PublicationManager()
+    #periodicity=models.CharField(max_length=128,choices=[ ("monthly","monthly"),("unknown","unknown") ],default="unknown")
+    #first_day=models.IntegerField(default=1)
 
     class Meta:
         ordering = ['title']
@@ -1129,6 +1254,9 @@ class Publication(models.Model):
         return "<i>"+tit+"</i>"
 
     def __unicode__(self): return unicode(self.title)
+
+    def get_absolute_url(self):
+        return "/bibliography/publication/%d" % self.pk
 
     def update_crc(self):
         self.issn_crc = self.crc()
@@ -1150,6 +1278,9 @@ class Publication(models.Model):
         self.issn_crc = self.crc()
         super(Publication, self).clean(*args, **kwargs)
 
+    def issue_set(self):
+        return Issue.objects.filter(volume__publication__id=self.id).order_by("date")
+
 class Volume(models.Model):
     label = models.CharField(max_length=256,db_index=True)
     publication = models.ForeignKey(Publication)
@@ -1170,6 +1301,10 @@ class Volume(models.Model):
 
 class IssueType(LabeledAbstract): pass
 
+class IssueManager(models.Manager):
+    def by_publication(self,publication):
+        return self.all().filter(volume__publication__id=publication.id).order_by("date")
+
 class Issue(models.Model):
     volume = models.ForeignKey(Volume)
     issue_type = models.ForeignKey(IssueType)
@@ -1177,9 +1312,18 @@ class Issue(models.Model):
     number = models.CharField(max_length=256)
     title = models.CharField(max_length=4096,blank=True,default="")
     date = models.DateField()
+    authors = models.ManyToManyField(Author,through='IssueAuthorRelation',blank=True)
+
+    objects=IssueManager()
+
+    class Meta:
+        ordering = ['date']
 
     def issn(self):
         return self.volume.publication.issn
+
+    def show_date(self):
+        return self.date.strftime(self.volume.publication.date_format)
 
     def html(self):
         H=self.volume.html()
@@ -1202,6 +1346,28 @@ class Issue(models.Model):
 
     def year(self):
         return self.date.year
+
+class IssueAuthorRelation(AuthorRelation,PositionAbstract):
+    issue = models.ForeignKey(Issue)
+
+    def __unicode__(self): return unicode(self.author)+u", "+unicode(self.issue)
+
+    def _year(self): return int(self.issue.year())
+    def _title(self): return unicode(self.issue.title)
+
+    def html(self): 
+        print "COM"
+        print self.issue.html()
+        return self.issue.html()
+
+    class Meta:
+        ordering=["pos"]
+        #unique_together= [ 'author','author_role','issue' ]
+
+    def save(self,*args,**kwargs):
+        if not self.pos:
+            self.pos=1
+        return super(IssueAuthorRelation,self).save(*args,**kwargs)
 
 class Article(models.Model):
     title = models.CharField(max_length=4096)
@@ -1279,6 +1445,10 @@ class ArticleAuthorRelation(AuthorRelation,PositionAbstract):
 
 ### books
 
+class BookManager(models.Manager):
+    def isbn_alpha(self):
+        return self.all().filter(isbn_crc10='Y').order_by("isbn_ced","isbn_book","year","title")
+
 class Book(CategorizedObject):
     isbn_ced = models.CharField(max_length=9,db_index=True)
     isbn_book = models.CharField(max_length=9,db_index=True)
@@ -1290,6 +1460,8 @@ class Book(CategorizedObject):
     year = models.IntegerField()
     publisher = models.ForeignKey(Publisher)
     authors = models.ManyToManyField(Author,through='BookAuthorRelation',blank=True)
+
+    objects=BookManager()
 
     def get_authors(self):
         return ", ".join(map(lambda x: unicode(x.author.long_name()), 
@@ -1346,6 +1518,13 @@ class Book(CategorizedObject):
         self.isbn_cache10=self.isbn_ced+self.isbn_book+unicode(self.crc10())
         self.isbn_cache13='978'+self.isbn_ced+self.isbn_book+unicode(self.crc13())
         super(Book, self).clean(*args, **kwargs)
+
+    def save(self,*args,**kwargs):
+        self.isbn_crc10 = self.crc10()
+        self.isbn_crc13 = self.crc13()
+        self.isbn_cache10=self.isbn_ced+self.isbn_book+unicode(self.crc10())
+        self.isbn_cache13='978'+self.isbn_ced+self.isbn_book+unicode(self.crc13())
+        super(Book, self).save(*args, **kwargs)
 
     def update_crc(self):
         self.isbn_crc10 = self.crc10()

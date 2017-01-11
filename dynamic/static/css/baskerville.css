@@ -81,6 +81,7 @@ body {
 }
 table {
   border-collapse: collapse;
+  font-size: .8em;
 }
 header {
   background: #c1d989;
@@ -142,7 +143,6 @@ nav .left {
 nav .submenu {
   background-color: #669100;
   color: #ddf0b2;
-  z-index: 100;
 }
 nav .submenu h1 {
   font-size: 1em;
@@ -161,9 +161,14 @@ nav .submenu .items {
   padding: .5em;
   display: none;
   position: relative;
+  background-color: #669100;
+}
+nav .submenu:hover {
+  z-index: 200;
 }
 nav .submenu:hover .items {
   display: block;
+  z-index: 200;
 }
 nav .submenu:hover h1 {
   background-color: #ddf0b2;
@@ -268,35 +273,42 @@ main th {
 main td {
   padding-left: .5em;
 }
-main tbody:nth-child(even) {
-  background: #fff1d7;
+main tbody:nth-of-type(even),
+main thead {
+  background: #e9f4ce;
 }
-main tbody:nth-child(even) th {
-  background: #ffe8be;
-  color: #9b6400;
+main tbody:nth-of-type(even) th,
+main thead th {
+  background: #ddf0b2;
+  color: #669100;
 }
-main tbody:nth-child(even) th a {
-  background: #ffe8be;
-  color: #9b6400;
+main tbody:nth-of-type(even) a,
+main thead a {
+  background: #ddf0b2;
+  color: #669100;
   text-decoration: none;
 }
-main tbody:nth-child(even) th a:hover {
-  background: #9b6400;
-  color: #ffe8be;
+main tbody:nth-of-type(even) a:hover,
+main thead a:hover {
+  background: #669100;
+  color: #ddf0b2;
 }
-main tbody:nth-child(odd) {
+main thead th {
+  border-bottom: 1px solid #669100;
+}
+main tbody:nth-of-type(odd) {
   background: #fffbd7;
 }
-main tbody:nth-child(odd) th {
+main tbody:nth-of-type(odd) th {
   background: #fff8be;
   color: #9b8a00;
 }
-main tbody:nth-child(odd) a {
+main tbody:nth-of-type(odd) a {
   background: #fff8be;
   color: #9b8a00;
   text-decoration: none;
 }
-main tbody:nth-child(odd) a:hover {
+main tbody:nth-of-type(odd) a:hover {
   background: #9b8a00;
   color: #fff8be;
 }

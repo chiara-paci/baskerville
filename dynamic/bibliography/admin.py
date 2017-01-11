@@ -411,12 +411,14 @@ admin.site.register(AuthorRelation,AuthorRelationAdmin)
 class NameFormatAdmin(admin.ModelAdmin):
     list_display= ['label','pattern','description']
     list_editable = ['pattern']
+    save_as=True
 
 admin.site.register(NameFormat,NameFormatAdmin)
 
 class NameFormatCollectionAdmin(admin.ModelAdmin):
-    list_display= ['label','description','long_format','short_format','list_format','ordering_format']
-    list_editable = ['long_format','short_format','list_format','ordering_format']
+    list_display= ['label','description','preferred','long_format','short_format','list_format','ordering_format']
+    list_editable = ['preferred','long_format','short_format','list_format','ordering_format']
+    save_as=True
 
 admin.site.register(NameFormatCollection,NameFormatCollectionAdmin)
 
@@ -536,7 +538,8 @@ admin.site.register(Volume)
 admin.site.register(IssueType)
 
 class PublicationAdmin(admin.ModelAdmin):
-    list_display=['issn','issn_crc','title','publisher','volume_type']
+    list_display=['issn','issn_crc','title','publisher','volume_type','date_format']
+    list_editable=['date_format']
 
 admin.site.register(Publication,PublicationAdmin)
 

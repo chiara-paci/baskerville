@@ -6,8 +6,10 @@ then
 fi
 
 CDM_DJANGO_MANAGE=$CDM_HOME/dynamic/manage.py
+DB_NAME=baskerville
+DB_USER=baskerville
 
-AZIONI="runserver syncdb"
+AZIONI="runserver syncdb backup"
 
 function help {
     echo 
@@ -29,6 +31,13 @@ done
 azione="${!OPTIND}"
 
 case $azione in
+    backup)
+	oggi=$( date  '+%Y-%m-%d-%H%M%S' )
+	fdump=$CDM_HOME/backup/pgdump_"${oggi}".sql
+	mkdir -p $CDM_HOME/backup
+	pg_dump -U $DB_USER $DB_NAME > $fdump
+	bzip2 $fdump
+	;;
     runserver)
 	$CDM_DJANGO_MANAGE $azione $HOST:8082
 	;;
