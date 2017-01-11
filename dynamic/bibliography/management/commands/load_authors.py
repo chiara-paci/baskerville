@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 
 
-from bibliography.models import Author,MigrAuthor,NameFormat,NameType,AuthorNameRelation
+from bibliography.models import Author,MigrAuthor,NameFormat,NameType,PersonNameRelation
 
 class Command(BaseCommand):
     args = '<file_elenco>'
@@ -56,6 +56,6 @@ class Command(BaseCommand):
             ma=MigrAuthor.objects.create(author=author,cod=obj["cod"],ind=obj["ind"])
             for key,val in obj["names"].items():
                 name_type=NameType.objects.get(label=key)
-                anr=AuthorNameRelation.objects.create(author=author,name_type=name_type,value=val)
+                anr=PersonNameRelation.objects.create(author=author,name_type=name_type,value=val)
             author.save()
             print unicode(author)

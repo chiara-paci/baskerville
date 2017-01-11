@@ -2,6 +2,6 @@
     "id": {{ category.id }},
     "name": "{{ category.name }}",
     "label": "{{ category.label }}",
-    "fathers": "{{ category.fathers }}",
+    "parents": "{{ category.parents }}",
     "children": "{{ category.children }}"
 }

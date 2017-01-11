@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %} - {% trans "Create author" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Choice an author" %}</h1>
+
+<form method="post" action="{{ action }}">
+{% csrf_token %}
+
+{{ hidden_form }}
+
+{% if form.non_field_errors %}
+<p class="errors">{{ form.non_field_errors }}</p>
+{% endif %}
+{% if form.author.errors %}
+<p class="errors">{{ form.author.errors }}</p>
+{% endif %}
+
+{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+
+<p>{{ form.author.label }}: {{ form.author }} </p>
+
+<input type="submit" value="{% trans "save" %}" />
+
+</form>
+</div> 
+</div> 
+
+{% endblock %}
+
+

@@ -7,6 +7,12 @@ For more information on this file, see
 https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 """
 
+import sys
+
+path = '/home/chiara/baskerville/dynamic'
+if path not in sys.path:
+    sys.path.append(path)
+
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dynamic.settings")
 

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from config import *
+#from config import *
 import urllib2
 import re
 
-from bibliography.models import PublisherAddress,AuthorCache,RepositoryCacheBook,RepositoryCacheAuthor
+from bibliography.models import PublisherAddress,PersonCache,RepositoryCacheBook,RepositoryCacheAuthor,Author
 
 URL_CONVERSION = [
     ( ["+"]                 , " " ),
@@ -29,6 +29,7 @@ def url_ripulisci(stringa):
         for l in lista:
             stringa=stringa.replace(l,val)
     stringa=stringa.strip()
+    print "===>",stringa
     return(stringa)
 
 class BookRepository(object):
@@ -46,19 +47,11 @@ class BookRepository(object):
         ret=[]
         n=0
         for aut in data:
-            if "," in aut:
-                t=aut.split(",")
-                aut=" ".join(t[1:])+" "+t[0]
-
-            t=filter(lambda x: bool(x),map(lambda x: x.strip(),aut.strip().split(" ")))
-            aut=" ".join(t)
-
-            objs=AuthorCache.objects.filter(long_name=aut)
-            if objs:
-                aut_obj=objs[0].author
-                ret.append(("author",n,aut_obj))
+            qset=Author.objects.filter_by_name(aut)
+            if qset.count():
+                ret.append( ("author",n,qset.first()) )
             else:
-                ret.append(("author",n,aut))
+                ret.append( ("author",n,aut) )
             n+=1
         return ret
 
@@ -97,12 +90,13 @@ class CacheRepository(BookRepository):
         for aut in obj.repositorycacheauthor_set.order_by("pos"):
             t=filter(lambda x: bool(x),map(lambda x: x.strip(),aut.name.strip().split(" ")))
             autname=" ".join(t)
-            objs=AuthorCache.objects.filter(long_name=autname)
-            if objs:
-                aut_obj=objs[0].author
-                authors.append( (aut.role,aut.pos,aut_obj) )
+            qset=Author.objects.filter_by_name(autname)
+            if qset.count():
+                authors.append( (aut.role,aut.pos,qset.first()) )
             else:
                 authors.append( (aut.role,aut.pos,autname) )
+
+
         R["authors"]=authors
         return R
 
@@ -190,6 +184,7 @@ class WRWorldCat(WebRepository):
         if not nome: nome="-"
         
         R["authors"]=self.get_authors([nome.strip()+" "+cognome.strip()])
+        print R
         return(R)
     
     
@@ -299,6 +294,6 @@ repositories=[
     CacheRepository(),
     WRWorldCat(),
     #WRCopac(),
-    WRGulliverTown(),
-    WRAbeBooks(),
+    #WRGulliverTown(),
+    #WRAbeBooks(),
     ]

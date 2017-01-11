@@ -1,7 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey,GenericRelation
+#from django.contrib.contenttypes import generic
 from django.db.models import Q 
 
 # Create your models here.
@@ -391,7 +392,7 @@ class ShortClassification(models.Model):
 class Classification(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type','object_id')
+    content_object = GenericForeignKey('content_type','object_id')
 
     argument = models.ForeignKey(ArgumentClassification)
     object_classification = models.CharField(max_length=1024)

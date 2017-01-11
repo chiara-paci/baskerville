@@ -7,7 +7,7 @@ class TemporaryAuthor(object):
 
 class TemporaryPublisher(object):
     def __init__(self,isbn_ced):
-        self.isbn_ced=isbn_ced
+        self.isbn_ced=isbn_ced.upper()
         self.db_object=None
         self.name=""
         self.addresses=[]
@@ -32,13 +32,16 @@ class TemporaryPublisher(object):
 
 class TemporaryBook(object):
     def __init__(self,isbn_ced,isbn_book):
-        self.isbn_ced=isbn_ced
-        self.isbn_book=isbn_book
+        self.isbn_ced=isbn_ced.upper()
+        self.isbn_book=isbn_book.upper()
         self.authors=[]
         self.publisher=None
         self.title=""
         self.year=""
         self.indb=False
+
+    def __str__(self): return self.isbn_ced+"-"+self.isbn_book
+    def __repr__(self): return self.isbn_ced+"-"+self.isbn_book
 
     def crc10(self):
         if not unicode(self.isbn_book).isdigit(): return('Y')
@@ -73,7 +76,7 @@ class TemporaryBook(object):
         return isbn10
 
     def look_for(self,publisher_dict):
-        objs=Book.objects.filter(isbn_ced=self.isbn_ced,isbn_book=self.isbn_book)
+        objs=Book.objects.filter(isbn_ced__iexact=self.isbn_ced,isbn_book__iexact=self.isbn_book)
         if len(objs)>0:
             obj=objs[0]
             self.authors=obj.bookauthorrelation_set.all()
@@ -114,6 +117,7 @@ def look_for(isbn_list):
     isbn_ced_list=[]
     unseparated=[]
     for isbn in isbn_list:
+        isbn=isbn.upper()
         t=isbn.replace("-","")
         if len(t) in [12,13]:
             isbn=isbn[3:]
@@ -135,7 +139,7 @@ def look_for(isbn_list):
     publisher_dict={}
     
     for isbn in publisher_isbn_list:
-        publisher_dict[isbn.isbn]=list(isbn.publisher_set.all())
+        publisher_dict[isbn.isbn.upper()]=list(isbn.publisher_set.all())
 
         
     book_list=[]
@@ -147,21 +151,48 @@ def look_for(isbn_list):
     for isbn in unseparated:
         for n in range(1,9):
             isbn_ced_list.append(isbn[:n])
+    print isbn_ced_list
     publisher_isbn_list=PublisherIsbn.objects.filter(isbn__in=isbn_ced_list)
+    print publisher_isbn_list
     for isbn in publisher_isbn_list:
-        publisher_dict[isbn.isbn]=list(isbn.publisher_set.all())
+        publisher_dict[isbn.isbn.upper()]=list(isbn.publisher_set.all())
+    print publisher_dict
+    print "unseparated:",unseparated
+    for i in unseparated: print i
 
-    for isbn in unseparated:
+    def find_ce(book_isbn,pub_dict):
         for n in range(1,9):
-            if publisher_dict.has_key(isbn[:n]):
-                isbn_ced=isbn[:n]
-                isbn_book=isbn[n:]
+            if pub_dict.has_key(book_isbn[:n]):
+                print book_isbn,book_isbn[:n],"yes"
+                isbn_ced=book_isbn[:n]
+                isbn_book=book_isbn[n:]
                 tmp_book=TemporaryBook(isbn_ced,isbn_book)
-                book_list.append(tmp_book)
-                unseparated.remove(isbn)
-                break
+                return tmp_book
+            print book_isbn,book_isbn[:n],"no"
+        return None
+
+    for isbn in unseparated[:]:
+        print "QQQ",isbn
+        tmp_book=find_ce(isbn,publisher_dict)
+        if not tmp_book: continue
+        book_list.append(tmp_book)
+        unseparated.remove(isbn)
+        print "A1",book_list
+        print "A1",unseparated
+        # for n in range(1,9):
+        #     if publisher_dict.has_key(isbn[:n]):
+        #         print isbn,isbn[:n],"yes"
+        #         isbn_ced=isbn[:n]
+        #         isbn_book=isbn[n:]
+        #         tmp_book=TemporaryBook(isbn_ced,isbn_book)
+        #         break
+        #     print isbn[:n],"no"
+            
+    print "AA",book_list
+    print "AA",unseparated
 
     for uisbn in unseparated:
+        ### solo per fargli calcolare crc10 e crc13
         tbook=TemporaryBook(uisbn[:3],uisbn[3:])
         uisbn10=uisbn+unicode(tbook.crc10())
         uisbn13="978"+uisbn+unicode(tbook.crc13())
@@ -169,17 +200,15 @@ def look_for(isbn_list):
 
         
     publisher_list=[]
-    author_list=[]
     n=0
     for book in book_list:
         book.look_for(publisher_dict)
         tpub=TemporaryPublisher(book.isbn_ced)
         publisher_list.append(tpub)
-        if publisher_dict.has_key(tpub.isbn_ced):
-            tpub.set_db(publisher_dict[tpub.isbn_ced][0])
+        if publisher_dict.has_key(tpub.isbn_ced.upper()):
+            tpub.set_db(publisher_dict[tpub.isbn_ced.upper()][0])
             continue
         tpub.set_no_db(book)
-
 
     return {
         'unseparable': unseparated,

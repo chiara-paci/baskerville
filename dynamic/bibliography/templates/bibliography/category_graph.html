@@ -8,6 +8,7 @@
   stroke: #fff;
   /*stroke-width: 1.5px;*/
     stroke-width: 0px;
+    font-size: 8pt;
 }
 
 .link {
@@ -22,7 +23,7 @@
 
 #commandbox {
     position: fixed;
-    top: 1em;
+    bottom: 1em;
     right: 1em;
     border: 1px solid black;
     background: rgba(255,255,255,0.5);
@@ -35,7 +36,7 @@
     padding: .5em;
     margin: .5em;
     width: 16em;
-    font-size: .8em;
+    font-size: 1em;
 }
 
 .commandcategory {
@@ -109,8 +110,6 @@
     background: -o-linear-gradient(top,rgba(255,255,255,.5),rgba(25,90,136,.5));
     color: rgb(25,90,136);
 }
-
-
 
 </style>
 
@@ -186,9 +185,9 @@ $.fn.filterByData = function(prop, val) {
 }
 
 {% if pk %}
-var width = 1024, height = 1024;
+var width = 1024, height = 800;
 {% else %}
-var width = 2048, height = 2048;
+var width = 2048, height = 1600;
 {% endif %}
 
 var color = d3.scale.category20();
@@ -197,11 +196,11 @@ var color = d3.scale.category20();
 
 {% if pk %}
 var force = d3.layout.force()
-    .charge(function (node,index) { return -20*node.level; } )
+    .charge(function (node,index) { return -30*node.level; } )
     .linkDistance(function (link,index) {
 	if (!link.is_internal)
 	    return 200;
-	return 50-2*link.father_level;
+	return 100-link.parent_level;
     })
     .size([width, height]);
 {% else %}
@@ -211,7 +210,7 @@ var force = d3.layout.force()
     .linkDistance(function (link,index) {
 	if (!link.is_internal)
 	    return 200;
-	return 50-3*link.father_level;
+	return 100-4*link.parent_level;
     })
     .size([width, height]);
 {% endif %}
@@ -251,7 +250,7 @@ var selected_colors={
     "no": "#ffffff",
     "first": "#ffff00",
     "second": "#00ffff",
-    "father": "#ff0000",
+    "parent": "#ff0000",
     "child": "#0000ff",
     "search": "#00ff00"
 };
@@ -354,13 +353,13 @@ $(".commandsimulaction").click(function (event){
     }
 });
 
-var highlight_neighbour = function(node,father_or_child){
+var highlight_neighbour = function(node,parent_or_child){
     var sel_vertex,other_vertex,label;
-    switch (father_or_child) {
-    case "father":
+    switch (parent_or_child) {
+    case "parent":
 	sel_vertex="target_id";
 	other_vertex="source_id";
-	label="father";
+	label="parent";
 	break;
     default:
 	sel_vertex="source_id";
@@ -402,12 +401,12 @@ $(".commandcategoryaction").click(function (event){
     switch (action) {
     case "highlight_first":
 	if (!selected_first) break;
-	highlight_neighbour(selected_first,"father");
+	highlight_neighbour(selected_first,"parent");
 	highlight_neighbour(selected_first,"child");
 	break;
     case "highlight_second":
 	if (!selected_second) break;
-	highlight_neighbour(selected_second,"father");
+	highlight_neighbour(selected_second,"parent");
 	highlight_neighbour(selected_second,"child");
 	break;
     case "invert":
@@ -432,7 +431,7 @@ $(".commandcategoryaction").click(function (event){
 });
 
 
-d3.json("/bibliography/json/categories/nodeslinks/{{ father_id }}", function(error, jsonobj) {
+d3.json("/bibliography/json/categories/nodeslinks/{{ parent_id }}", function(error, jsonobj) {
     var radius = d3.scale.linear()
 	.domain([0, jsonobj.max_num_objects])
 	.range([2,20]);
@@ -510,7 +509,7 @@ d3.json("/bibliography/json/categories/nodeslinks/{{ father_id }}", function(err
     $(".link").each(function (){
 	$(this).data("highlighted","no");
 	$(this).data({
-	    "father_level": $(this)[0].__data__["father_level"],
+	    "parent_level": $(this)[0].__data__["parent_level"],
 	    "group": $(this)[0].__data__["group"],
 	    "is_internal": $(this)[0].__data__["is_internal"],
 	    "source_id": $(this)[0].__data__["source"]["cat_id"],

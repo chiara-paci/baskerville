@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{{ publication.title }}</h1>
+
+<table>
+<tr>
+  <th>issn</th>
+  <td>{{ publication.issn }}-{{ publication.issn_crc }}</td>
+</tr>
+<tr><th>publisher</th><td>{{ publication.publisher }}</td></tr>
+<tr><th>volume type</th><td>{{ publication.volume_type }}</td></tr>
+</table>
+
+
+<form method="POST" action="{{ action }}">
+  {% csrf_token %}
+
+  <div>
+  {{ author_form.errors }}
+  </div>
+
+  <div>
+  {{ author_form.author.label }}: {{ author_form.author }} 
+  {{ author_form.author_role.label }}: {{ author_form.author_role }} 
+  {{ author_form.pos.label }}: {{ author_form.pos }} 
+  </div>
+
+  <p>Apply to:</p>
+
+  {{ issues_formset.management_form }}
+  <table>
+    {% for form in issues_formset %}
+    <tr><th>{{ form.selected }}</th><td>{{ form.id }}{{ form.number }}</td><td>{{ form.title }}</td></tr>
+    {% endfor %}
+  </table>
+
+  <input type="submit"/>
+  
+</form>
+
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

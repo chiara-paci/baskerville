@@ -2,7 +2,7 @@
     "id": {{ author.id }},
     "format_collection": "{{ author.format_collection }}",
     "names": {
-	{% for rel in author.authornamerelation_set.all %}
+	{% for rel in author.personnamerelation_set.all %}
 	"{{ rel.name_type }}": "{{ rel.value }}"{% if forloop.last %}{% else %},{% endif %}
 	{% endfor %}
     },

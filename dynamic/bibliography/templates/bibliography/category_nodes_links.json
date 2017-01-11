@@ -9,13 +9,13 @@
 	{% endfor %}
     ],
     "links": [
-	{% for source,target,group,is_internal,father_level in rel_list %}
+	{% for source,target,group,is_internal,parent_level in rel_list %}
 	{
 	    "source":{{ source }},
             "target":{{ target }},
 	    "group":{{ group }},
 	    "is_internal": {{ is_internal|lower }},
-	    "father_level": {{ father_level }}
+	    "parent_level": {{ parent_level }}
 	}{% if forloop.last %}{% else %},{% endif %}
 	{% endfor %}
     ]

@@ -10,7 +10,7 @@
 <input type="submit" value="{% trans "save" %}" />
 <input type="reset" value="{% trans "reset" %}" />
     <table>
-      <tr><th>delete</th><th>category</th><th>fathers</th></tr>
+      <tr><th>delete</th><th>category</th><th>parents</th></tr>
     {% for form in formset %}
         {{ form.id }}
         <tr>
@@ -18,7 +18,7 @@
           <td>{{ form.DELETE }}</td>
           {% endif %}
           <td>{{ form.name }}</td>
-          <td>{{ form.fathers }}</td>
+          <td>{{ form.parents }}</td>
         </tr>
     {% endfor %}
     </table>

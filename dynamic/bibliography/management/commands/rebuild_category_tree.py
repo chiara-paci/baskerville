@@ -37,13 +37,13 @@ class Command(BaseCommand):
             print catrel
             log_write(fd,unicode(catrel))
             log_write(fd,u"\n")
-            obj_list=CategoryTreeNode.objects.add_child_category(catrel.father,catrel.child)
+            obj_list=CategoryTreeNode.objects.add_child_category(catrel.parent,catrel.child)
             for action,obj in obj_list:
                 log_write(fd,u"    ")
                 log_write(fd,unicode(action))
                 log_write(fd,u" "+unicode(obj)+u"\n")
         
-        CategoryTreeNode.objects.filter(is_category=False).delete()
+        #CategoryTreeNode.objects.filter(is_category=False).delete()
         for catrel in Book.categories.through.objects.all():
             print catrel.category,u"/",catrel.book
             log_write(fd,unicode(catrel.category)+u"/")
@@ -58,3 +58,6 @@ class Command(BaseCommand):
 
         if fd:
             fd.close()
+
+        for node in CategoryTreeNode.objects.all():
+            node.save()
