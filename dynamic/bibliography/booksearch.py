@@ -84,7 +84,7 @@ class TemporaryBook(object):
             self.year=obj.year
             self.publisher=obj.publisher
             self.indb=True
-            print obj.isbn_cache10,obj.isbn_cache13,"db"
+            #print obj.isbn_cache10,obj.isbn_cache13,"db"
             return
 
         if publisher_dict.has_key(self.isbn_ced):
@@ -99,7 +99,7 @@ class TemporaryBook(object):
         for rep in repositories:
             data=rep.get_by_isbn(isbn10,isbn13)
             if data:
-                print isbn10,isbn13,rep.name
+                #print isbn10,isbn13,rep.name
                 if data.has_key("title"):
                     self.title=data["title"]
                 if data.has_key("year"):
@@ -109,7 +109,6 @@ class TemporaryBook(object):
                 if not self.publisher:
                     self.publisher=(data["publisher"],data["city"],data["addresses"])
                 return
-        print isbn10,isbn13,"failed"
         RepositoryFailedIsbn.objects.get_or_create(isbn10=isbn10,isbn13=isbn13)
 
 def look_for(isbn_list):
@@ -151,14 +150,9 @@ def look_for(isbn_list):
     for isbn in unseparated:
         for n in range(1,9):
             isbn_ced_list.append(isbn[:n])
-    print isbn_ced_list
     publisher_isbn_list=PublisherIsbn.objects.filter(isbn__in=isbn_ced_list)
-    print publisher_isbn_list
     for isbn in publisher_isbn_list:
         publisher_dict[isbn.isbn.upper()]=list(isbn.publisher_set.all())
-    print publisher_dict
-    print "unseparated:",unseparated
-    for i in unseparated: print i
 
     def find_ce(book_isbn,pub_dict):
         for n in range(1,9):
@@ -172,13 +166,10 @@ def look_for(isbn_list):
         return None
 
     for isbn in unseparated[:]:
-        print "QQQ",isbn
         tmp_book=find_ce(isbn,publisher_dict)
         if not tmp_book: continue
         book_list.append(tmp_book)
         unseparated.remove(isbn)
-        print "A1",book_list
-        print "A1",unseparated
         # for n in range(1,9):
         #     if publisher_dict.has_key(isbn[:n]):
         #         print isbn,isbn[:n],"yes"
@@ -188,9 +179,6 @@ def look_for(isbn_list):
         #         break
         #     print isbn[:n],"no"
             
-    print "AA",book_list
-    print "AA",unseparated
-
     for uisbn in unseparated:
         ### solo per fargli calcolare crc10 e crc13
         tbook=TemporaryBook(uisbn[:3],uisbn[3:])

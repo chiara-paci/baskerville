@@ -1,0 +1,171 @@
+[
+{
+    "model": "bibliography.nameformatcollection",
+    "pk": 1,
+    "fields": {
+        "label": "western_twonames",
+        "description": "Western formats with name and surname",
+        "long_format": 1,
+        "short_format": 2,
+        "list_format": 3,
+        "ordering_format": 4,
+        "preferred": true
+    }
+},
+{
+    "model": "bibliography.nameformatcollection",
+    "pk": 2,
+    "fields": {
+        "label": "arabic",
+        "description": "Arabic formats",
+        "long_format": 17,
+        "short_format": 18,
+        "list_format": 19,
+        "ordering_format": 20,
+        "preferred": false
+    }
+},
+{
+    "model": "bibliography.nameformatcollection",
+    "pk": 3,
+    "fields": {
+        "label": "onename",
+        "description": "One name format",
+        "long_format": 12,
+        "short_format": 12,
+        "list_format": 12,
+        "ordering_format": 13,
+        "preferred": true
+    }
+},
+{
+    "model": "bibliography.nameformatcollection",
+    "pk": 4,
+    "fields": {
+        "label": "western_threenames",
+        "description": "Western formats with name, middle name and surname",
+        "long_format": 21,
+        "short_format": 22,
+        "list_format": 23,
+        "ordering_format": 24,
+        "preferred": true
+    }
+},
+{
+    "model": "bibliography.nameformatcollection",
+    "pk": 5,
+    "fields": {
+        "label": "western_threenames_pre",
+        "description": "Western formats with name, middle name and surname, abbreviated first",
+        "long_format": 21,
+        "short_format": 22,
+        "list_format": 25,
+        "ordering_format": 24,
+        "preferred": false
+    }
+},
+{
+    "model": "bibliography.nameformatcollection",
+    "pk": 6,
+    "fields": {
+        "label": "western_twonames_and_title",
+        "description": "Western formats with name, surname and title",
+        "long_format": 15,
+        "short_format": 2,
+        "list_format": 16,
+        "ordering_format": 4,
+        "preferred": false
+    }
+},
+{
+    "model": "bibliography.nameformatcollection",
+    "pk": 7,
+    "fields": {
+        "label": "western_twonames_and_order",
+        "description": "Western formats with name, surname and order",
+        "long_format": 9,
+        "short_format": 2,
+        "list_format": 10,
+        "ordering_format": 11,
+        "preferred": false
+    }
+},
+{
+    "model": "bibliography.nameformatcollection",
+    "pk": 8,
+    "fields": {
+        "label": "russian",
+        "description": "Russian formats",
+        "long_format": 5,
+        "short_format": 6,
+        "list_format": 7,
+        "ordering_format": 8,
+        "preferred": false
+    }
+},
+{
+    "model": "bibliography.nameformatcollection",
+    "pk": 9,
+    "fields": {
+        "label": "western_twonames_married",
+        "description": "Western format for married women",
+        "long_format": 14,
+        "short_format": 2,
+        "list_format": 3,
+        "ordering_format": 4,
+        "preferred": false
+    }
+},
+{
+    "model": "bibliography.nameformatcollection",
+    "pk": 10,
+    "fields": {
+        "label": "aavv",
+        "description": "autori vari",
+        "long_format": 26,
+        "short_format": 26,
+        "list_format": 26,
+        "ordering_format": 27,
+        "preferred": true
+    }
+},
+{
+    "model": "bibliography.nameformatcollection",
+    "pk": 12,
+    "fields": {
+        "label": "western_fournames_pre",
+        "description": "name, middle name and two surname, abbreviated first",
+        "long_format": 28,
+        "short_format": 31,
+        "list_format": 29,
+        "ordering_format": 30,
+        "preferred": false
+    }
+},
+{
+    "model": "bibliography.nameformatcollection",
+    "pk": 13,
+    "fields": {
+        "label": "western_fournames",
+        "description": "name, two middle names and surname",
+        "long_format": 33,
+        "short_format": 35,
+        "list_format": 32,
+        "ordering_format": 34,
+        "preferred": false
+    }
+},
+{
+    "model": "bibliography.nameformatcollection",
+    "pk": 14,
+    "fields": {
+        "label": "latin",
+        "description": "Latin formats",
+        "long_format": 36,
+        "short_format": 38,
+        "list_format": 39,
+        "ordering_format": 37,
+        "preferred": false
+    }
+}
+]

@@ -3,7 +3,7 @@
 from django.db import models
 import django.template.defaultfilters
 from django.db.models import Max
-
+from django.utils.functional import cached_property
 # Create your models here.
 
 from django.conf import settings
@@ -14,7 +14,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save,post_delete,pre_save,pre_delete
 from django.db.models.signals import m2m_changed
 
-from santaclara_base.models import PositionAbstract
+#from santaclara_base.models import PositionAbstract
 
 import re
 
@@ -83,6 +83,68 @@ def custom_model_list(model_list):
         xret.append( (sec,ret[sec]))
     
     return xret
+
+class PositionAbstract(models.Model): 
+    """ Classe astratta per gestire oggetti posizionabili all'interno di un elenco.
+    
+    Definisce il campo *pos* (posizione) come intero positivo. 
+
+    Emette il segnale :any:`santaclara_base.signals.position_changed`
+    quando la posizione viene modificata.
+
+    Un modello che estende la classe PositionAbstract e ridefinisce
+    __init__() o save() deve ricordarsi di richiamare rispettivamente
+    :any:`PositionAbstract.my_action_post_init
+    <santaclara_base.models.PositionAbstract.my_action_post_init>` e
+    :any:`PositionAbstract.my_action_post_save
+    <santaclara_base.models.PositionAbstract.my_action_post_save>`.
+
+    Un modello che estende la classe PositionAbstract con eredità
+    multipla e in modo che save() e __init__() siano ereditati da
+    un'altra classe (quindi con PositionAbstract non primo modello tra
+    i padri), deve ridefinirli in modo o da richiamare
+    PositionAbstract.save() e PositionAbstract.__init__() oppure da
+    utilizzare esplicitamente
+    :any:`PositionAbstract.my_action_post_init
+    <santaclara_base.models.PositionAbstract.my_action_post_init>` e
+    :any:`PositionAbstract.my_action_post_save
+    <santaclara_base.models.PositionAbstract.my_action_post_save>`.
+    """
+
+    #: Posizione.
+    pos = models.PositiveIntegerField()
+
+    class Meta:
+        abstract = True
+
+    def __init__(self,*args,**kwargs):
+        super(PositionAbstract, self).__init__(*args, **kwargs)
+        self.my_action_post_init(*args,**kwargs)
+
+    def save(self,*args,**kwargs):
+        super(PositionAbstract,self).save(*args,**kwargs)
+        self.my_action_post_save(*args,**kwargs)
+
+    def my_action_post_save(self,*args,**kwargs):
+        """ Se un modello che estende PositionAbstract sovrascrive
+        save() e non richiama esplicitamente PositionAbstract.save(),
+        oppure se in caso di eredità multipla il save() del modello
+        non è PositionAbstract.save(), nel nuovo save() dev'essere
+        richiamata questa funzione, passandole gli stessi parametri di
+        save(). """
+        if self.__original_pos!=self.pos:
+            position_changed.send(self.__class__,instance=self)
+            self.__original_pos = self.pos
+        
+    def my_action_post_init(self,*args,**kwargs):
+        """ Se un modello che estende PositionAbstract sovrascrive
+        __init__() e non richiama esplicitamente PositionAbstract.__init__(),
+        oppure se in caso di eredità multipla il __init__() del modello
+        non è PositionAbstract.__init__(), nel nuovo __init__() dev'essere
+        richiamata questa funzione, passandole gli stessi parametri di
+        __init__(). """
+        self.__original_pos = self.pos
+
 
 class LabeledAbstract(models.Model):
     label = models.SlugField(unique=True)
@@ -372,7 +434,7 @@ class NameFormatCollection(LabeledAbstract):
         for person in self.person_set.all():
             person.update_cache()
 
-    @property
+    @cached_property
     def fields(self):
         L=["name","surname"]
         long_name=unicode(self.long_format.pattern)
@@ -515,6 +577,18 @@ class PersonManager(models.Manager):
         t_name=search.lower().split(" ")
         return self.search_names(t_name)
 
+    def create_by_names(self,format_collection,**kwargs):
+        obj=self.create(format_collection=format_collection)
+        for key,val in kwargs.items():
+            name_type,created=NameType.objects.get_or_create(label=key)
+            rel,created=PersonNameRelation.objects.get_or_create(person=obj,name_type=name_type,
+                                                                 defaults={"value": val})
+            if not created:
+                rel.value=val
+                rel.save()
+        return obj
+
+
 class Person(models.Model):
     format_collection = models.ForeignKey(NameFormatCollection)
     cache = models.OneToOneField(PersonCache,editable=False,null=True)
@@ -535,7 +609,7 @@ class Person(models.Model):
     def list_name(self): return unicode(self.cache.list_name)
 
     def save(self, *args, **kwargs):
-        if (not self.cache):
+        if not self.cache:
             self.cache = PersonCache.objects.create()
         super(Person, self).save(*args, **kwargs)
         self.update_cache()
@@ -1071,6 +1145,9 @@ class Author(Person):
     def get_absolute_url(self):
         return "/bibliography/author/%d" % self.pk
 
+    def save(self,*args,**kwargs):
+        Person.save(self,*args,**kwargs)
+
 class AuthorRole(LabeledAbstract): 
     cover_name = models.BooleanField(default=False)
     action = models.CharField(default="",max_length=1024,blank=True)
@@ -1235,12 +1312,13 @@ class PublicationManager(models.Manager):
         return self.all().filter(issn_crc='Y')
 
 class Publication(models.Model):
-    issn = models.CharField(max_length=128)
+    issn = models.CharField(max_length=128) #7
     issn_crc = models.CharField(max_length=1,editable=False,default="Y")
     publisher = models.ForeignKey(Publisher)
     title = models.CharField(max_length=4096)
     volume_type = models.ForeignKey(VolumeType)
     date_format = models.CharField(max_length=4096,default="%Y-%m-%d")
+
     objects=PublicationManager()
     #periodicity=models.CharField(max_length=128,choices=[ ("monthly","monthly"),("unknown","unknown") ],default="unknown")
     #first_day=models.IntegerField(default=1)

@@ -88,13 +88,11 @@
 
 body {
     /*font: 12pt LibreBaskerville, 'FreeSerif', Garamond, Times, serif;*/
-    font: 11pt  FreeSans,DidactGothic, Helvetica, Arial,  sans-serif;
+    font: 12pt  FreeSans,DidactGothic, Helvetica, Arial,  sans-serif;
     margin: 0;
     padding: 2%;
     border: 0;
     {% background_gradient "top" COLOR_BODY_BACK_START COLOR_BODY_BACK_STOP %}
-    /*background-image:      url({{ BACKGROUND }});
-    background-position:   top center;*/
     color: {{ COLOR_TEXT_FORE }};
 }
 
@@ -355,7 +353,7 @@ h1.title {
     text-align: center;
     width: 100%;
     {% background_gradient "top" COLOR_MENU_ITEM_BACK_START COLOR_MENU_ITEM_BACK_STOP %}
-    font-size: 80%;
+    font-size: 100%;
 }
 
 .mainitem li:hover, .mainitem li:active {
@@ -738,7 +736,7 @@ input[type=button] {
     padding-top: .2em;
     padding-bottom: .2em;
     margin: 1em;
-    font-size: 90%;
+    font-size: 100%;
     color: {{ COLOR_A_MENU_FORE }}; 
     {% background_gradient "top" COLOR_MENU_ITEM_BACK_START COLOR_MENU_ITEM_BACK_STOP %}
 }

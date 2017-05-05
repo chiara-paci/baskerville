@@ -71,7 +71,8 @@ class PublisherAddressForm(forms.Form):
 class RequiredFormSet(BaseFormSet):
     def __init__(self, *args, **kwargs):
         super(RequiredFormSet, self).__init__(*args, **kwargs)
-        self.forms[0].empty_permitted = False
+        if self.forms:
+            self.forms[0].empty_permitted = False
 
 PublisherAddressFormSet = formset_factory(PublisherAddressForm,extra=2,formset=RequiredFormSet)
 
@@ -132,7 +133,7 @@ class SimpleSearchForm(forms.Form):
     search = forms.CharField()
 
 class AuthorChoiceForm(forms.Form):
-    author = forms.ModelChoiceField(queryset=models.Author.objects.all(),required=False)
+    author = forms.ModelChoiceField(queryset=models.Author.objects.all()) #,required=False)
 
     # def __init__(self,initial=None, queryset=models.Author.objects.all(), *args, **kwargs):
     #     super(AuthorChoiceForm, self).__init__(initial=initial, *args, **kwargs)

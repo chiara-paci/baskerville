@@ -1,0 +1,353 @@
+[
+{
+    "model": "bibliography.nameformat",
+    "pk": 1,
+    "fields": {
+        "label": "long_western_twonames",
+        "description": "Long name in western format with name and surname",
+        "pattern": "{{C|name}} {{V|surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 2,
+    "fields": {
+        "label": "short_western_twonames",
+        "description": "Short name in western format with name and surname",
+        "pattern": "{{I|name}} {{V|surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 3,
+    "fields": {
+        "label": "list_western_twonames",
+        "description": "List name in western format with name and surname",
+        "pattern": "{{V|surname}}, {{C|name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 4,
+    "fields": {
+        "label": "ordering_western_twonames",
+        "description": "Ordering name in western format with name and surname",
+        "pattern": "{{N|surname}},{{N|name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 5,
+    "fields": {
+        "label": "long_russian",
+        "description": "Long name in russian format",
+        "pattern": "{{name}} {{patronymic}} {{surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 6,
+    "fields": {
+        "label": "short_russian",
+        "description": "Short name in russian format",
+        "pattern": "{{I|name}} {{I|patronymic}} {{surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 7,
+    "fields": {
+        "label": "list_russian",
+        "description": "List name in russian format",
+        "pattern": "{{C|surname}}, {{C|name}} {{I|patronymic}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 8,
+    "fields": {
+        "label": "ordering_russian",
+        "description": "Ordering name in russian format",
+        "pattern": "{{N|surname}},{{N|name}},{{N|patronymic}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 9,
+    "fields": {
+        "label": "long_western_twonames_and_order",
+        "description": "Long name in western format with name, surname and order",
+        "pattern": "{{C|name}} {{V|surname}} {{R|order}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 10,
+    "fields": {
+        "label": "list_western_twonames_and_order",
+        "description": "List name in western format with name, surname and order",
+        "pattern": "{{V|surname}}, {{C|name}} {{R|order}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 11,
+    "fields": {
+        "label": "ordering_western_twonames_and_order",
+        "description": "Ordering name in western format with name, surname and order",
+        "pattern": "{{N|surname}},{{N|name}},{{A|order}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 12,
+    "fields": {
+        "label": "onename",
+        "description": "Long one name",
+        "pattern": "{{C|name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 13,
+    "fields": {
+        "label": "ordering_onename",
+        "description": "One name ordering",
+        "pattern": "{{N|name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 14,
+    "fields": {
+        "label": "long_western_twonames_married",
+        "description": "Long name in western format for married women",
+        "pattern": "{{C|name}} {{V|surname}} {{V|husband_surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 15,
+    "fields": {
+        "label": "long_western_twonames_and_title",
+        "description": "Long name in western format with name, surname and title",
+        "pattern": "{{L|title}} {{C|name}} {{V|surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 16,
+    "fields": {
+        "label": "list_western_twonames_and_title",
+        "description": "List name in western format with name, surname and title",
+        "pattern": "{{V|surname}}, {{L|title}} {{name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 17,
+    "fields": {
+        "label": "long_arabic",
+        "description": "Long name in arabic format",
+        "pattern": "{{V|full_name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 18,
+    "fields": {
+        "label": "short_arabic",
+        "description": "Short name in arabic format",
+        "pattern": "{{V|name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 19,
+    "fields": {
+        "label": "list_arabic",
+        "description": "List name in arabic format",
+        "pattern": "{{V|name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 20,
+    "fields": {
+        "label": "ordering_arabic",
+        "description": "Ordering name in arabic format",
+        "pattern": "{{N|name}},{{N|full_name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 21,
+    "fields": {
+        "label": "long_western_threenames",
+        "description": "Long name in western format with name, middle name and surname",
+        "pattern": "{{C|name}} {{C|middle_name}} {{V|surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 22,
+    "fields": {
+        "label": "short_western_threenames",
+        "description": "Short name in western format with name, middle name and surname",
+        "pattern": "{{I|name}} {{I|middle_name}} {{V|surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 23,
+    "fields": {
+        "label": "list_western_threenames",
+        "description": "List name in western format with name, middle name and surname",
+        "pattern": "{{V|surname}}, {{C|name}} {{I|middle_name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 24,
+    "fields": {
+        "label": "ordering_western_threenames",
+        "description": "Ordering  name in western format with name, middle name and surname",
+        "pattern": "{{N|surname}},{{N|name}},{{N|middle_name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 25,
+    "fields": {
+        "label": "list_western_threenames_pre",
+        "description": "List name in western format with name, middle name and surname, abbreviated first",
+        "pattern": "{{V|surname}}, {{I|name}} {{C|middle_name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 26,
+    "fields": {
+        "label": "aavv",
+        "description": "autori vari",
+        "pattern": "AA. VV."
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 27,
+    "fields": {
+        "label": "aavv_ordering",
+        "description": "autori vari ordering",
+        "pattern": "AAAAA"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 28,
+    "fields": {
+        "label": "long_western_fournames_pre",
+        "description": "Long name in western format with name, middle name and two surname",
+        "pattern": "{{C|name}} {{C|middle_name}} {{V|surname}} {{V|second_surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 29,
+    "fields": {
+        "label": "list_western_fournames_pre",
+        "description": "List name in western format with name, middle name and two surname, abbreviated first",
+        "pattern": "{{V|second_surname}}, {{C|name}} {{I|middle_name}} {{I|surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 30,
+    "fields": {
+        "label": "ordering_western_fournames_pre",
+        "description": "Ordering name in western format with name, middle name and two surname, abbreviated first",
+        "pattern": "{{N|second_surname}},{{N|name}},{{N|middle_name}},{{N|surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 31,
+    "fields": {
+        "label": "short_western_fournames_pre",
+        "description": "Short name in western format with name, middle name and two surname, abbreviated first",
+        "pattern": "{{I|name}} {{I|middle_name}} {{I|surname}} {{V|second_surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 32,
+    "fields": {
+        "label": "list_western_fournames",
+        "description": "List name in western format with name, two middle names and  surname, abbreviated second and third",
+        "pattern": "{{V|surname}}, {{C|name}} {{I|middle_name}} {{I|second middle_name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 33,
+    "fields": {
+        "label": "long_western_fournames",
+        "description": "Long name in western format with name, two middle names and surname",
+        "pattern": "{{C|name}} {{C|middle_name}} {{C|second_middle_name}} {{V|surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 34,
+    "fields": {
+        "label": "ordering_western_fournames",
+        "description": "Ordering  name in western format with name, two middle names and surname",
+        "pattern": "{{N|surname}},{{N|name}},{{N|middle_name}},{{N|second_middle_name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 35,
+    "fields": {
+        "label": "short_western_fournames",
+        "description": "Short name in western format with name, two middle names and surname",
+        "pattern": "{{I|name}} {{I|middle_name}} {{I|second_middle_name}} {{V|surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 36,
+    "fields": {
+        "label": "long_latin",
+        "description": "Long name in latin format",
+        "pattern": "{{name}} {{family_name}} {{surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 37,
+    "fields": {
+        "label": "ordering_latin",
+        "description": "Ordering name in latin format",
+        "pattern": "{{N|surname}},{{N|family_name}},{{N|name}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 38,
+    "fields": {
+        "label": "short_latin",
+        "description": "Short name in latin format",
+        "pattern": "{{C|surname}}"
+    }
+},
+{
+    "model": "bibliography.nameformat",
+    "pk": 39,
+    "fields": {
+        "label": "list_latin",
+        "description": "List name in latin format with name, family name and surname",
+        "pattern": "{{C|surname}}, {{C|name}} {{C|family_name}}"
+    }
+}
+]
