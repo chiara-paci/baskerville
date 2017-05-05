@@ -1,0 +1,20 @@
+[
+{
+    "model": "bibliography.volumetype",
+    "pk": 1,
+    "fields": {
+        "label": "volume",
+        "description": "Volume",
+        "read_as": "vol."
+    }
+},
+{
+    "model": "bibliography.volumetype",
+    "pk": 2,
+    "fields": {
+        "label": "annata",
+        "description": "Annata",
+        "read_as": ""
+    }
+}
+]

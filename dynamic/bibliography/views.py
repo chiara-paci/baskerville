@@ -2,8 +2,8 @@
 
 from django.shortcuts import render,redirect
 from django.urls import reverse
+from django.http import HttpResponse
 
-from . import forms
 
 from django.views.generic import TemplateView,ListView,View,CreateView,DetailView
 from django.views.generic.detail import SingleObjectMixin
@@ -13,9 +13,19 @@ from bibliography.models import Publisher,PublisherAddress,PublisherState,Publis
 from bibliography.models import Author,NameType,PersonNameRelation,NameFormatCollection
 from bibliography.models import Book,BookAuthorRelation,AuthorRole,Publication,Issue,IssueAuthorRelation
 
+from . import forms
 from . import booksearch
 
 import json
+
+class JsonDetailView(DetailView): 
+    def render_to_response(self, context, **kwargs):
+        return super(JsonDetailView, self).render_to_response(context,content_type='application/json; charset=utf8', **kwargs)
+
+    def get_template_names(self):
+        L=super(JsonDetailView, self).get_template_names()
+        ret=map(lambda x: x.replace(".html",".json"),L)
+        return(ret)
 
 class JsonCategoryNodesLinksView(View): 
     model = Category
@@ -910,21 +920,22 @@ class PublicationIssuesAuthorChoiceView(View,SingleObjectMixin):
         
     def post(self,request,*args,**kwargs):
         publication=self.get_object()
-        print request.POST
 
         form = forms.AuthorChoiceForm(request.POST)
 
         if not form.is_valid():
-            print "Invalid form"
             return render(request, self.template_name, {self.context_object_name: publication,'form': form})
         author=form.cleaned_data["author"]
         form = forms.IssueAuthorForm(prefix="author",initial={"author": author.pk})
         formset = forms.IssueChoiceFormset(prefix="issues",queryset=Issue.objects.by_publication(publication))
-        return render(request, self.template_name_add, {self.context_object_name: publication,
-                                                        'author_form': form,
-                                                        'issues_formset': formset,
-                                                        'action': reverse("bibliography:publication-issues-author-add",
-                                        kwargs={"pk":publication.id})})
+        return render(request, self.template_name_add, 
+                      {
+                          self.context_object_name: publication,
+                          'author_form': form,
+                          'issues_formset': formset,
+                          'action': reverse("bibliography:publication-issues-author-add",
+                                            kwargs={"pk":publication.id})
+                      })
 
 class PublicationIssuesAuthorCreateView(View,SingleObjectMixin):
     template_name = "bibliography/author_form.html"
@@ -985,9 +996,6 @@ class PublicationIssuesAuthorCreateView(View,SingleObjectMixin):
         author_obj.update_cache()
 
         return author_obj
-
-
-        
 
 class PublicationIssuesAuthorSearchView(View,SingleObjectMixin):
     template_name = "bibliography/publication_issues_author_add.html"

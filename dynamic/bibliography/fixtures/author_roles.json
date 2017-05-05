@@ -1,0 +1,90 @@
+[
+{
+    "model": "bibliography.authorrole",
+    "pk": 1,
+    "fields": {
+        "label": "author",
+        "description": "Author",
+        "cover_name": true,
+        "action": "",
+        "pos": 1
+    }
+},
+{
+    "model": "bibliography.authorrole",
+    "pk": 2,
+    "fields": {
+        "label": "editor",
+        "description": "Editor",
+        "cover_name": true,
+        "action": "edited by",
+        "pos": 2
+    }
+},
+{
+    "model": "bibliography.authorrole",
+    "pk": 3,
+    "fields": {
+        "label": "translator",
+        "description": "Translator",
+        "cover_name": false,
+        "action": "translated by",
+        "pos": 100
+    }
+},
+{
+    "model": "bibliography.authorrole",
+    "pk": 4,
+    "fields": {
+        "label": "illustrator",
+        "description": "Illustrator",
+        "cover_name": false,
+        "action": "illustrated by",
+        "pos": 110
+    }
+},
+{
+    "model": "bibliography.authorrole",
+    "pk": 6,
+    "fields": {
+        "label": "photographer",
+        "description": "Photographer",
+        "cover_name": false,
+        "action": "photos by",
+        "pos": 120
+    }
+},
+{
+    "model": "bibliography.authorrole",
+    "pk": 7,
+    "fields": {
+        "label": "cartoonist",
+        "description": "Cartoonist",
+        "cover_name": true,
+        "action": "illustrated by",
+        "pos": 3
+    }
+},
+{
+    "model": "bibliography.authorrole",
+    "pk": 8,
+    "fields": {
+        "label": "letterer",
+        "description": "Letterer",
+        "cover_name": false,
+        "action": "lettering by",
+        "pos": 130
+    }
+},
+{
+    "model": "bibliography.authorrole",
+    "pk": 9,
+    "fields": {
+        "label": "cover",
+        "description": "Cover",
+        "cover_name": false,
+        "action": "cover by",
+        "pos": 160
+    }
+}
+]

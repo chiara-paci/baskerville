@@ -1,9 +1,8 @@
-{% load santa_clara_editor %}
 {
     "id": {{ publisher.id }},
     "name": "{{ publisher.name }}",
     "url": "{{ publisher.url }}",
-    "note": "{{ publisher.note|santa_clara_json }}",
+    "note": "{{ publisher.note }}",
     "full_name": "{{ publisher.full_name }}",
     "alias": {{ publisher.alias|lower }},
     "isbn": [

@@ -1,0 +1,90 @@
+[
+{
+    "model": "bibliography.nametype",
+    "pk": 1,
+    "fields": {
+        "label": "name",
+        "description": "Name"
+    }
+},
+{
+    "model": "bibliography.nametype",
+    "pk": 2,
+    "fields": {
+        "label": "surname",
+        "description": "Surname"
+    }
+},
+{
+    "model": "bibliography.nametype",
+    "pk": 3,
+    "fields": {
+        "label": "patronymic",
+        "description": "Patronymic"
+    }
+},
+{
+    "model": "bibliography.nametype",
+    "pk": 4,
+    "fields": {
+        "label": "order",
+        "description": "Order"
+    }
+},
+{
+    "model": "bibliography.nametype",
+    "pk": 5,
+    "fields": {
+        "label": "husband_surname",
+        "description": "Surname of husband"
+    }
+},
+{
+    "model": "bibliography.nametype",
+    "pk": 6,
+    "fields": {
+        "label": "title",
+        "description": "Title"
+    }
+},
+{
+    "model": "bibliography.nametype",
+    "pk": 7,
+    "fields": {
+        "label": "middle_name",
+        "description": "Middle name"
+    }
+},
+{
+    "model": "bibliography.nametype",
+    "pk": 8,
+    "fields": {
+        "label": "full_name",
+        "description": "Full name"
+    }
+},
+{
+    "model": "bibliography.nametype",
+    "pk": 9,
+    "fields": {
+        "label": "second_surname",
+        "description": "second surname"
+    }
+},
+{
+    "model": "bibliography.nametype",
+    "pk": 10,
+    "fields": {
+        "label": "second_middle_name",
+        "description": "second middle name"
+    }
+},
+{
+    "model": "bibliography.nametype",
+    "pk": 11,
+    "fields": {
+        "label": "family_name",
+        "description": "Family name"
+    }
+}
+]
