@@ -25,5 +25,5 @@ class Command(BaseCommand):
             cat.save()
             n+=1
             if 100.0*float(n)/float(L) > next_perc:
-                print "    %2.2f%%" % (100*float(n)/float(L))
+                print("    %2.2f%%" % (100*float(n)/float(L)))
                 next_perc+=10

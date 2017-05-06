@@ -34,13 +34,13 @@ class ProvaTest(TestCase):
 
     def test_prova(self):
         format_c=random.choice(models.NameFormatCollection.objects.all())
-        print format_c
-        print format_c.fields
+        print(format_c)
+        print(format_c.fields)
         kwargs={}
         for k in format_c.fields:
             kwargs[k]=random_string().capitalize()
         author=models.Author.objects.create_by_names(format_c,**kwargs)
-        print author
+        print(author)
 
 
 class TemplateViewTestMixin(object):
@@ -109,8 +109,8 @@ class PaginatedListViewTestMixin(ListViewTestMixin):
         self.assertEqual(response.context['page_obj'].paginator.num_pages,1)
 
     def test_paginate_by_upper(self):
-        N=random.choice(range(2,10))
-        L=random.choice(range(self.paginate_by+1,N*self.paginate_by))
+        N=random.choice(list(range(2,10)))
+        L=random.choice(list(range(self.paginate_by+1,N*self.paginate_by)))
         num_pages=int(math.ceil(L/float(self.paginate_by)))
         response=self.get_response_pagination(L)
         self.assertEqual(response.context['page_obj'].paginator.num_pages,num_pages)
@@ -616,7 +616,7 @@ class BooksInsertViewTest(TestCase,PostTemplateViewTestMixin):
         response=self.post_invalid()
         self.assertIsInstance(response.context['form'], self.form)
 
-    def check_valid_post_context_type_list(self,label,types=[str,unicode]):
+    def check_valid_post_context_type_list(self,label,types=[str,str]):
         response=self.post_valid()
         self.assertIsInstance(response.context[label], list)
         if not response.context[label]: return
@@ -628,8 +628,8 @@ class BooksInsertViewTest(TestCase,PostTemplateViewTestMixin):
         self.assertIsInstance(response.context[label], list)
         if not response.context[label]: return
         for val1,val2,v_form,v_formset in response.context[label]:
-            self.assertIn(type(val1),[str,unicode])
-            self.assertIn(type(val2),[str,unicode])
+            self.assertIn(type(val1),[str,str])
+            self.assertIn(type(val2),[str,str])
             self.assertIsInstance(v_form,form_type)
             self.assertIsInstance(v_formset,formset_type)
 
@@ -748,7 +748,7 @@ class AuthorSearchViewTest(TestCase,TemplateViewTestMixin):
         for k in format_c.fields:
             kwargs[k]=random_string().capitalize()
         author=models.Author.objects.create_by_names(format_c,**kwargs)
-        return {"search": kwargs.values()[0]},author
+        return {"search": list(kwargs.values())[0]},author
 
     def post_valid_unique(self):
         data,obj=self.create_random_data_unique()
@@ -764,7 +764,7 @@ class AuthorSearchViewTest(TestCase,TemplateViewTestMixin):
     def create_random_data_multiple(self): 
         common_name=random_string(10)
         obj_id_list=[]
-        for L in range(0,random.choice(range(2,20))):
+        for L in range(0,random.choice(list(range(2,20)))):
             format_c=random.choice(models.NameFormatCollection.objects.all())
             while not format_c.fields: 
                 format_c=random.choice(models.NameFormatCollection.objects.all())
@@ -808,7 +808,7 @@ class AuthorInsertViewTest(AuthorSearchViewTest):
     def test_valid_post_not_found_form(self):
         response=self.post_valid_not_found()
         self.assertIsInstance(response.context['form'], forms.AuthorForm)
-        print response.context["form"]
+        print(response.context["form"])
 
     def test_valid_post_not_found_formset(self):
         response=self.post_valid_not_found()

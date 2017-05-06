@@ -153,8 +153,8 @@ class LabeledAbstract(models.Model):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
-        return unicode(self.label)
+    def __str__(self):
+        return str(self.label)
 
     def clean(self,*args,**kwargs):
         self.label = self.label.lower()
@@ -169,10 +169,10 @@ class DateModifier(PositionAbstract):
     class Meta:
         ordering = [ 'pos' ]
 
-    def __unicode__(self):
+    def __str__(self):
         if self.id==0: return ""
         if not self.name: return "-"
-        return unicode(self.name)
+        return str(self.name)
 
     def save(self,*args,**kwargs):
         super(DateModifier, self).save(*args, **kwargs)
@@ -187,10 +187,10 @@ class TimePoint(models.Model):
         ordering = [ 'modifier','date' ]
         unique_together= [ 'modifier','date' ]
 
-    def __unicode__(self):
-        U=unicode(abs(self.date))
+    def __str__(self):
+        U=str(abs(self.date))
         if self.modifier.id!=0:
-            U+=" "+unicode(self.modifier)
+            U+=" "+str(self.modifier)
         return U
 
     def save(self,*args,**kwargs):
@@ -203,14 +203,14 @@ class TimePoint(models.Model):
         super(TimePoint, self).save(*args, **kwargs)
 
     def begins(self):
-        return u"; ".join(map(lambda x: unicode(x),self.begin_set.all()))
+        return "; ".join([str(x) for x in self.begin_set.all()])
         
     def ends(self):
-        return u"; ".join(map(lambda x: unicode(x),self.end_set.all()))
+        return "; ".join([str(x) for x in self.end_set.all()])
         
     def time_spans(self):
-        L=map(lambda x: unicode(x),self.begin_set.all())
-        L+=map(lambda x: unicode(x),self.end_set.all())
+        L=[str(x) for x in self.begin_set.all()]
+        L+=[str(x) for x in self.end_set.all()]
         L=list(set(L))
         return "; ".join(L)
 
@@ -219,16 +219,16 @@ class TimeSpan(models.Model):
     end   = models.ForeignKey(TimePoint,related_name="end_set")
     name  = models.CharField(max_length=4096,blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.name:
-            return unicode(self.name)
-        return unicode(self.begin)+"-"+unicode(self.end)
+            return str(self.name)
+        return str(self.begin)+"-"+str(self.end)
 
     class Meta:
         ordering = [ 'begin','end' ]
 
     def categories(self):
-        return u"; ".join(map(lambda x: unicode(x.category),self.categorytimespanrelation_set.all()))
+        return "; ".join([str(x.category) for x in self.categorytimespanrelation_set.all()])
 
 
 ### language
@@ -236,41 +236,41 @@ class TimeSpan(models.Model):
 class Language(models.Model):
     name = models.CharField(max_length=4096)
 
-    def __unicode__(self): return self.name
+    def __str__(self): return self.name
 
     def families(self):
-        return u"; ".join(map(lambda x: unicode(x.family),self.languagefamilyrelation_set.all()))
+        return "; ".join([str(x.family) for x in self.languagefamilyrelation_set.all()])
 
     def varieties(self):
-        return u"; ".join(map(lambda x: unicode(x),self.languagevariety_set.all()))
+        return "; ".join([str(x) for x in self.languagevariety_set.all()])
 
 class LanguageFamily(models.Model):
     name = models.CharField(max_length=4096)
 
-    def __unicode__(self): return self.name
+    def __str__(self): return self.name
 
     def parents(self):
-        return u"; ".join(map(lambda x: unicode(x.parent),self.parent_set.all()))
+        return "; ".join([str(x.parent) for x in self.parent_set.all()])
 
     def children(self):
-        return u"; ".join(map(lambda x: unicode(x.child),self.child_set.all()))
+        return "; ".join([str(x.child) for x in self.child_set.all()])
 
     def languages(self):
-        return u"; ".join(map(lambda x: unicode(x.language),self.languagefamilyrelation_set.all()))
+        return "; ".join([str(x.language) for x in self.languagefamilyrelation_set.all()])
 
 class LanguageFamilyRelation(models.Model):
     language = models.ForeignKey(Language)
     family = models.ForeignKey(LanguageFamily)
 
-    def __unicode__(self): 
-        return unicode(self.family)+u"/"+unicode(self.language)
+    def __str__(self): 
+        return str(self.family)+"/"+str(self.language)
 
 class LanguageFamilyFamilyRelation(models.Model):
     parent = models.ForeignKey(LanguageFamily,related_name="child_set")
     child = models.ForeignKey(LanguageFamily,related_name="parent_set")
 
-    def __unicode__(self): 
-        return unicode(self.parent)+u"/"+unicode(self.child)
+    def __str__(self): 
+        return str(self.parent)+"/"+str(self.child)
 
     class Meta:
         ordering = ["parent","child"]
@@ -279,42 +279,42 @@ class LanguageFamilyFamilyRelation(models.Model):
 class LanguageVarietyType(models.Model):
     name = models.CharField(max_length=4096)    
 
-    def __unicode__(self): return self.name
+    def __str__(self): return self.name
 
 class LanguageVariety(models.Model):
     name = models.CharField(max_length=4096,blank=True)
     language = models.ForeignKey(Language)
     type = models.ForeignKey(LanguageVarietyType,default=1)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.type.id==1:
-            return unicode(self.language)
+            return str(self.language)
         if not self.name:
-            return unicode(self.language)
-        return unicode(self.language)+" ("+unicode(self.name)+")"
+            return str(self.language)
+        return str(self.language)+" ("+str(self.name)+")"
 
 ### place
 
 class PlaceType(models.Model):
     name = models.CharField(max_length=4096)
 
-    def __unicode__(self): return self.name
+    def __str__(self): return self.name
 
 class Place(models.Model):
     name = models.CharField(max_length=4096,unique=True)
     type = models.ForeignKey(PlaceType)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def alternate_names(self):
-        return u"; ".join(map(lambda x: unicode(x.name),self.alternateplacename_set.all()))
+        return "; ".join([str(x.name) for x in self.alternateplacename_set.all()])
 
     def areas(self):
-        return u"; ".join(map(lambda x: unicode(x.area),self.area_set.all()))
+        return "; ".join([str(x.area) for x in self.area_set.all()])
 
     def places(self):
-        return u"; ".join(map(lambda x: unicode(x.place),self.place_set.all()))
+        return "; ".join([str(x.place) for x in self.place_set.all()])
 
     class Meta:
         ordering = [ "name" ]
@@ -324,15 +324,15 @@ class AlternatePlaceName(models.Model):
     name = models.CharField(max_length=4096)
     note = models.CharField(max_length=65536,blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class PlaceRelation(models.Model):
     place = models.ForeignKey(Place,related_name="area_set")
     area = models.ForeignKey(Place,related_name="place_set")
 
-    def __unicode__(self): 
-        return unicode(self.area)+u"/"+unicode(self.place)
+    def __str__(self): 
+        return str(self.area)+"/"+str(self.place)
 
     class Meta:
         ordering = ["area","place"]
@@ -437,10 +437,10 @@ class NameFormatCollection(LabeledAbstract):
     @cached_property
     def fields(self):
         L=["name","surname"]
-        long_name=unicode(self.long_format.pattern)
-        short_name=unicode(self.short_format.pattern)
-        list_name=unicode(self.list_format.pattern)
-        ordering_name=unicode(self.ordering_format.pattern)
+        long_name=str(self.long_format.pattern)
+        short_name=str(self.short_format.pattern)
+        list_name=str(self.list_format.pattern)
+        ordering_name=str(self.ordering_format.pattern)
 
         for s in "VALURNIC":
             long_name=long_name.replace("{{"+s+"|","{{")
@@ -450,8 +450,7 @@ class NameFormatCollection(LabeledAbstract):
         
         names=[]
         for f in [long_name,short_name,list_name,ordering_name]:
-            L=map(lambda x: x.replace("{{","").replace("}}",""),
-                  re.findall(r'{{.*?}}',f))
+            L=[x.replace("{{","").replace("}}","") for x in re.findall(r'{{.*?}}',f)]
             for name in L:
                 if name in names: continue
                 names.append(name)
@@ -469,11 +468,11 @@ class NameFormatCollection(LabeledAbstract):
     #   {{I|<name_type>}}: iniziali (Gian Uberto => G. U.)
 
     def apply_formats(self,names):
-        long_name=unicode(self.long_format.pattern)
-        short_name=unicode(self.short_format.pattern)
-        list_name=unicode(self.list_format.pattern)
-        ordering_name=unicode(self.ordering_format.pattern)
-        for key,val in names.items():
+        long_name=str(self.long_format.pattern)
+        short_name=str(self.short_format.pattern)
+        list_name=str(self.list_format.pattern)
+        ordering_name=str(self.ordering_format.pattern)
+        for key,val in list(names.items()):
             val_f={}
             t=RE_NAME_SEP.split(val)
             #t=map(lambda x: x.capitalize(),RE_NAME_SEP.split(val))
@@ -492,12 +491,12 @@ class NameFormatCollection(LabeledAbstract):
                 else:
                     norm_t.append(x)
                     
-            cap_t=map(lambda x: x.capitalize(),norm_t)
+            cap_t=[x.capitalize() for x in norm_t]
             val_norm="".join(norm_t)
             val_f["L"]=val.lower()
             val_f["U"]=val.upper()
             val_f["N"]=val.lower().replace(" ","_")
-            val_f["I"]=". ".join(map(lambda x: x[0].upper(),filter(bool,val.split(" "))))+"."
+            val_f["I"]=". ".join([x[0].upper() for x in list(filter(bool,val.split(" ")))])+"."
             val_f["C"]="".join(cap_t)
             val_f["V"]="".join(vons_t)
 
@@ -531,7 +530,7 @@ class PersonCache(models.Model):
         ordering = ["ordering_name"]
         db_table = 'bibliography_personcache'
 
-    def __unicode__(self): return self.list_name
+    def __str__(self): return self.list_name
 
 class PersonManager(models.Manager):
 
@@ -542,11 +541,11 @@ class PersonManager(models.Manager):
         for name in names:
             if name.endswith("."):
                 name=name[:-1]
-                S=set(map(lambda x: x.person.id,PersonNameRelation.objects.filter(value__istartswith=name)))
+                S=set([x.person.id for x in PersonNameRelation.objects.filter(value__istartswith=name)])
             elif len(name)==1:
-                S=set(map(lambda x: x.person.id,PersonNameRelation.objects.filter(value__istartswith=name)))
+                S=set([x.person.id for x in PersonNameRelation.objects.filter(value__istartswith=name)])
             else:
-                S=set(map(lambda x: x.person.id,PersonNameRelation.objects.filter(value__iexact=name)))
+                S=set([x.person.id for x in PersonNameRelation.objects.filter(value__iexact=name)])
             D.append(S)
         for id_set in D:
             qset=qset.filter(id__in=list(id_set))
@@ -579,7 +578,7 @@ class PersonManager(models.Manager):
 
     def create_by_names(self,format_collection,**kwargs):
         obj=self.create(format_collection=format_collection)
-        for key,val in kwargs.items():
+        for key,val in list(kwargs.items()):
             name_type,created=NameType.objects.get_or_create(label=key)
             rel,created=PersonNameRelation.objects.get_or_create(person=obj,name_type=name_type,
                                                                  defaults={"value": val})
@@ -600,13 +599,13 @@ class Person(models.Model):
         ordering = ["cache"]
         db_table = 'bibliography_person'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.list_name()
 
-    def long_name(self): return unicode(self.cache.long_name)
-    def short_name(self): return unicode(self.cache.short_name)
-    def ordering_name(self): return unicode(self.cache.ordering_name)
-    def list_name(self): return unicode(self.cache.list_name)
+    def long_name(self): return str(self.cache.long_name)
+    def short_name(self): return str(self.cache.short_name)
+    def ordering_name(self): return str(self.cache.ordering_name)
+    def list_name(self): return str(self.cache.list_name)
 
     def save(self, *args, **kwargs):
         if not self.cache:
@@ -617,7 +616,7 @@ class Person(models.Model):
     def update_cache(self):
         names={}
         for rel in self.personnamerelation_set.all():
-            names[unicode(rel.name_type.label)]=unicode(rel.value)
+            names[str(rel.name_type.label)]=str(rel.value)
         long_name,short_name,list_name,ordering_name=self.format_collection.apply_formats(names)
         self.cache.long_name = long_name
         self.cache.short_name = short_name
@@ -630,7 +629,7 @@ class PersonNameRelation(models.Model):
     name_type = models.ForeignKey(NameType)
     value = models.CharField(max_length=4096,default="-")
 
-    def __unicode__(self): return unicode(self.value)
+    def __str__(self): return str(self.value)
 
     def save(self, *args, **kwargs):
         super(PersonNameRelation, self).save(*args, **kwargs)
@@ -650,14 +649,14 @@ class CategoryTreeNodeManager(models.Manager):
 
     def branch_nodes(self,base_node,level,only_category=True):
         if not only_category:
-            return self.filter(level=level,node_id__istartswith=base_node.node_id+u":")
-        return self.filter(level=level,node_id__istartswith=base_node.node_id+u":",is_category=True)
+            return self.filter(level=level,node_id__istartswith=base_node.node_id+":")
+        return self.filter(level=level,node_id__istartswith=base_node.node_id+":",is_category=True)
 
     def update_category(self,cat): 
         ctype = ContentType.objects.get_for_model(Category)
         for cat_node in self.filter(content_type=ctype,object_id=cat.id):
             level=int(cat_node.level)
-            old_node_id=unicode(cat_node.node_id)
+            old_node_id=str(cat_node.node_id)
             parent_node_id=":".join(old_node_id.split(":")[:-1])
             if parent_node_id:
                 new_node_id=parent_node_id+":"+cat.label
@@ -685,7 +684,7 @@ class CategoryTreeNodeManager(models.Manager):
 
     def reparent(self,parent_node_id,parent_level,cat_node):
         ret=[]
-        old_node_id=unicode(cat_node.node_id)
+        old_node_id=str(cat_node.node_id)
         old_level=int(cat_node.level)
         rel_node_id=old_node_id.split(":")[-1]
         if parent_node_id:
@@ -707,7 +706,7 @@ class CategoryTreeNodeManager(models.Manager):
 
         cat_children=list(self.filter(node_id__istartswith=old_node_id+":"))
         for cch_node in cat_children:
-            new_cch_node_id=unicode(cch_node.node_id).replace(old_node_id+":",new_node_id+":",1)
+            new_cch_node_id=str(cch_node.node_id).replace(old_node_id+":",new_node_id+":",1)
             new_cch_level=int(cch_node.level)-old_level+new_level
             cch_node.node_id=new_cch_node_id
             cch_node.level=new_cch_level
@@ -718,7 +717,7 @@ class CategoryTreeNodeManager(models.Manager):
 
     def clone(self,parent_node_id,parent_level,cat_node):
         ret=[]
-        old_node_id=unicode(cat_node.node_id)
+        old_node_id=str(cat_node.node_id)
         old_level=int(cat_node.level)
         rel_node_id=old_node_id.split(":")[-1]
         if parent_node_id:
@@ -740,7 +739,7 @@ class CategoryTreeNodeManager(models.Manager):
 
         cat_children=list(self.filter(node_id__istartswith=old_node_id+":"))
         for cch_node in cat_children:
-            new_cch_node_id=unicode(cch_node.node_id).replace(old_node_id+":",new_node_id+":",1)
+            new_cch_node_id=str(cch_node.node_id).replace(old_node_id+":",new_node_id+":",1)
             new_cch_level=int(cch_node.level)-old_level+new_level
             newobj=self.create(content_object=cch_node.content_object,
                                node_id=new_cch_node_id,
@@ -761,13 +760,13 @@ class CategoryTreeNodeManager(models.Manager):
         if len(child_nodes)==1 and child_nodes[0].level==0:
             ## l'unico child è un rootnode
             fn=parent_nodes[0]
-            new_objects=self.reparent(unicode(fn.node_id),int(fn.level),cn)
+            new_objects=self.reparent(str(fn.node_id),int(fn.level),cn)
             startind=1
             fn.has_children=True
             fn.save()
 
         for fn in parent_nodes[startind:]:
-            new_objects+=self.clone(unicode(fn.node_id),int(fn.level),cn)
+            new_objects+=self.clone(str(fn.node_id),int(fn.level),cn)
             fn.has_children=True
             fn.save()
 
@@ -780,9 +779,9 @@ class CategoryTreeNodeManager(models.Manager):
         del_list=[]
         
         for fn in parent_nodes:
-            fn_node_id=unicode(fn.node_id)
+            fn_node_id=str(fn.node_id)
             for cn in child_nodes:
-                cn_node_id=unicode(cn.node_id)
+                cn_node_id=str(cn.node_id)
                 cn_rel_node_id=cn_node_id.split(":")[-1]
                 if cn_node_id==fn_node_id+":"+cn_rel_node_id:
                     del_list.append((fn,cn))
@@ -795,7 +794,7 @@ class CategoryTreeNodeManager(models.Manager):
 
         for parent,node in del_list:
             self.remove_branch(node)
-            parent.has_children=bool(self.filter(node_id__istartswith=unicode(parent.node_id)+":").exists())
+            parent.has_children=bool(self.filter(node_id__istartswith=str(parent.node_id)+":").exists())
             parent.save()
 
     def update_child_category(self,old_parent,old_child,new_parent,new_child):
@@ -805,7 +804,7 @@ class CategoryTreeNodeManager(models.Manager):
         self.add_child_category(new_parent,new_child)
 
     def remove_branch(self,basenode):
-        base_node_id=unicode(basenode.node_id)
+        base_node_id=str(basenode.node_id)
         self.filter(node_id__istartswith=base_node_id+":").delete()
         self.filter(node_id=base_node_id).delete()
 
@@ -814,7 +813,7 @@ class CategoryTreeNodeManager(models.Manager):
 
         ret=[]
         for fn in parent_nodes:
-            new_node_id=unicode(fn.node_id)+":"+unicode(child.id)
+            new_node_id=str(fn.node_id)+":"+str(child.id)
             new_level=int(fn.level)+1
             newobj=self.create(content_object=child,
                                node_id=new_node_id,
@@ -830,11 +829,11 @@ class CategoryTreeNodeManager(models.Manager):
 
         node_ids=[]
         for fn in parent_nodes:
-            node_ids.append(unicode(fn.node_id)+":"+unicode(child.id))
+            node_ids.append(str(fn.node_id)+":"+str(child.id))
         self.filter(node_id__in=node_ids).delete()
 
         for fn in parent_nodes:
-            fn.has_children=bool(self.filter(node_id__istartswith=unicode(fn.node_id)+":").exists())
+            fn.has_children=bool(self.filter(node_id__istartswith=str(fn.node_id)+":").exists())
             fn.save()
 
     def update_category_relation(self,old_cat,old_child,new_cat,new_child):
@@ -887,8 +886,8 @@ class CategoryTreeNode(models.Model):
             return CategoryTreeNode.objects.filter(node_id__istartswith=self.node_id+":",is_category=True)
         return CategoryTreeNode.objects.filter(node_id__istartswith=self.node_id+":")
 
-    def __unicode__(self):
-        U= u"%3d %s" % (int(self.level),unicode(self.node_id))
+    def __str__(self):
+        U= "%3d %s" % (int(self.level),str(self.node_id))
         return U
 
     def direct_size(self):
@@ -899,8 +898,8 @@ class CategoryTreeNode(models.Model):
         ordering = [ "node_id" ]
 
     def save(self, *args, **kwargs):
-        self.label_children="_"+unicode(self.node_id).replace(":","_")
-        t=unicode(self.node_id).split(":")
+        self.label_children="_"+str(self.node_id).replace(":","_")
+        t=str(self.node_id).split(":")
         if len(t)==1: 
             self.label=""
         else:
@@ -919,7 +918,7 @@ class CategoryManager(models.Manager):
                 children_ids=[parent.id]
                 for catnode in parent.tree_nodes.all():
                     L=catnode.branch()
-                    children_ids+=map(lambda x: x.object_id,list(L))
+                    children_ids+=[x.object_id for x in list(L)]
                 children_ids=list(set(children_ids))
                 return self.filter(id__in=children_ids)
         return CategoryQueryset(Category)
@@ -929,7 +928,7 @@ class CategoryManager(models.Manager):
         children_ids=[parent.id]
         for catnode in parent.tree_nodes.all():
             L=catnode.branch()
-            children_ids+=map(lambda x: x.object_id,list(L))
+            children_ids+=[x.object_id for x in list(L)]
         children_ids=list(set(children_ids))
         return queryset.filter(id__in=children_ids)
         
@@ -1013,13 +1012,13 @@ class Category(models.Model):
     tree_nodes = GenericRelation(CategoryTreeNode)
     objects = CategoryManager()
 
-    def __unicode__(self): return unicode(self.name)
+    def __str__(self): return str(self.name)
 
     class Meta:
         ordering = ["name"]
  
     def slugify(self):
-        S=unicode(self.name)
+        S=str(self.name)
         S=S.replace("#","sharp")
         S=S.replace("++","plusplus")
         return django.template.defaultfilters.slugify(S)
@@ -1029,22 +1028,22 @@ class Category(models.Model):
         super(Category, self).save(*args, **kwargs)
 
     def parents(self):
-        return u"; ".join(map(lambda x: unicode(x.parent),self.parent_set.all()))
+        return "; ".join([str(x.parent) for x in self.parent_set.all()])
 
     def children(self):
-        return u"; ".join(map(lambda x: unicode(x.child),self.child_set.all()))
+        return "; ".join([str(x.child) for x in self.child_set.all()])
 
     def time_span(self):
-        return u"; ".join(map(lambda x: unicode(x.time_span),self.categorytimespanrelation_set.all()))
+        return "; ".join([str(x.time_span) for x in self.categorytimespanrelation_set.all()])
 
     def place(self):
-        return u"; ".join(map(lambda x: unicode(x.place),self.categoryplacerelation_set.all()))
+        return "; ".join([str(x.place) for x in self.categoryplacerelation_set.all()])
 
     def person(self):
-        return u"; ".join(map(lambda x: unicode(x.person),self.categorypersonrelation_set.all()))
+        return "; ".join([str(x.person) for x in self.categorypersonrelation_set.all()])
 
     def language(self):
-        return u"; ".join(map(lambda x: unicode(x.language),self.categorylanguagerelation_set.all()))
+        return "; ".join([str(x.language) for x in self.categorylanguagerelation_set.all()])
 
     def num_books(self):
         return self.book_set.count()
@@ -1086,8 +1085,8 @@ class CategoryRelation(models.Model):
     child = models.ForeignKey(Category,related_name="parent_set")
     parent = models.ForeignKey(Category,related_name="child_set")
 
-    def __unicode__(self): 
-        return unicode(self.parent)+u"/"+unicode(self.child)
+    def __str__(self): 
+        return str(self.parent)+"/"+str(self.child)
 
     class Meta:
         ordering = ["parent","child"]
@@ -1096,29 +1095,29 @@ class CategoryTimeSpanRelation(models.Model):
     time_span=models.ForeignKey(TimeSpan)
     category=models.ForeignKey(Category)
 
-    def __unicode__(self):
-        return unicode(self.time_span)+u"/"+unicode(self.category)
+    def __str__(self):
+        return str(self.time_span)+"/"+str(self.category)
 
 class CategoryPlaceRelation(models.Model):
     place=models.ForeignKey(Place)
     category=models.ForeignKey(Category)
 
-    def __unicode__(self):
-        return unicode(self.place)+u"/"+unicode(self.category)
+    def __str__(self):
+        return str(self.place)+"/"+str(self.category)
 
 class CategoryPersonRelation(models.Model):
     person=models.ForeignKey(Person)
     category=models.ForeignKey(Category)
 
-    def __unicode__(self):
-        return unicode(self.person)+u"/"+unicode(self.category)
+    def __str__(self):
+        return str(self.person)+"/"+str(self.category)
 
 class CategoryLanguageRelation(models.Model):
     language=models.ForeignKey(LanguageVariety)
     category=models.ForeignKey(Category)
 
-    def __unicode__(self):
-        return unicode(self.language)+u"/"+unicode(self.category)
+    def __str__(self):
+        return str(self.language)+"/"+str(self.category)
 
 class CategorizedObject(models.Model):
     categories = models.ManyToManyField(Category,blank=True)
@@ -1127,7 +1126,7 @@ class CategorizedObject(models.Model):
         abstract = True
 
     def get_categories(self):
-        return "; ".join(map(lambda x: unicode(x),self.categories.all()))
+        return "; ".join([str(x) for x in self.categories.all()])
 
 
 ### authors
@@ -1198,7 +1197,7 @@ class MigrAuthor(models.Model):
     ind = models.IntegerField(db_index=True)
     author = models.ForeignKey(Author)
 
-    def __unicode__(self): return unicode(self.cod)+unicode(self.ind)+u" "+unicode(self.author)
+    def __str__(self): return str(self.cod)+str(self.ind)+" "+str(self.author)
 
 ### publishers
 
@@ -1208,13 +1207,13 @@ class PublisherState(models.Model):
     class Meta:
         ordering = ["name"]
 
-    def __unicode__(self): return unicode(self.name)
+    def __str__(self): return str(self.name)
 
 class PublisherAddress(models.Model):
     city = models.CharField(max_length=4096)
     state = models.ForeignKey(PublisherState)
 
-    def __unicode__(self): return unicode(self.city)+u" - "+unicode(self.state)
+    def __str__(self): return str(self.city)+" - "+str(self.state)
 
     class Meta:
         ordering = ["city"]
@@ -1249,10 +1248,10 @@ class PublisherIsbn(models.Model):
         self.preferred=self.get_preferred()
         super(PublisherIsbn, self).clean(*args, **kwargs)
 
-    def __unicode__(self): return unicode(self.isbn)
+    def __str__(self): return str(self.isbn)
 
     def publishers(self):
-        return "; ".join(map(unicode, self.publisher_set.all()))
+        return "; ".join(map(str, self.publisher_set.all()))
 
 class Publisher(models.Model):
     name = models.CharField(max_length=4096)
@@ -1271,10 +1270,10 @@ class Publisher(models.Model):
             self.full_name=self.name
         super(Publisher, self).clean(*args, **kwargs)
 
-    def __unicode__(self): return unicode(self.name)
+    def __str__(self): return str(self.name)
 
     def address(self):
-        return " - ".join(map(lambda x: unicode(x.address.city),self.publisheraddresspublisherrelation_set.order_by("pos")))
+        return " - ".join([str(x.address.city) for x in self.publisheraddresspublisherrelation_set.order_by("pos")])
 
     def show_name(self):
         if self.full_name: return self.full_name
@@ -1288,19 +1287,19 @@ class Publisher(models.Model):
         return H
 
     def isbn_prefix(self):
-        return ", ".join(map(lambda x: unicode(x.isbn),self.isbns.all()))
+        return ", ".join([str(x.isbn) for x in self.isbns.all()])
 
 class PublisherAddressPublisherRelation(PositionAbstract):
     address = models.ForeignKey(PublisherAddress)
     publisher = models.ForeignKey(Publisher)
 
-    def __unicode__(self): return unicode(self.publisher)+u" ["+unicode(self.pos)+u"] "+unicode(self.address)
+    def __str__(self): return str(self.publisher)+" ["+str(self.pos)+"] "+str(self.address)
 
 class MigrPublisherRiviste(models.Model):
     registro = models.CharField(max_length=4096)
     publisher = models.ForeignKey(Publisher)
 
-    def __unicode__(self): return unicode(self.registro)
+    def __str__(self): return str(self.registro)
 
 ### publications
 
@@ -1327,11 +1326,11 @@ class Publication(models.Model):
         ordering = ['title']
 
     def html(self):
-        tit=unicode(self.title)
+        tit=str(self.title)
         if not tit: return ""
         return "<i>"+tit+"</i>"
 
-    def __unicode__(self): return unicode(self.title)
+    def __str__(self): return str(self.title)
 
     def get_absolute_url(self):
         return "/bibliography/publication/%d" % self.pk
@@ -1341,12 +1340,12 @@ class Publication(models.Model):
         self.save()
 
     def crc(self):
-        if not unicode(self.issn).isdigit(): return('Y')
+        if not str(self.issn).isdigit(): return('Y')
         pesi=[8,7,6,5,4,3,2]
-        cod_lista=map(int,list(self.issn))
+        cod_lista=list(map(int,list(self.issn)))
         if len(cod_lista)<7:
             L=len(cod_lista)
-            cod_lista+=map(lambda x: 0, range(L,7))
+            cod_lista+=[0 for x in range(L,7)]
         crc=11-(sum(map(lambda x,y: x*y,cod_lista,pesi))%11)
         if (crc==10): return('X')
         if (crc==11): return(0)
@@ -1363,16 +1362,16 @@ class Volume(models.Model):
     label = models.CharField(max_length=256,db_index=True)
     publication = models.ForeignKey(Publication)
 
-    def __unicode__(self): return unicode(self.publication)+u" - "+unicode(self.label)
+    def __str__(self): return str(self.publication)+" - "+str(self.label)
 
     def html(self):
         H=self.publication.html()
         if H:
             H+=", "
-        H+=unicode(self.publication.volume_type.read_as)
+        H+=str(self.publication.volume_type.read_as)
         if H:
             H+=" "
-        H+=unicode(self.label)
+        H+=str(self.label)
         return H
 
 ### publication issues
@@ -1407,19 +1406,19 @@ class Issue(models.Model):
         H=self.volume.html()
         if H:
             H+=", "
-        H+="n. "+unicode(self.number)
-        tit=unicode(self.title)
+        H+="n. "+str(self.number)
+        tit=str(self.title)
         if tit:
             H+=", <i>"+tit+"</i>"
         H+=", "
         H+=self.date.strftime("%B %Y")
         return H
 
-    def __unicode__(self):
-        U=unicode(self.volume)
-        U+=u"/"+unicode(self.number)
-        if unicode(self.title):
-            U+=u". "+unicode(self.title)
+    def __str__(self):
+        U=str(self.volume)
+        U+="/"+str(self.number)
+        if str(self.title):
+            U+=". "+str(self.title)
         return U
 
     def year(self):
@@ -1428,14 +1427,14 @@ class Issue(models.Model):
 class IssueAuthorRelation(AuthorRelation,PositionAbstract):
     issue = models.ForeignKey(Issue)
 
-    def __unicode__(self): return unicode(self.author)+u", "+unicode(self.issue)
+    def __str__(self): return str(self.author)+", "+str(self.issue)
 
     def _year(self): return int(self.issue.year())
-    def _title(self): return unicode(self.issue.title)
+    def _title(self): return str(self.issue.title)
 
     def html(self): 
-        print "COM"
-        print self.issue.html()
+        print("COM")
+        print(self.issue.html())
         return self.issue.html()
 
     class Meta:
@@ -1455,8 +1454,7 @@ class Article(models.Model):
     authors = models.ManyToManyField(Author,through='ArticleAuthorRelation',blank=True)
 
     def get_authors(self):
-        return ", ".join(map(lambda x: unicode(x.author.long_name()), 
-                             self.articleauthorrelation_set.filter(author_role__cover_name=True).order_by("pos")))
+        return ", ".join([str(x.author.long_name()) for x in self.articleauthorrelation_set.filter(author_role__cover_name=True).order_by("pos")])
 
     def get_secondary_authors(self):
         L=list(self.articleauthorrelation_set.filter(author_role__cover_name=False).order_by("author_role__pos","pos"))
@@ -1465,7 +1463,7 @@ class Article(models.Model):
         comma=True
         for rel in L:
             if curr_pos!=int(rel.author_role.pos):
-                action=unicode(rel.author_role.action).strip()
+                action=str(rel.author_role.action).strip()
                 if action:
                     if ret:
                         ret+=", "
@@ -1479,7 +1477,7 @@ class Article(models.Model):
         return ret
 
 
-    def __unicode__(self): return unicode(self.title) #+" ("+unicode(self.year)+")"
+    def __str__(self): return str(self.title) #+" ("+unicode(self.year)+")"
 
     def issn(self): return self.issue.issn()
 
@@ -1492,30 +1490,30 @@ class Article(models.Model):
         H+=self.get_authors()
         if H:
             H+=", "
-        H+=u"“"+unicode(self.title)+u"”, "
+        H+="“"+str(self.title)+"”, "
         sec_authors=self.get_secondary_authors()
         if sec_authors:
             H+=sec_authors+", "
         issue=self.issue.html()
         if issue:
             H+=issue+", "
-        if unicode(self.page_begin)==unicode(self.page_end):
-            H+="p. "+unicode(self.page_begin)
+        if str(self.page_begin)==str(self.page_end):
+            H+="p. "+str(self.page_begin)
         else:
-            H+="pp. "+unicode(self.page_begin)+"-"+unicode(self.page_end)
+            H+="pp. "+str(self.page_begin)+"-"+str(self.page_end)
         return H
 
 class ArticleAuthorRelation(AuthorRelation,PositionAbstract):
     article = models.ForeignKey(Article)
 
-    def __unicode__(self): return unicode(self.author)+u", "+unicode(self.article)
+    def __str__(self): return str(self.author)+", "+str(self.article)
 
     def _year(self): return int(self.article.year())
-    def _title(self): return unicode(self.article.title)
+    def _title(self): return str(self.article.title)
 
     def html(self): 
-        print "ART"
-        print self.article.html()
+        print("ART")
+        print(self.article.html())
         return self.article.html()
 
     class Meta:
@@ -1542,12 +1540,11 @@ class Book(CategorizedObject):
     objects=BookManager()
 
     def get_authors(self):
-        return ", ".join(map(lambda x: unicode(x.author.long_name()), 
-                             self.bookauthorrelation_set.filter(author_role__cover_name=True).order_by("pos")))
+        return ", ".join([str(x.author.long_name()) for x in self.bookauthorrelation_set.filter(author_role__cover_name=True).order_by("pos")])
 
     def get_absolute_url(self):
-        U=u"/bibliography/book/%d" % self.pk
-        print U
+        U="/bibliography/book/%d" % self.pk
+        print(U)
         return U
 
     def get_secondary_authors(self):
@@ -1557,7 +1554,7 @@ class Book(CategorizedObject):
         comma=True
         for rel in L:
             if curr_pos!=int(rel.author_role.pos):
-                action=unicode(rel.author_role.action).strip()
+                action=str(rel.author_role.action).strip()
                 if action:
                     if ret:
                         ret+=", "
@@ -1573,73 +1570,73 @@ class Book(CategorizedObject):
     class Meta:
         ordering=["title","year","publisher"]
 
-    def __unicode__(self): return unicode(self.title)+u" ("+unicode(self.year)+u")"
+    def __str__(self): return str(self.title)+" ("+str(self.year)+")"
 
     def html(self):
         H=""
         H+=self.get_authors()
         if H:
             H+=", "
-        H+="<i>"+unicode(self.title)+"</i>, "
+        H+="<i>"+str(self.title)+"</i>, "
         sec_authors=self.get_secondary_authors()
         if sec_authors:
             H+=sec_authors+", "
         pub=self.publisher.html()
         if pub:
             H+=pub+", "
-        H+=unicode(self.year)
+        H+=str(self.year)
         return H
 
     def clean(self,*args,**kwargs):
         self.isbn_crc10 = self.crc10()
         self.isbn_crc13 = self.crc13()
-        self.isbn_cache10=self.isbn_ced+self.isbn_book+unicode(self.crc10())
-        self.isbn_cache13='978'+self.isbn_ced+self.isbn_book+unicode(self.crc13())
+        self.isbn_cache10=self.isbn_ced+self.isbn_book+str(self.crc10())
+        self.isbn_cache13='978'+self.isbn_ced+self.isbn_book+str(self.crc13())
         super(Book, self).clean(*args, **kwargs)
 
     def save(self,*args,**kwargs):
         self.isbn_crc10 = self.crc10()
         self.isbn_crc13 = self.crc13()
-        self.isbn_cache10=self.isbn_ced+self.isbn_book+unicode(self.crc10())
-        self.isbn_cache13='978'+self.isbn_ced+self.isbn_book+unicode(self.crc13())
+        self.isbn_cache10=self.isbn_ced+self.isbn_book+str(self.crc10())
+        self.isbn_cache13='978'+self.isbn_ced+self.isbn_book+str(self.crc13())
         super(Book, self).save(*args, **kwargs)
 
     def update_crc(self):
         self.isbn_crc10 = self.crc10()
         self.isbn_crc13 = self.crc13()
-        self.isbn_cache10=self.isbn_ced+self.isbn_book+unicode(self.crc10())
-        self.isbn_cache13='978'+self.isbn_ced+self.isbn_book+unicode(self.crc13())
+        self.isbn_cache10=self.isbn_ced+self.isbn_book+str(self.crc10())
+        self.isbn_cache13='978'+self.isbn_ced+self.isbn_book+str(self.crc13())
         self.save()
 
     def isbn10(self):
-        return unicode(self.isbn_ced)+"-"+unicode(self.isbn_book)+"-"+unicode(self.isbn_crc10)
+        return str(self.isbn_ced)+"-"+str(self.isbn_book)+"-"+str(self.isbn_crc10)
 
     def isbn13(self):
-        return "978-"+unicode(self.isbn_ced)+"-"+unicode(self.isbn_book)+"-"+unicode(self.isbn_crc13)
+        return "978-"+str(self.isbn_ced)+"-"+str(self.isbn_book)+"-"+str(self.isbn_crc13)
 
     def crc10(self):
-        if not unicode(self.isbn_book).isdigit(): return('Y')
-        if not unicode(self.isbn_ced).isdigit(): return('Y')
-        isbn=unicode(self.isbn_ced)+unicode(self.isbn_book)
+        if not str(self.isbn_book).isdigit(): return('Y')
+        if not str(self.isbn_ced).isdigit(): return('Y')
+        isbn=str(self.isbn_ced)+str(self.isbn_book)
         pesi=[10,9,8,7,6,5,4,3,2]
-        cod_lista=map(int,list(isbn))
+        cod_lista=list(map(int,list(isbn)))
         if len(cod_lista)<9:
             L=len(cod_lista)
-            cod_lista+=map(lambda x: 0, range(L,9))
+            cod_lista+=[0 for x in range(L,9)]
         crc=11-(sum(map(lambda x,y: x*y,cod_lista,pesi))%11)
         if (crc==10): return('X')
         if (crc==11): return(0)
         return(crc)
 
     def crc13(self):
-        if not unicode(self.isbn_book).isdigit(): return('Y')
-        if not unicode(self.isbn_ced).isdigit(): return('Y')
-        isbn=unicode(self.isbn_ced)+unicode(self.isbn_book)
+        if not str(self.isbn_book).isdigit(): return('Y')
+        if not str(self.isbn_ced).isdigit(): return('Y')
+        isbn=str(self.isbn_ced)+str(self.isbn_book)
         pesi=[1,3,1,3,1,3,1,3,1,3,1,3]
-        cod_lista=[9,7,8]+map(int,list(isbn))
+        cod_lista=[9,7,8]+list(map(int,list(isbn)))
         if len(cod_lista)<12:
             L=len(cod_lista)
-            cod_lista+=map(lambda x: 0, range(L,12))
+            cod_lista+=[0 for x in range(L,12)]
         crc=10-(sum(map(lambda x,y: x*y,cod_lista,pesi))%10)
         if (crc==10): return(0)
         return(crc)
@@ -1647,10 +1644,10 @@ class Book(CategorizedObject):
 class BookAuthorRelation(AuthorRelation,PositionAbstract):
     book = models.ForeignKey(Book)
 
-    def __unicode__(self): return unicode(self.author)+u", "+unicode(self.book)
+    def __str__(self): return str(self.author)+", "+str(self.book)
 
     def _year(self): return int(self.book.year)
-    def _title(self): return unicode(self.book.title)
+    def _title(self): return str(self.book.title)
 
     def html(self): return self.book.html()
     def get_absolute_url(self): return self.book.get_absolute_url()
@@ -1666,7 +1663,7 @@ class TextsCdrom(LabeledAbstract):
 #     time_span=models.ForeignKey(TimeSpan)
 #     book=models.OneToOneField(Book)
 
-#     def __unicode__(self):
+#     def __str__(self):
 #         return unicode(self.time_span)+u"/"+unicode(self.book)
 
 ### repository cache
@@ -1685,8 +1682,8 @@ class RepositoryCacheBook(models.Model):
         super(RepositoryCacheBook, self).clean(*args, **kwargs)
 
 
-    def __unicode__(self):
-        return unicode(self.isbn)+u" "+unicode(self.title)
+    def __str__(self):
+        return str(self.isbn)+" "+str(self.title)
 
     class Meta:
         ordering = [ "isbn" ]
@@ -1696,7 +1693,7 @@ class RepositoryCacheAuthor(PositionAbstract):
     name = models.CharField(max_length=4096)
     role = models.CharField(max_length=4096)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -1707,7 +1704,7 @@ class RepositoryFailedIsbn(models.Model):
     isbn10 = models.CharField(max_length=4096)
     isbn13 = models.CharField(max_length=4096)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.isbn10+"/"+self.isbn13
 
     class Meta:
@@ -1723,8 +1720,7 @@ class BookSerieWithoutIsbn(models.Model):
     title_prefix = models.CharField(max_length=4096,default='',blank=True)
     publisher = models.ForeignKey(Publisher)
     
-    def __unicode__(self): return unicode(self.title)
-
+    def __str__(self): return str(self.title)
 
 ### signals
 
@@ -1761,10 +1757,10 @@ class CategoryRelationChangeHandler(object):
             return
         old_parent=None
         old_child=None
-        if self.old_parents.has_key(instance.id):
+        if instance.id in self.old_parents:
             old_parent=self.old_parents[instance.id]
             del(self.old_parents[instance.id])
-        if self.old_children.has_key(instance.id):
+        if instance.id in self.old_children:
             old_child=self.old_children[instance.id]
             del(self.old_children[instance.id])
         CategoryTreeNode.objects.update_child_category(old_parent,old_child,instance.parent,instance.child)

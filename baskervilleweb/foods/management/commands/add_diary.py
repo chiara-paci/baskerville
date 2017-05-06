@@ -60,12 +60,12 @@ class Command(BaseCommand):
         if not measure_list:
             measure_list=MeasureUnit.objects.filter(name__icontains=measure_name)
         if not measure_list:
-            print "Measure %s not available" % measure_name
+            print("Measure %s not available" % measure_name)
             return
         if len(measure_list) > 1:
-            print "Too many measures:"
+            print("Too many measures:")
             for m in measure_list:
-                print "    ",m
+                print("    ",m)
             return
         measure=measure_list.first()
 
@@ -73,16 +73,16 @@ class Command(BaseCommand):
         if not product_list:
             product_list=Product.objects.filter(name__icontains=product_name)
         if not product_list:
-            print "Product %s not available" % product_name
+            print("Product %s not available" % product_name)
             return
         if len(product_list) > 1:
-            print "Too many products:"
+            print("Too many products:")
             for m in product_list:
-                print "    ",m
+                print("    ",m)
             return
         product=product_list.first()
 
     
 
-        print user,d_time,product,quantity,measure
+        print(user,d_time,product,quantity,measure)
         FoodDiaryEntry.objects.create(user=user,time=d_time,product=product,quantity=quantity,measure_unit=measure)

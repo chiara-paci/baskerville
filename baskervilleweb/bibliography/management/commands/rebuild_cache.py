@@ -25,7 +25,7 @@ class Command(BaseCommand):
             types=args
 
         if "author_names" in types:
-            print "Author names"
+            print("Author names")
             author_list=Author.objects.all()
             L=len(author_list)
             next_perc=10
@@ -34,11 +34,11 @@ class Command(BaseCommand):
                 author.update_cache()
                 n+=1
                 if 100.0*float(n)/float(L) > next_perc:
-                    print "    %2.2f%%" % (100*float(n)/float(L))
+                    print("    %2.2f%%" % (100*float(n)/float(L)))
                     next_perc+=10
 
         if "isbn" in types:
-            print "ISBN"
+            print("ISBN")
             book_list=Book.objects.all()
             L=len(book_list)
             next_perc=10
@@ -47,11 +47,11 @@ class Command(BaseCommand):
                 book.update_crc()
                 n+=1
                 if 100.0*float(n)/float(L) > next_perc:
-                    print "    %2.2f%%" % (100*float(n)/float(L))
+                    print("    %2.2f%%" % (100*float(n)/float(L)))
                     next_perc+=10
 
         if "issn_crc" in types:
-            print "ISSN crc"
+            print("ISSN crc")
             publication_list=Publication.objects.all()
             L=len(publication_list)
             next_perc=10
@@ -60,11 +60,11 @@ class Command(BaseCommand):
                 publication.update_crc()
                 n+=1
                 if 100.0*float(n)/float(L) > next_perc:
-                    print "    %2.2f%%" % (100*float(n)/float(L))
+                    print("    %2.2f%%" % (100*float(n)/float(L)))
                     next_perc+=10
 
         if "preferred_publisher" in types:
-            print "Preferred Publisher"
+            print("Preferred Publisher")
             pub_isbn_list=PublisherIsbn.objects.all()
             L=len(pub_isbn_list)
             next_perc=10
@@ -73,11 +73,11 @@ class Command(BaseCommand):
                 pub_isbn.update_preferred()
                 n+=1
                 if 100.0*float(n)/float(L) > next_perc:
-                    print "    %2.2f%%" % (100*float(n)/float(L))
+                    print("    %2.2f%%" % (100*float(n)/float(L)))
                     next_perc+=10
             
         if "publication_years" in types:
-            print "Publication Year"
+            print("Publication Year")
             
             for rel in BookAuthorRelation.objects.all():
                 rel.save()
@@ -92,7 +92,7 @@ class Command(BaseCommand):
                 arel.update_year()
                 n+=1
                 if 100.0*float(n)/float(L) > next_perc:
-                    print "    %2.2f%%" % (100*float(n)/float(L))
+                    print("    %2.2f%%" % (100*float(n)/float(L)))
                     next_perc+=10
                 
         if "nodes" in types:

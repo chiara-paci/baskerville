@@ -1,7 +1,8 @@
-costruttoridimondi/costruttoridimondi/settings.py
 __pycache__
 *.sqlite3
 *.db
 *.pyc
+*.bak
 *.log
 *~
+settings.py

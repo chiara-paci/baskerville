@@ -20,18 +20,18 @@ class Command(BaseCommand):
         types=args
 
         for aut in RepositoryCacheAuthor.objects.all():
-            if "," in unicode(aut.name):
-                t=map(lambda x: x.strip(),unicode(aut.name).split(","))
+            if "," in str(aut.name):
+                t=[x.strip() for x in str(aut.name).split(",")]
                 t.reverse()
                 aut.name=" ".join(t)
-            if ( ( "aa" in unicode(aut.name) 
-                   or "AA" in unicode(aut.name) )
-                 and ( "vv" in unicode(aut.name) 
-                   or "VV" in unicode(aut.name) ) ):
+            if ( ( "aa" in str(aut.name) 
+                   or "AA" in str(aut.name) )
+                 and ( "vv" in str(aut.name) 
+                   or "VV" in str(aut.name) ) ):
                 aut.name="AA. VV."
                 aut.save()
                 return
-            t=filter(bool,aut.name.split(" "))
+            t=list(filter(bool,aut.name.split(" ")))
             for n in range(0,len(t)):
                 if len(t[n])==1: t[n]+="."
             aut.name=" ".join(t)

@@ -140,16 +140,16 @@ class Command(BaseCommand):
 
         for cat_node in roots:
             num_level=cat_node.branch_depth()
-            Q=map(lambda x: 0,range(0,num_level))
-            print cat_node
+            Q=[0 for x in range(0,num_level)]
+            print(cat_node)
             Q[0]=cat_node.branch_level_size(1)
 
             for level in range(1,len(Q)):
                 cat_nodes=CategoryTreeNode.objects.branch_nodes(cat_node,level)
                 for cat_leaf in cat_nodes:
                     Q[level]=max(Q[level],cat_leaf.branch_level_size(level+1))
-            print "    Q",Q
-            RQ=map(lambda x: 0,range(0,num_level+1))
+            print("    Q",Q)
+            RQ=[0 for x in range(0,num_level+1)]
 
             RQ[num_level]=0
             RQ[num_level-1]=K
@@ -159,20 +159,20 @@ class Command(BaseCommand):
                 RQ[i]=RQ[i+1]*( 1 + 1/( 2*math.sin(math.pi/(Q[i]+1)) ) )
                 i-=1
                 
-            print "    R",RQ
+            print("    R",RQ)
             R[cat_node.label]=RQ
             html+="<h1>"+cat_node.content_object.name+"</h1>\n"
             html+='<img src="./'+cat_node.label+'.svg"/>\n'
 
         return
 
-        nodes=map(Node,list(Category.objects.all()))
+        nodes=list(map(Node,list(Category.objects.all())))
         N=len(nodes)
         reverse={}
         for n in range(0,N):
             reverse[nodes[n].cat.id]=n
 
-        edges=map(Edge,list(CategoryRelation.objects.all()))
+        edges=list(map(Edge,list(CategoryRelation.objects.all())))
         M=len(edges)
 
         for edge in edges:
@@ -197,7 +197,7 @@ class Command(BaseCommand):
         for x in range(0,int(w)):
             for y in range(0,int(h)):
                 if x*w+y>=N: break
-                print x*w+y,"/",N,x,y
+                print(x*w+y,"/",N,x,y)
                 nodes[x*w+y].x=x*K
                 nodes[x*w+y].y=y*K
 

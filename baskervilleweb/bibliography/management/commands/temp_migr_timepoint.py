@@ -15,13 +15,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for cts in CategoryTimeSpanRelation.objects.filter(category__name__istartswith="opere "):
-            cat_name=unicode(cts.category).strip()
+            cat_name=str(cts.category).strip()
             t=cat_name.split(" ")
             x=t[-1].split("-")
             if len(x)<=1:
-                print cts.category,len(x),"<===================================="
+                print(cts.category,len(x),"<====================================")
                 continue
-            print cts.category,":",x[0],x[1]
+            print(cts.category,":",x[0],x[1])
             b=int(x[0])
             e=int(x[1])
             cts.time_span.begin.date=b
@@ -33,4 +33,4 @@ class Command(BaseCommand):
             ts_name=cat_name.replace("opere ","vita ")
             cts.time_span.name=ts_name
             cts.time_span.save()
-            print "    ",cts.time_span,cts.time_span.begin,cts.time_span.end
+            print("    ",cts.time_span,cts.time_span.begin,cts.time_span.end)

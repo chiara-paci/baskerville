@@ -22,12 +22,12 @@ class Command(BaseCommand):
         lista=[]
         fd=open(elenco,"r")
         for l in fd.readlines():
-            l=unicode(l,'utf-8')
+            l=str(l,'utf-8')
             l=l.strip()
             if not l: continue
-            t=map(lambda x: x.strip(),l.split("|"))
+            t=[x.strip() for x in l.split("|")]
             if len(t)!=5: 
-                print t
+                print(t)
                 continue
 
             issn_pub=t[1].strip()
@@ -40,15 +40,15 @@ class Command(BaseCommand):
 
             try:
                 issue=Issue.objects.get(volume__pubblication__issn=issn_pub,issn_num=issn_num)
-            except ObjectDoesNotExist, e:
-                print "NE issue:",issn_pub,issn_num
+            except ObjectDoesNotExist as e:
+                print("NE issue:",issn_pub,issn_num)
                 sys.exit()
 
             article,created=Article.objects.get_or_create(issue=issue,page_begin=page_begin,page_end=page_end,
                                                           defaults={"title":title})
 
             if created:
-                print "Created: ",article
+                print("Created: ",article)
 
 
 

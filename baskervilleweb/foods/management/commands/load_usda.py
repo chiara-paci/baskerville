@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from foods.models import UsdaNndFoodGroup,UsdaNndFood
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import re
 
 def null_or_float(val):
@@ -17,7 +17,7 @@ def load_food_group(t):
     name=t[1].replace('~','')
     food_group,created=UsdaNndFoodGroup.objects.get_or_create(name=name,usda_id=usda_id)
     if created:
-        print "FGRP",food_group
+        print("FGRP",food_group)
 
 def load_food(t):
     usda_id=t[0].replace('~','')
@@ -51,7 +51,7 @@ def load_food(t):
                                                               "fat_factor": fat_factor,
                                                               "carbohydrate_factor": carbohydrate_factor })
     if created:
-        print "FOOD",food
+        print("FOOD",food)
         return
     food.food_group=food_group
     food.long_description=long_description

@@ -24,7 +24,7 @@ class JsonDetailView(DetailView):
 
     def get_template_names(self):
         L=super(JsonDetailView, self).get_template_names()
-        ret=map(lambda x: x.replace(".html",".json"),L)
+        ret=[x.replace(".html",".json") for x in L]
         return(ret)
 
 class JsonCategoryNodesLinksView(View): 
@@ -44,7 +44,7 @@ class JsonCategoryNodesLinksView(View):
             n+=1
 
 
-        if kwargs.has_key("pk"):
+        if "pk" in kwargs:
             parent=Category.objects.get(id=self.kwargs["pk"])
             min_level=parent.min_level()
             max_level=parent.my_branch_depth()
@@ -69,8 +69,8 @@ class JsonCategoryNodesLinksView(View):
 
         rel_list=[]
         for rel in cat_rel:
-            if not cat_maps.has_key(rel.parent.id): continue
-            if not cat_maps.has_key(rel.child.id): continue
+            if rel.parent.id not in cat_maps: continue
+            if rel.child.id not in cat_maps: continue
             source=cat_maps[rel.parent.id]
             target=cat_maps[rel.child.id]
             branch=rel.parent.my_branch_id()
@@ -106,7 +106,7 @@ class JsonCategoryNodesLinksView2(View):
             n+=1
 
 
-        if kwargs.has_key("pk"):
+        if "pk" in kwargs:
             parent=Category.objects.get(id=self.kwargs["pk"])
             min_level=parent.min_level()
             max_level=parent.my_branch_depth()
@@ -225,8 +225,8 @@ class JsonCategoryNodesLinksView2(View):
 
         links=[]
         for rel in cat_rel:
-            if not cat_maps.has_key(rel.parent.id): continue
-            if not cat_maps.has_key(rel.child.id): continue
+            if rel.parent.id not in cat_maps: continue
+            if rel.child.id not in cat_maps: continue
             source_base_node=base_nodes_by_catid[rel.parent.id]
             target_base_node=base_nodes_by_catid[rel.child.id]
 
@@ -274,12 +274,12 @@ class CategoryChildrenView(ListView):
 
     def get_queryset(self, *args, **kwargs):
         qset=super(CategoryChildrenView, self).get_queryset(*args, **kwargs)
-        if not self.kwargs.has_key("pk"):
+        if "pk" not in self.kwargs:
             return qset
         if not self.kwargs["pk"]:
             return qset
         parent_id=self.kwargs["pk"]
-        print parent_id
+        print(parent_id)
         return Category.objects.all_in_branch(parent_id)
         
         # parent=Category.objects.get(pk=parent_id)
@@ -301,7 +301,7 @@ class CategoryGraphView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(CategoryGraphView, self).get_context_data(**kwargs)
-        if kwargs.has_key("pk"):
+        if "pk" in kwargs:
             context["parent_id"]=kwargs["pk"]
         return context
 
@@ -312,7 +312,7 @@ class CategoryTreeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(CategoryTreeView, self).get_context_data(**kwargs)
         obj_list = list(CategoryTreeNode.objects.all())
-        context["category_tree"]=map(lambda x: x.get_desc("catroot"),obj_list)
+        context["category_tree"]=[x.get_desc("catroot") for x in obj_list]
         return context
 
 
@@ -322,24 +322,24 @@ class CategorizerView(ListView):
 
     def get_queryset(self, *args, **kwargs):
         qset=super(CategorizerView, self).get_queryset(*args, **kwargs)
-        if not self.kwargs.has_key("pk"):
+        if "pk" not in self.kwargs:
             return qset
         if not self.kwargs["pk"]:
             return qset
         parent_id=self.kwargs["pk"]
-        print parent_id
+        print(parent_id)
         parent=Category.objects.get(pk=parent_id)
 
         children_ids=[]
         for catnode in parent.tree_nodes.all():
-            print catnode
+            print(catnode)
             L=catnode.branch()
             for cn in L:
-                print cn
-            children_ids+=map(lambda x: x.object_id,list(L))
+                print(cn)
+            children_ids+=[x.object_id for x in list(L)]
         children_ids=list(set(children_ids))
-        print children_ids
-        print 100 in children_ids
+        print(children_ids)
+        print(100 in children_ids)
         return Category.objects.filter(id__in=children_ids)
 
     def get(self, request, *args, **kwargs):
@@ -364,7 +364,7 @@ class JsonTreeView(ListView):
 
     def get_template_names(self):
         L=super(JsonTreeView, self).get_template_names()
-        ret=map(lambda x: x.replace(".html",".json"),L)
+        ret=[x.replace(".html",".json") for x in L]
         return(ret)
 
     def get_queryset(self):
@@ -434,7 +434,7 @@ class PublisherCreateView(CreateView):
         for row_data in address_formset.cleaned_data:
             if not row_data: continue
             pos+=1
-            print row_data
+            print(row_data)
             address_obj=row_data["address"]
             if address_obj:
                 address_obj_list.append((pos,address_obj))
@@ -646,7 +646,7 @@ class JsonBookChangeCategoriesView(View):
         book_obj=Book.objects.get(id=book_id)
 
         categories_txt=form.cleaned_data["categories"].strip()
-        categories=map(lambda x: x.strip().replace('.','.*'),categories_txt.split(";"))
+        categories=[x.strip().replace('.','.*') for x in categories_txt.split(";")]
         categories_objects=[]
 
         for cat in categories:
@@ -686,7 +686,7 @@ class JsonCategoryChangeParentsView(View):
         child_obj=Category.objects.get(id=child_id)
 
         parents_txt=form.cleaned_data["categories"].strip()
-        parents=map(lambda x: x.strip().replace('.','.*'),parents_txt.split(";"))
+        parents=[x.strip().replace('.','.*') for x in parents_txt.split(";")]
         parents_objects=[]
 
         for cat in parents:
@@ -699,12 +699,12 @@ class JsonCategoryChangeParentsView(View):
                 cat_obj=L[0]
             parents_objects.append(cat_obj)
 
-        print parents,parents_objects
+        print(parents,parents_objects)
         
         for rel_obj in child_obj.parent_set.all():
-            print rel_obj
+            print(rel_obj)
             if rel_obj.parent in parents_objects: continue
-            print rel_obj
+            print(rel_obj)
             rel_obj.delete()
 
         for cat_obj in parents_objects:
@@ -789,7 +789,7 @@ class BooksInsertView(View):
                 continue
             suspended=False
             for role,pos,aut in book.authors:
-                if type(aut) not in [unicode,str]:
+                if type(aut) not in [str,str]:
                     old_author_list.append(aut)
                     continue
                 temp_author_list.append(aut)
@@ -804,18 +804,18 @@ class BooksInsertView(View):
                       "title": book.title, "year": book.year, "publisher": book.publisher }
             bookform=forms.BookForm(prefix="newbook"+str(n),initial=initial)
             initial=[]
-            lauts=map(lambda x: (x[1],(x[0],x[2])),book.authors)
+            lauts=[(x[1],(x[0],x[2])) for x in book.authors]
             lauts.sort()
             for pos,(role,author) in lauts:
                 aut_role=AuthorRole.objects.get(label=role)
                 initial.append({"author":author,"author_role":aut_role})
             bookauthorformset=forms.BookAuthorFormSet(prefix="newbook"+str(n)+"-author",initial=initial)
-            new_book_list.append( (str(n),book.isbn_10().replace("-","")+u" "+unicode(book.title),bookform, bookauthorformset) )
+            new_book_list.append( (str(n),book.isbn_10().replace("-","")+" "+str(book.title),bookform, bookauthorformset) )
             n+=1
         n=0
         for aut in temp_author_list:
-            t=filter(lambda x: bool(x),map(lambda x: x.strip(),aut.strip().split(" ")))
-            print t,len(t)
+            t=[x for x in [x.strip() for x in aut.strip().split(" ")] if bool(x)]
+            print(t,len(t))
             initial=[]
             if len(t)==1:
                 lab_format="onename"
@@ -870,7 +870,7 @@ class AuthorSearchView(View):
         if not L:
             return self.render_not_found(request,form)
         if len(L)==1:
-            print type(L[0])
+            print(type(L[0]))
             return redirect(L[0])
         return render(request,self.template_name_list,{"object_list":L})
 
@@ -881,7 +881,7 @@ class AuthorInsertView(AuthorSearchView):
         search=form.cleaned_data["search"]
         format_c,names=NameFormatCollection.objects.get_format_for_name(search)
         field_names=format_c.fields
-        print format_c,field_names,names
+        print(format_c,field_names,names)
         initial=[]
         for n in range(0,len(field_names)):
             name_type,created=NameType.objects.get_or_create(label=field_names[n])
@@ -889,7 +889,7 @@ class AuthorInsertView(AuthorSearchView):
                 initial.append( {"value": names[n],"name_type": name_type.pk})
             else:
                 initial.append( {"name_type": name_type.pk})
-        print initial
+        print(initial)
         name_formset = forms.AuthorName0FormSet(prefix="name",initial=initial)
         author_form = forms.AuthorForm(initial={"format_collection": format_c})
         return render(request, self.template_name_not_found, 

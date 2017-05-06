@@ -23,10 +23,10 @@ class Command(BaseCommand):
         lista=[]
         fd=open(elenco,"r")
         for l in fd.readlines():
-            l=unicode(l,'utf-8')
+            l=str(l,'utf-8')
             l=l.strip()
             if not l: continue
-            t=map(lambda x: x.strip(),l.split("%"))
+            t=[x.strip() for x in l.split("%")]
             name=t[0]
             url=t[1]
             city=t[2]
@@ -34,15 +34,15 @@ class Command(BaseCommand):
             note=t[4]
             try:
                 city_obj=PublisherAddress.objects.get(city=city)
-            except ObjectDoesNotExist, e:
-                print "NE",city
+            except ObjectDoesNotExist as e:
+                print("NE",city)
                 continue
             ce_obj,created=Publisher.objects.get_or_create(name=name,url=url,note=note)
             if created:
-                print "CE",ce_obj
+                print("CE",ce_obj)
             rel,created=PublisherAddressPublisherRelation.objects.get_or_create(pos=pos,publisher=ce_obj,address=city_obj)
             if created:
-                print "RE",ce_obj,pos,city
+                print("RE",ce_obj,pos,city)
                 
 
         fd.close()

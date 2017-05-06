@@ -30,31 +30,31 @@ class Command(BaseCommand):
 
         for cat in Category.objects.all():
             obj=CategoryTreeNode.objects.create_category(cat)
-            print "Created: %s" % unicode(obj)
-            log_write(fd,u"Created: %s\n" % unicode(obj))
+            print("Created: %s" % str(obj))
+            log_write(fd,"Created: %s\n" % str(obj))
 
         for catrel in CategoryRelation.objects.all():
-            print catrel
-            log_write(fd,unicode(catrel))
-            log_write(fd,u"\n")
+            print(catrel)
+            log_write(fd,str(catrel))
+            log_write(fd,"\n")
             obj_list=CategoryTreeNode.objects.add_child_category(catrel.parent,catrel.child)
             for action,obj in obj_list:
-                log_write(fd,u"    ")
-                log_write(fd,unicode(action))
-                log_write(fd,u" "+unicode(obj)+u"\n")
+                log_write(fd,"    ")
+                log_write(fd,str(action))
+                log_write(fd," "+str(obj)+"\n")
         
         #CategoryTreeNode.objects.filter(is_category=False).delete()
         for catrel in Book.categories.through.objects.all():
-            print catrel.category,u"/",catrel.book
-            log_write(fd,unicode(catrel.category)+u"/")
-            log_write(fd,unicode(catrel.book))
-            log_write(fd,u"\n")
+            print(catrel.category,"/",catrel.book)
+            log_write(fd,str(catrel.category)+"/")
+            log_write(fd,str(catrel.book))
+            log_write(fd,"\n")
             obj_list=CategoryTreeNode.objects.add_category_relation(catrel.category,catrel.book)
             for action,obj in obj_list:
-                log_write(fd,u"    ")
-                log_write(fd,unicode(action))
-                log_write(fd,u" "+unicode(obj))
-                log_write(fd,u"\n")
+                log_write(fd,"    ")
+                log_write(fd,str(action))
+                log_write(fd," "+str(obj))
+                log_write(fd,"\n")
 
         if fd:
             fd.close()

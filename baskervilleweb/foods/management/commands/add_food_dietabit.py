@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from foods.models import ProductMicroNutrient,Product,Vendor,MicroNutrient,ProductCategory
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import re
 
 class Command(BaseCommand):
@@ -17,7 +17,7 @@ class Command(BaseCommand):
         cat_name=args[1]
         url=args[2]
 
-        response = urllib2.urlopen(url)
+        response = urllib.request.urlopen(url)
         status="header"
         tables=[]
         current=[]
@@ -56,7 +56,7 @@ class Command(BaseCommand):
                     t[1]=t[1].replace(",",".")
                     try:
                         t[1]=float(t[1])
-                    except ValueError, e:
+                    except ValueError as e:
                         continue
                     vals.append( (t[0].lower(),t[1],t[2]) )
 
@@ -111,28 +111,28 @@ class Command(BaseCommand):
         micro=[]
 
         for t in vals:
-            if t[0] in base.keys():
+            if t[0] in list(base.keys()):
                 base[t[0]]=(t[1],t[2])
                 continue
             if t[0] in escludi: continue
-            if t[0] in vit_map.keys():
+            if t[0] in list(vit_map.keys()):
                 micro.append( (vit_map[t[0]],t[1],t[2]) )
             else:
                 micro.append(t)
 
-        print base
+        print(base)
 
-        for name,(val,mis) in base.items():
-            print "B %40.40s %10.2f %s" % (name,val,mis)
+        for name,(val,mis) in list(base.items()):
+            print("B %40.40s %10.2f %s" % (name,val,mis))
 
-        for name in base.keys():
+        for name in list(base.keys()):
             if base[name][1]=="mg":
                 base[name]=(base[name][0]/1000.0,"g")
             
         vendor,created=Vendor.objects.get_or_create(name="generico")
         category,created=ProductCategory.objects.get_or_create(name=cat_name)
 
-        print vendor,category
+        print(vendor,category)
 
         product,created=Product.objects.get_or_create(name=prod_name.lower(),
                                                       defaults={ "category": category,
@@ -161,19 +161,19 @@ class Command(BaseCommand):
         product.protein=base["proteine"][0]
         product.save()
 
-        print product
+        print(product)
 
         for name,val,mis in micro:
             if not val: continue
             try:
                 micro_obj=MicroNutrient.objects.get(name=name)
-            except MicroNutrient.DoesNotExist, e:
-                print "micro nutrient %s non esiste" % name
+            except MicroNutrient.DoesNotExist as e:
+                print("micro nutrient %s non esiste" % name)
                 continue
             if mis=="g": V=val*1000
             elif mis!="mg": V=val/1000.0
             else:V=val
-            print "  %40.40s %10.6f mg %10.6f %s" % (micro_obj,V,val,mis)
+            print("  %40.40s %10.6f mg %10.6f %s" % (micro_obj,V,val,mis))
             prod_mnut,created=ProductMicroNutrient.objects.get_or_create(product=product,
                                                                          micro_nutrient=micro_obj,
                                                                          defaults={ "quantity": V })

@@ -84,7 +84,7 @@ def diary_dated_pie(uid,date_list, object_list, extra_context):
                                                         Sum("saturated_fat"))
     percs=calories_balance(extra_context["aggregates_simulation"])
     degree={}
-    for k in percs.keys():
+    for k in list(percs.keys()):
         degrees[k]=percs[k]*360/100.0
     extra_context["calories_degrees"]=degrees
     
@@ -168,7 +168,7 @@ def diary_dated_items(uid,date_list, object_list, extra_context):
         
     for entry in object_list:
         for f_micro in entry.product.productmicronutrient_set.all():
-            if not micro.has_key(f_micro.micro_nutrient.id):
+            if f_micro.micro_nutrient.id not in micro:
                 micro[f_micro.micro_nutrient.id]={
                     "micro_nutrient": f_micro.micro_nutrient,
                     "value": 0.0, 
@@ -186,7 +186,7 @@ def diary_dated_items(uid,date_list, object_list, extra_context):
                 micro[f_micro.micro_nutrient.id]["rda_perc_simulation"]=100*micro[f_micro.micro_nutrient.id]["value_simulation"]/f_micro.micro_nutrient.rda
 
             
-    extra_context["micro_nutrients"]=micro.values()
+    extra_context["micro_nutrients"]=list(micro.values())
         
     return date_list, object_list, extra_context
 
@@ -258,9 +258,9 @@ class DiaryWeekArchiveView(WeekArchiveView):
         date_dict={}
 
         for entry in object_list:
-            if not date_dict.has_key( (entry.time.year,entry.time.month,entry.time.day) ):
+            if (entry.time.year,entry.time.month,entry.time.day) not in date_dict:
                 date_dict[(entry.time.year,entry.time.month,entry.time.day)]=entry.time
-            if not aggregate_products.has_key(entry.product.id):
+            if entry.product.id not in aggregate_products:
                 aggregate_products[entry.product.id]={
                     "product": entry.product,
                     "quantity": 0,
@@ -294,9 +294,9 @@ class DiaryWeekArchiveView(WeekArchiveView):
             aggregate_products[entry.product.id]["fiber"]+=entry.fiber
             aggregate_products[entry.product.id]["water"]+=entry.water
 
-        date_list=date_dict.values()
+        date_list=list(date_dict.values())
         date_list.sort()
-        extra_context["aggregate_products"]=aggregate_products.values()
+        extra_context["aggregate_products"]=list(aggregate_products.values())
         num_days=len(date_list)
         extra_context["num_days"]=num_days
         extra_context["first_day"]=date_list[0]
@@ -341,7 +341,7 @@ class AddDiariesView(View):
     
         def parse_date(day_str,day_date):
             today=datetime.datetime.today()
-            print day_str
+            print(day_str)
             if day_str=="today":
                 return today.year,today.month,today.day
             yesterday=today-datetime.timedelta(days=1)
@@ -390,7 +390,7 @@ class AddDiariesView(View):
             return render(request,self.template_name,context)
 
         for form in formset:
-            print form.cleaned_data
+            print(form.cleaned_data)
             user=form.cleaned_data["user"]
             d_time=self.convert_date_time(form.cleaned_data)
             entry_type=form.cleaned_data["entry_type"]
@@ -402,7 +402,7 @@ class AddDiariesView(View):
                 entry_list=self.product_parse(form.cleaned_data)
             for product,quantity,measure in entry_list:
                 FoodDiaryEntry.objects.create(user=user,time=d_time,product=product,quantity=quantity,measure_unit=measure)
-                print user,d_time,product,quantity,measure
+                print(user,d_time,product,quantity,measure)
 
 
         context = { "formset": self.formset_class() }

@@ -140,7 +140,7 @@ class Command(BaseCommand):
             in_degree_matrix[(j,j)]+=1
             n+=1
             if 100.0*float(n)/float(L) > next_perc:
-                print "    %2.2f%%" % (100*float(n)/float(L))
+                print("    %2.2f%%" % (100*float(n)/float(L)))
                 next_perc+=10
 
         # outlaplace_matrix=outdegree_matrix-adjacency_matrix
@@ -159,10 +159,10 @@ class Command(BaseCommand):
         out_eigenvalues,out_eigenvectors=numpy.linalg.eig(out_laplace_matrix)
         in_eigenvalues,in_eigenvectors=numpy.linalg.eig(in_laplace_matrix)
 
-        print "out",numpy.count_nonzero(out_eigenvalues),num_cats
-        print "in",numpy.count_nonzero(in_eigenvalues),num_cats
+        print("out",numpy.count_nonzero(out_eigenvalues),num_cats)
+        print("in",numpy.count_nonzero(in_eigenvalues),num_cats)
 
-        print CategoryTreeNode.objects.filter(level=0).count()
+        print(CategoryTreeNode.objects.filter(level=0).count())
 
         ### draw
 

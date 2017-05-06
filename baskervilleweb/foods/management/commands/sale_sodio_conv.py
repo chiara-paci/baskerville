@@ -38,4 +38,4 @@ class Command(BaseCommand):
                 obj_sale=obj_b
                 obj_sodio=obj_a
             if obj_sodio.quantity != .4*obj_sale.quantity:
-                print "ERR",micro.product,"sodio =",obj_sodio.quantity,"sale =",obj_sale.quantity,"sodio exp. =",.4*obj_sale.quantity
+                print("ERR",micro.product,"sodio =",obj_sodio.quantity,"sale =",obj_sale.quantity,"sodio exp. =",.4*obj_sale.quantity)

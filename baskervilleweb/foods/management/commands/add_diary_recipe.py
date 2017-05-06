@@ -51,12 +51,12 @@ def search_measure(measure_name):
     if not measure_list:
         measure_list=MeasureUnit.objects.filter(name__icontains=measure_name)
     if not measure_list:
-        print "Measure %s not available" % measure_name
+        print("Measure %s not available" % measure_name)
         return None
     if len(measure_list) > 1:
-        print "Too many measures:"
+        print("Too many measures:")
         for m in measure_list:
-            print "    ",m
+            print("    ",m)
         return None
     return measure_list.first()
 
@@ -65,12 +65,12 @@ def search_product(product_name):
     if not product_list:
         product_list=Product.objects.filter(name__icontains=product_name)
     if not product_list:
-        print "Product %s not available" % product_name
+        print("Product %s not available" % product_name)
         return None
     if len(product_list) > 1:
-        print "Too many products:"
+        print("Too many products:")
         for m in product_list:
-            print "    ",m
+            print("    ",m)
         return None
     return product_list.first()
 
@@ -79,16 +79,16 @@ def search_recipe(recipe_name,recipe_date):
     if not recipe_list:
         recipe_list=Recipe.objects.filter(name__icontains=recipe_name)
     if not recipe_list:
-        print "Recipe %s not available" % recipe_name
+        print("Recipe %s not available" % recipe_name)
         return None
     if len(recipe_list) > 1:
         recipe_list=recipe_list.filter(time__year=recipe_date.year,
                                        time__month=recipe_date.month,
                                        time__day=recipe_date.day)
     if len(recipe_list) > 1:
-        print "Too many recipes:"
+        print("Too many recipes:")
         for m in recipe_list:
-            print "    ",m,m.time
+            print("    ",m,m.time)
         return None
     return recipe_list.first()
 
@@ -120,7 +120,7 @@ class Command(BaseCommand):
         
         for rp in recipe.recipeproduct_set.all():
             quota=portion_factor*rp.quantity_real()
-            print rp,quota,"g"
+            print(rp,quota,"g")
             FoodDiaryEntry.objects.create(user=user,time=d_time,product=rp.product,
                                           quantity=quota,measure_unit=measure)
 

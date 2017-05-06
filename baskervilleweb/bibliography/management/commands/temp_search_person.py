@@ -72,9 +72,9 @@ class Command(BaseCommand):
             # for name_dict in initial:
             #     print u"    ",name_dict["name_type"],name_dict["value"]
 
-            print t
+            print(t)
             for p in Person.objects.filter_by_name(" ".join(t)):
-                print "    ",p
+                print("    ",p)
 
         # print(sys.stdout.encoding)
         # print(sys.stdout.isatty())

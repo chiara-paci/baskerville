@@ -22,12 +22,12 @@ class Command(BaseCommand):
         lista=[]
         fd=open(elenco,"r")
         for l in fd.readlines():
-            l=unicode(l,'utf-8')
+            l=str(l,'utf-8')
             l=l.strip()
             if not l: continue
-            t=map(lambda x: x.strip(),l.split("|"))
+            t=[x.strip() for x in l.split("|")]
             if len(t)!=8: 
-                print t
+                print(t)
                 continue
 
             issn_pub=t[0].strip()
@@ -45,8 +45,8 @@ class Command(BaseCommand):
 
             try:
                 migr_auth_obj=MigrAuthor.objects.get(cod=aut_cod,ind=aut_ind)
-            except ObjectDoesNotExist, e:
-                print "NE author:",aut_cod,aut_ind
+            except ObjectDoesNotExist as e:
+                print("NE author:",aut_cod,aut_ind)
                 sys.exit()
             
             author_obj=migr_auth_obj.author
@@ -55,8 +55,8 @@ class Command(BaseCommand):
                 article_obj=Article.objects.get(issue__volume__pubblication__issn=issn_pub,
                                                 issue__issn_num=issn_num,
                                                 page_begin=page_begin,page_end=page_end)
-            except ObjectDoesNotExist, e:
-                print "NE article:",issn_pub,issn_num,pages
+            except ObjectDoesNotExist as e:
+                print("NE article:",issn_pub,issn_num,pages)
                 sys.exit()
 
             author_role,created=AuthorRole.objects.get_or_create(label=aut_role,
@@ -64,13 +64,13 @@ class Command(BaseCommand):
 
 
             if created:
-                print "Created: ",author_role
+                print("Created: ",author_role)
 
             author_article_rel,created=ArticleAuthorRelation.objects.get_or_create(author=author_obj,article=article_obj,
                                                                                    author_role=author_role,
                                                                                    defaults={"pos":aut_pos})
             if created:
-                print "Created: ",author_article_rel
+                print("Created: ",author_article_rel)
                 
 
         fd.close()

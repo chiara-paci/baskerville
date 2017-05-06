@@ -21,14 +21,14 @@ class Command(BaseCommand):
         for argclass in ArgumentClassification.objects.all():
             if argclass.classification_set.exists(): continue
             if argclass.shortclassification_set.exists(): continue
-            print "Delete",argclass
+            print("Delete",argclass)
             argclass.delete()
         for arg in Argument.objects.all():
             if arg.id==0: continue
             argclass,created=ArgumentClassification.objects.get_or_create(number=arg.identifier,
                                                                           defaults={"name": arg.name })
             if created:
-                print "Created",argclass
+                print("Created",argclass)
         for suffixcollection in ArgumentSuffixCollection.objects.all():
             for arg in suffixcollection.roots():
                 if arg.id==0: continue
@@ -39,5 +39,5 @@ class Command(BaseCommand):
                     argclass,created=ArgumentClassification.objects.get_or_create(number=number,
                                                                                   defaults={"name": name })
                     if created:
-                        print "Created",argclass
+                        print("Created",argclass)
                     

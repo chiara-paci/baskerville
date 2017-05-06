@@ -31,20 +31,20 @@ class CategorizerForm(forms.ModelForm):
     def save(self,commit=True):
         def remove_dup_space(S):
             S=S.strip()
-            return " ".join(filter(bool,map(lambda x: x.strip(),S.split(" "))))
+            return " ".join(filter(bool,[x.strip() for x in S.split(" ")]))
             
         super(CategorizerForm, self).save(commit=commit)
-        new_parents_names=map(remove_dup_space,self.cleaned_data["parents"].split(","))
+        new_parents_names=list(map(remove_dup_space,self.cleaned_data["parents"].split(",")))
         deleted=[]
         unchanged=[]
         for old_rels in self.instance.parent_set.all():
-            f_name=unicode(old_rels.parent.name)
+            f_name=str(old_rels.parent.name)
             if not f_name in new_parents_names:
                 deleted.append(f_name)
             else:
                 unchanged.append(f_name)
-        added=filter(lambda x: x not in unchanged, new_parents_names)
-        print self.instance,deleted,added
+        added=[x for x in new_parents_names if x not in unchanged]
+        print(self.instance,deleted,added)
         for del_name in deleted:
             del_cat=models.Category.objects.get(name=del_name)
             models.CategoryRelation.objects.filter(parent=del_cat,child=self.instance).delete()

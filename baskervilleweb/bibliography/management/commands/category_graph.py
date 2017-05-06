@@ -214,7 +214,7 @@ class Command(BaseCommand):
 
             (W,H,nodes)=calcolate_nodes(0,0,10,5,cat_node)
 
-            print W,H,fname
+            print(W,H,fname)
 
             ### svg plot
             cg=CategoryGraph(fname,W,H)

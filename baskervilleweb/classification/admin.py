@@ -48,7 +48,7 @@ class RootArgumentFilter(admin.SimpleListFilter):
         t=[]
         for arg in qset.filter(parent__id=0):
             if arg.id==0: continue
-            t.append( (arg.number,unicode(arg)) )
+            t.append( (arg.number,str(arg)) )
         return tuple(t)
 
     def queryset(self, request, queryset):
@@ -117,7 +117,7 @@ class RootArgumentClassificationFilter(admin.SimpleListFilter):
         t=[]
         for arg in qset.filter(parent__id=0):
             if arg.id==0: continue
-            t.append( (arg.number,unicode(arg)) )
+            t.append( (arg.number,str(arg)) )
         return tuple(t)
 
     def queryset(self, request, queryset):

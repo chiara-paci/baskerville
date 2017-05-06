@@ -23,10 +23,10 @@ class Command(BaseCommand):
         lista=[]
         fd=open(elenco,"r")
         for l in fd.readlines():
-            l=unicode(l,'utf-8')
+            l=str(l,'utf-8')
             l=l.strip()
             if not l: continue
-            t=map(lambda x: x.strip(),l.split("|"))
+            t=[x.strip() for x in l.split("|")]
             obj={
                 "cod": t[0],
                 "ind": int(t[1]),
@@ -54,8 +54,8 @@ class Command(BaseCommand):
                                          list_format=list_format,
                                          ordering_format=ordering_format)
             ma=MigrAuthor.objects.create(author=author,cod=obj["cod"],ind=obj["ind"])
-            for key,val in obj["names"].items():
+            for key,val in list(obj["names"].items()):
                 name_type=NameType.objects.get(label=key)
                 anr=PersonNameRelation.objects.create(author=author,name_type=name_type,value=val)
             author.save()
-            print unicode(author)
+            print(str(author))

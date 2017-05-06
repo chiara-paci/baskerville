@@ -28,15 +28,15 @@ class Command(BaseCommand):
                                                           short_format=author.short_format,
                                                           list_format=author.list_format,
                                                           ordering_format=author.ordering_format)            
-            except ObjectDoesNotExist, e:
-                print author
-                print "    ",author.long_format
-                print "    ",author.short_format
-                print "    ",author.list_format
-                print "    ",author.ordering_format
+            except ObjectDoesNotExist as e:
+                print(author)
+                print("    ",author.long_format)
+                print("    ",author.short_format)
+                print("    ",author.list_format)
+                print("    ",author.ordering_format)
                 continue
-            print author
-            print "    ",author.format_collection,"=>",new_coll
+            print(author)
+            print("    ",author.format_collection,"=>",new_coll)
             author.format_collection=new_coll
             author.save()
 

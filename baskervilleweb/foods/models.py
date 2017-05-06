@@ -10,7 +10,7 @@ import datetime
 class Vendor(models.Model):
     name = models.CharField(max_length=1024)
 
-    def __unicode__(self): return unicode(self.name)
+    def __str__(self): return str(self.name)
 
     class Meta:
         ordering = [ 'name' ]
@@ -18,7 +18,7 @@ class Vendor(models.Model):
 class MicroNutrientClass(models.Model):
     name = models.CharField(max_length=1024)
 
-    def __unicode__(self): return unicode(self.name)
+    def __str__(self): return str(self.name)
 
     class Meta:
         ordering = [ 'name' ]
@@ -30,7 +30,7 @@ class MicroNutrient(models.Model):
     rda_max = models.FloatField(validators=[validators.MinValueValidator(0.0)],verbose_name='rda max (mg)',default=0.0)
     
 
-    def __unicode__(self): return unicode(self.name)
+    def __str__(self): return str(self.name)
 
     class Meta:
         ordering = [ 'name' ]
@@ -54,7 +54,7 @@ class MicroNutrient(models.Model):
 class ProductCategory(models.Model):
     name = models.CharField(max_length=1024)
     
-    def __unicode__(self): return unicode(self.name)
+    def __str__(self): return str(self.name)
 
 class Product(models.Model):
     name = models.CharField(max_length=1024)
@@ -81,7 +81,7 @@ class Product(models.Model):
 
     micro_nutrients = models.ManyToManyField(MicroNutrient,through='ProductMicroNutrient',blank=True)
 
-    def __unicode__(self): return unicode(self.name)
+    def __str__(self): return str(self.name)
 
     class Meta:
         ordering = [ 'name','vendor' ]
@@ -98,7 +98,7 @@ class ProductMicroNutrient(models.Model):
     micro_nutrient = models.ForeignKey(MicroNutrient)
     quantity = models.FloatField(validators=[validators.MinValueValidator(0.0)],verbose_name='quantity (mg)')
 
-    def __unicode__(self): return unicode(self.micro_nutrient)
+    def __str__(self): return str(self.micro_nutrient)
     
 class MeasureUnit(models.Model):
     name = models.CharField(max_length=1024)
@@ -106,7 +106,7 @@ class MeasureUnit(models.Model):
                                                                    ( "ml", "ml" ) ))
     factor = models.FloatField(validators=[validators.MinValueValidator(0.0)])
 
-    def __unicode__(self): return unicode(self.name)
+    def __str__(self): return str(self.name)
     
     class Meta:
         ordering = [ 'name' ]
@@ -135,7 +135,7 @@ class FoodDiaryEntry(models.Model):
 
     future = models.BooleanField(default=False)
 
-    def __unicode__(self): return unicode(self.product)
+    def __str__(self): return str(self.product)
 
     class Meta:
         ordering = [ 'time' ]
@@ -201,7 +201,7 @@ class Recipe(models.Model):
     final_weight = models.PositiveIntegerField(default=0)
     total_weight = models.PositiveIntegerField(editable=False)
 
-    def __unicode__(self): return unicode(self.name)
+    def __str__(self): return str(self.name)
 
     def _total_weight(self):
         total=0
@@ -221,7 +221,7 @@ class RecipeProduct(models.Model):
     measure_unit = models.ForeignKey(MeasureUnit)
     quantity = models.FloatField(validators=[validators.MinValueValidator(0.0)])
 
-    def __unicode__(self): return unicode(self.product)
+    def __str__(self): return str(self.product)
 
     def quantity_real(self):
         return self.quantity*self.measure_unit.factor
@@ -231,7 +231,7 @@ class FrequentDiaryEntry(models.Model):
     measure_unit = models.ForeignKey(MeasureUnit)
     quantity = models.FloatField(validators=[validators.MinValueValidator(0.0)])
 
-    def __unicode__(self): return unicode(self.product)+" ("+unicode(self.quantity)+" "+unicode(self.measure_unit)+")"
+    def __str__(self): return str(self.product)+" ("+str(self.quantity)+" "+str(self.measure_unit)+")"
 
 
 #####
@@ -241,7 +241,7 @@ class UsdaNndFoodGroup(models.Model):
     name = models.CharField(max_length=1024)
     usda_id = models.CharField(max_length=1024)
 
-    def __unicode__(self): return unicode(self.name)
+    def __str__(self): return str(self.name)
     
 class UsdaNndFood(models.Model):
     usda_id = models.CharField(max_length=1024)
@@ -259,17 +259,17 @@ class UsdaNndFood(models.Model):
     fat_factor = models.FloatField(validators=[validators.MinValueValidator(0.0)])
     carbohydrate_factor = models.FloatField(validators=[validators.MinValueValidator(0.0)])
 
-    def __unicode__(self): return unicode(self.short_description)
+    def __str__(self): return str(self.short_description)
 
 class UsdaNndLangual(models.Model):
     usda_id = models.CharField(max_length=1024)
     description = models.CharField(max_length=1024)
 
-    def __unicode__(self): return unicode(self.description)
+    def __str__(self): return str(self.description)
 
 class UsdaNndFoodLangualRelation(models.Model):
     food    = models.ForeignKey(UsdaNndFood)
     langual = models.ForeignKey(UsdaNndLangual)
     
-    def __unicode__(self): return unicode(self.langual.description)
+    def __str__(self): return str(self.langual.description)
     

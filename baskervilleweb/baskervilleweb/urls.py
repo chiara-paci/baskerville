@@ -27,7 +27,7 @@ class MyAdminSite(admin.AdminSite):
     def each_context(self,request):
         context=super(MyAdminSite,self).each_context(request)
         context["app_index_block_template_default"]="admin/app_index_block.html"
-        context["app_with_custom_block_template"]=self.app_with_custom_model_list.keys()
+        context["app_with_custom_block_template"]=list(self.app_with_custom_model_list.keys())
         return context
 
     @never_cache
@@ -37,7 +37,7 @@ class MyAdminSite(admin.AdminSite):
         apps that have been registered in this site.
         """
         app_dict = {}
-        for model, model_admin in self._registry.items():
+        for model, model_admin in list(self._registry.items()):
             app_label = model._meta.app_label
             has_module_perms = model_admin.has_module_permission(request)
 
@@ -46,7 +46,7 @@ class MyAdminSite(admin.AdminSite):
 
                 # Check whether user has any perm for this module.
                 # If so, add the module to the model_list.
-                if True in perms.values():
+                if True in list(perms.values()):
                     info = (app_label, model._meta.model_name)
                     model_dict = {
                         'name': capfirst(model._meta.verbose_name_plural),
@@ -86,7 +86,7 @@ class MyAdminSite(admin.AdminSite):
         # Sort the models alphabetically within each app.
         for app in app_list:
             app['models'].sort(key=lambda x: x['name'])
-            if self.app_with_custom_model_list.has_key(app["app_label"]):
+            if app["app_label"] in self.app_with_custom_model_list:
                 app["custom_models"]=self.app_with_custom_model_list[app["app_label"]](app['models'])
 
         context = dict(
@@ -104,7 +104,7 @@ class MyAdminSite(admin.AdminSite):
     def app_index(self, request, app_label, extra_context=None):
         app_name = apps.get_app_config(app_label).verbose_name
         app_dict = {}
-        for model, model_admin in self._registry.items():
+        for model, model_admin in list(self._registry.items()):
             if app_label == model._meta.app_label:
                 has_module_perms = model_admin.has_module_permission(request)
                 if not has_module_perms:
@@ -114,7 +114,7 @@ class MyAdminSite(admin.AdminSite):
 
                 # Check whether user has any perm for this module.
                 # If so, add the module to the model_list.
-                if True in perms.values():
+                if True in list(perms.values()):
                     info = (app_label, model._meta.model_name)
                     model_dict = {
                         'name': capfirst(model._meta.verbose_name_plural),
@@ -148,7 +148,7 @@ class MyAdminSite(admin.AdminSite):
         if not app_dict:
             raise Http404('The requested admin page does not exist.')
         # Sort the models alphabetically within each app.
-        if self.app_with_custom_model_list.has_key(app_dict["app_label"]):
+        if app_dict["app_label"] in self.app_with_custom_model_list:
             app_dict["custom_models"]=self.app_with_custom_model_list[app_dict["app_label"]](app_dict['models'])
         app_dict['models'].sort(key=lambda x: x['name'])
         context = dict(self.each_context(request),
