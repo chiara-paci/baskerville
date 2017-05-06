@@ -32,6 +32,6 @@ class Command(BaseCommand):
 
         arg_obj,created=ArgumentSuffix.objects.get_or_create(collection=collection,parent=parent,number=number,name=name)
         if created:
-            print "Created:",arg_obj
+            print("Created:",arg_obj)
 
 

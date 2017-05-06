@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #from config import *
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import re
 
 from bibliography.models import PublisherAddress,PersonCache,RepositoryCacheBook,RepositoryCacheAuthor,Author
@@ -29,7 +29,7 @@ def url_ripulisci(stringa):
         for l in lista:
             stringa=stringa.replace(l,val)
     stringa=stringa.strip()
-    print "===>",stringa
+    print("===>",stringa)
     return(stringa)
 
 class BookRepository(object):
@@ -57,8 +57,8 @@ class BookRepository(object):
 
     def save_cache(self,isbn,R):
         for k in ["city","publisher","year"]:
-            if not R.has_key(k): R[k]=""
-        if not R.has_key("authors"): R["authors"]=[]
+            if k not in R: R[k]=""
+        if "authors" not in R: R["authors"]=[]
         book_obj,created=RepositoryCacheBook.objects.get_or_create(isbn=isbn,
                                                                    defaults={ "title": R["title"],
                                                                               "city": R["city"],
@@ -88,7 +88,7 @@ class CacheRepository(BookRepository):
         R["year"]=obj.year
         authors=[]
         for aut in obj.repositorycacheauthor_set.order_by("pos"):
-            t=filter(lambda x: bool(x),map(lambda x: x.strip(),aut.name.strip().split(" ")))
+            t=[x for x in [x.strip() for x in aut.name.strip().split(" ")] if bool(x)]
             autname=" ".join(t)
             qset=Author.objects.filter_by_name(autname)
             if qset.count():
@@ -109,8 +109,8 @@ class WebRepository(BookRepository):
 
     def get_page_by_isbn(self,isbn10,isbn13):
         url=self.mk_url(isbn10,isbn13)
-        req=urllib2.Request(url=url)
-        f=urllib2.urlopen(req)
+        req=urllib.request.Request(url=url)
+        f=urllib.request.urlopen(req)
         html=f.read()
         f.close()
         return(html)
@@ -151,32 +151,32 @@ class WRWorldCat(WebRepository):
             tokens[x[0]]=x[1]
         R={}
 
-        if tokens.has_key("rft.btitle"):
+        if "rft.btitle" in tokens:
             R["title"]=url_ripulisci(tokens["rft.btitle"])
         else:
             R["title"]=url_ripulisci(tokens["rft.title"])
-        if tokens.has_key("rft.place"):
+        if "rft.place" in tokens:
             R["city"]=url_ripulisci(tokens["rft.place"])
         else:
             R["city"]=""
 
-        if tokens.has_key("rft.pub"):
+        if "rft.pub" in tokens:
             R["publisher"]=url_ripulisci(tokens["rft.pub"])
         else:
             R["publisher"]=""
 
         R["year"]=url_ripulisci(tokens["rft.date"])
 
-        if tokens.has_key("rft.aulast"):
+        if "rft.aulast" in tokens:
             cognome=tokens["rft.aulast"]
         else:
             cognome=""
-        if tokens.has_key("rft.aufirst"):
+        if "rft.aufirst" in tokens:
             nome=tokens["rft.aufirst"]
         else:
             nome=""
             
-        if tokens.has_key("rft.auinitm"):
+        if "rft.auinitm" in tokens:
             nome+=" "+tokens["rft.auinitm"]
         cognome=url_ripulisci(cognome)
         nome=url_ripulisci(nome)
@@ -184,7 +184,7 @@ class WRWorldCat(WebRepository):
         if not nome: nome="-"
         
         R["authors"]=self.get_authors([nome.strip()+" "+cognome.strip()])
-        print R
+        print(R)
         return(R)
     
     
@@ -238,7 +238,7 @@ class WRAbeBooks(WebRepository):
 
     def parse_html(self,html):
         R={}
-        righe=map(lambda x: x.strip(), html.split("\n"))
+        righe=[x.strip() for x in html.split("\n")]
         retitle=re.compile("<h2 id=\"plp-sub-heading\" property=\"name\" class=\"nopadding plptitle\">.*</h2>")
         reauthor_split=re.compile("^.*>(.*)</span.*$")
         reauthor=re.compile(".*<span .*property=\"author\">.*</span>.*</h3>.*")
@@ -265,7 +265,7 @@ class WRGulliverTown(WebRepository13):
 
     def parse_html(self,html):
         R={}
-        righe=map(lambda x: x.strip(), html.split("\n"))
+        righe=[x.strip() for x in html.split("\n")]
         retitle=re.compile(".*<strong>Titolo:</strong>.*")
         reauthor=re.compile("<strong>Autore:</strong>")
         reyear=re.compile(".*<strong>Anno:</strong>.*")

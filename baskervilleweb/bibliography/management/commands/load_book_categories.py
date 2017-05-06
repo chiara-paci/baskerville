@@ -22,12 +22,12 @@ class Command(BaseCommand):
         lista=[]
         fd=open(elenco,"r")
         for l in fd.readlines():
-            l=unicode(l,'utf-8')
+            l=str(l,'utf-8')
             l=l.strip()
             if not l: continue
-            t=map(lambda x: x.strip(),l.split("|"))
+            t=[x.strip() for x in l.split("|")]
             if len(t)!=3: 
-                print t
+                print(t)
                 continue
 
             isbn_ced=t[0].strip()
@@ -36,14 +36,14 @@ class Command(BaseCommand):
 
             try:
                 cat_obj=Category.objects.get(name=category)
-            except ObjectDoesNotExist, e:
-                print "NE category:",category
+            except ObjectDoesNotExist as e:
+                print("NE category:",category)
                 sys.exit()
 
             try:
                 book_obj=Book.objects.get(isbn_ced=isbn_ced,isbn_book=isbn_book)
-            except ObjectDoesNotExist, e:
-                print "NE book:",isbn_ced,isbn_book
+            except ObjectDoesNotExist as e:
+                print("NE book:",isbn_ced,isbn_book)
                 sys.exit()
                 
             book_obj.categories.add(cat_obj)

@@ -18,4 +18,4 @@ class TesterTest(unittest.TestCase):
                                                   year=random_year(),title=random_string(50),city=random_string(15))
         ret=booksearch.look_for([isbn_ced+"-"+isbn_book])
     
-        print ret
+        print(ret)

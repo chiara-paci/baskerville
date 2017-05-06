@@ -33,7 +33,7 @@ class ArgumentManager(models.Manager):
                 if len(s)==1: 
                     ranges.append([s])
                     continue
-                ranges.append(range(int(s[0]),int(s[1])+1))
+                ranges.append(list(range(int(s[0]),int(s[1])+1)))
                 continue
             r=[]
             q=token.split(",")
@@ -42,7 +42,7 @@ class ArgumentManager(models.Manager):
                     r.append(a)
                     continue
                 s=a.split("-")
-                r+=range(int(s[0]),int(s[1])+1)
+                r+=list(range(int(s[0]),int(s[1])+1))
             ranges.append(r)
 
         ids=ranges[0]
@@ -52,7 +52,7 @@ class ArgumentManager(models.Manager):
             ids=[]
             for i in oldids:
                 for s in r:
-                    ids.append(unicode(i)+unicode(s))
+                    ids.append(str(i)+str(s))
         if exact:
             return self.filter(identifier__in=ids)
 
@@ -72,8 +72,8 @@ class Argument(models.Model):
     class Meta:
         ordering = [ 'identifier' ]
 
-    def __unicode__(self):
-        return unicode(self.identifier)+" "+unicode(self.name)
+    def __str__(self):
+        return str(self.identifier)+" "+str(self.name)
 
     def parent_identifier(self): return self.parent.identifier
 
@@ -81,9 +81,9 @@ class Argument(models.Model):
         if self.parent.id==0:
             self.identifier=self.number
         elif self.parent.parent.id==0:
-            self.identifier=unicode(self.parent.identifier)+"."+unicode(self.number)
+            self.identifier=str(self.parent.identifier)+"."+str(self.number)
         else:
-            self.identifier=unicode(self.parent.identifier)+unicode(self.number)
+            self.identifier=str(self.parent.identifier)+str(self.number)
         super(Argument,self).save(*args, **kwargs)
 
 class ArgumentSuffixCollection(models.Model):
@@ -95,8 +95,8 @@ class ArgumentSuffixCollection(models.Model):
     class Meta:
         ordering = [ 'name' ]
 
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
 
     def roots(self):
 
@@ -115,7 +115,7 @@ class ArgumentSelector(models.Model):
     pattern = models.CharField(max_length=4096,unique=True)
     collection = models.ForeignKey(ArgumentSuffixCollection)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.pattern
 
 
@@ -130,14 +130,14 @@ class ArgumentSuffix(models.Model):
         ordering = [ 'collection','identifier' ]
         unique_together = [ "collection", "identifier" ]
 
-    def __unicode__(self):
-        return unicode(self.identifier)+" "+unicode(self.name)
+    def __str__(self):
+        return str(self.identifier)+" "+str(self.name)
 
     def save(self, *args, **kwargs):
         if self.parent.id==0:
-            self.identifier=".0"+unicode(self.collection.number)+unicode(self.number)
+            self.identifier=".0"+str(self.collection.number)+str(self.number)
         else:
-            self.identifier=unicode(self.parent.identifier)+unicode(self.number)
+            self.identifier=str(self.parent.identifier)+str(self.number)
         super(ArgumentSuffix,self).save(*args, **kwargs)
 
     def parent_identifier(self): return self.parent.identifier
@@ -169,7 +169,7 @@ class DecimalNumberManager(models.Manager):
                 if len(s)==1: 
                     ranges.append([s])
                     continue
-                ranges.append(range(int(s[0]),int(s[1])+1))
+                ranges.append(list(range(int(s[0]),int(s[1])+1)))
                 continue
             r=[]
             q=token.split(",")
@@ -178,7 +178,7 @@ class DecimalNumberManager(models.Manager):
                     r.append(a)
                     continue
                 s=a.split("-")
-                r+=range(int(s[0]),int(s[1])+1)
+                r+=list(range(int(s[0]),int(s[1])+1))
             ranges.append(r)
 
         ids=ranges[0]
@@ -188,7 +188,7 @@ class DecimalNumberManager(models.Manager):
             ids=[]
             for i in oldids:
                 for s in r:
-                    ids.append(unicode(i)+unicode(s))
+                    ids.append(str(i)+str(s))
         if exact:
             return self.filter(number__in=ids)
 
@@ -202,14 +202,14 @@ class DecimalNumberAbstract(models.Model):
     name = models.CharField(max_length=4096)
     objects = DecimalNumberManager()
 
-    def __unicode__(self):
-        return self.identifier()+" "+unicode(self.name)
+    def __str__(self):
+        return self.identifier()+" "+str(self.name)
 
     def identifier(self):
-        return unicode(self.number)
+        return str(self.number)
 
     def description(self):
-        return unicode(self.name)
+        return str(self.name)
 
     class Meta:
         abstract = True
@@ -232,7 +232,7 @@ class LanguageClassification(models.Model):
     language = models.ForeignKey(LanguageNumber)
     auxiliaries = models.ManyToManyField(LanguageAuxiliaryNumber,blank=True)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.identifier()+" "+self.description()
 
     def identifier(self):
@@ -242,9 +242,9 @@ class LanguageClassification(models.Model):
         return I
 
     def description(self):
-        D=unicode(self.language.name)
+        D=str(self.language.name)
         for aux in self.auxiliaries.all():
-            D+="/"+unicode(aux.description())
+            D+="/"+str(aux.description())
         return D
             
 class PlaceAuxiliaryNumber(DecimalNumberAbstract):
@@ -259,7 +259,7 @@ class PlaceClassification(models.Model):
     place = models.ForeignKey(PlaceNumber)
     auxiliaries = models.ManyToManyField(PlaceAuxiliaryNumber,blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.identifier()+" "+self.description()
 
     def identifier(self):
@@ -269,9 +269,9 @@ class PlaceClassification(models.Model):
         return I
 
     def description(self):
-        D=unicode(self.place.name)
+        D=str(self.place.name)
         for aux in self.auxiliaries.all():
-            D+="/"+unicode(aux.name)
+            D+="/"+str(aux.name)
         return D
     
 class TimeClassification(DecimalNumberAbstract):
@@ -291,28 +291,28 @@ class ShortClassificationManager(models.Manager):
             if sc.id==0:
                 continue
 
-            prefix=unicode(sc.argument.number)
-            if unicode(classification.argument.number)[0:len(prefix)]!=prefix: 
+            prefix=str(sc.argument.number)
+            if str(classification.argument.number)[0:len(prefix)]!=prefix: 
                 continue
 
             sc_ids=sc.forms.all().values("id")
             tg_ids=classification.forms.all().values("id")
-            if bool(filter(lambda x: x not in tg_ids,sc_ids)): 
+            if bool([x for x in sc_ids if x not in tg_ids]): 
                 continue
 
             sc_ids=sc.languages.all().values("id")
             tg_ids=classification.languages.all().values("id")
-            if bool(filter(lambda x: x not in tg_ids,sc_ids)): 
+            if bool([x for x in sc_ids if x not in tg_ids]): 
                 continue
 
             sc_ids=sc.places.all().values("id")
             tg_ids=classification.places.all().values("id")
-            if bool(filter(lambda x: x not in tg_ids,sc_ids)): 
+            if bool([x for x in sc_ids if x not in tg_ids]): 
                 continue
 
             sc_ids=sc.times.all().values("id")
             tg_ids=classification.times.all().values("id")
-            if bool(filter(lambda x: x not in tg_ids,sc_ids)): 
+            if bool([x for x in sc_ids if x not in tg_ids]): 
                 continue
 
             return sc
@@ -345,39 +345,39 @@ class ShortClassification(models.Model):
         return D
         
     def identifier(self):
-        return unicode(self.label)
+        return str(self.label)
 
     def reduced_identifier(self):
         return self.identifier()
         
     def reduced_description(self):
-        return unicode(self.name)
+        return str(self.name)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.identifier()+" "+self.description()
 
     def get_short_identifier(self,classification):
         if self.id==0:
             return classification.identifier()
 
-        sub=unicode(sc.argument.number)
-        prefix=unicode(self.label)+unicode(classification.argument.number)[len(sub):]
+        sub=str(sc.argument.number)
+        prefix=str(self.label)+str(classification.argument.number)[len(sub):]
 
         sc_ids=sc.forms.all().values("id")
         tg_ids=classification.forms.all().values("id")
-        form_ids=filter(lambda x: x not in sc_ids,tg_ids) 
+        form_ids=[x for x in tg_ids if x not in sc_ids] 
         
         sc_ids=sc.languages.all().values("id")
         tg_ids=classification.languages.all().values("id")
-        language_ids=filter(lambda x: x not in sc_ids,tg_ids)
+        language_ids=[x for x in tg_ids if x not in sc_ids]
         
         sc_ids=sc.places.all().values("id")
         tg_ids=classification.places.all().values("id")
-        place_ids=filter(lambda x: x not in sc_ids,tg_ids)
+        place_ids=[x for x in tg_ids if x not in sc_ids]
         
         sc_ids=sc.times.all().values("id")
         tg_ids=classification.times.all().values("id")
-        time_ids=filter(lambda x: x not in sc_ids,tg_ids)
+        time_ids=[x for x in tg_ids if x not in sc_ids]
 
         for aux in classification.languages.filter(id__in=language_ids):
             I+="="+aux.identifier()
@@ -417,7 +417,7 @@ class Classification(models.Model):
         super(Classification, self).save(*args, **kwargs)
 
     def identifier(self):
-        I=self.argument.identifier()+":"+unicode(self.object_classification)
+        I=self.argument.identifier()+":"+str(self.object_classification)
         if self.object_copy > 0:
             I+=":%02d" % self.object_copy
         for aux in self.languages.all():
@@ -431,7 +431,7 @@ class Classification(models.Model):
         return I
 
     def reduced_identifier(self):
-        I=self.argument.identifier()+":"+unicode(self.object_classification)
+        I=self.argument.identifier()+":"+str(self.object_classification)
         return I
         
     def description(self):
@@ -449,6 +449,6 @@ class Classification(models.Model):
     def reduced_description(self):
         return self.argument.description()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.identifier()+" "+self.description()
 

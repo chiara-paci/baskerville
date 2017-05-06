@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from foods.models import UsdaNndFoodGroup
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import re
 
 class Command(BaseCommand):
@@ -20,5 +20,5 @@ class Command(BaseCommand):
             usda_id=t[0].replace('~','')
             name=t[1].replace('~','')
             food_group,created=UsdaNndFoodGroup.objects.get_or_create(name=name,usda_id=usda_id)
-            print food_group,created
+            print(food_group,created)
 

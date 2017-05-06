@@ -22,12 +22,12 @@ class Command(BaseCommand):
         lista=[]
         fd=open(elenco,"r")
         for l in fd.readlines():
-            l=unicode(l,'utf-8')
+            l=str(l,'utf-8')
             l=l.strip()
             if not l: continue
-            t=map(lambda x: x.strip(),l.split("|"))
+            t=[x.strip() for x in l.split("|")]
             if len(t)!=5: 
-                print t
+                print(t)
                 continue
 
             isbn_ced=t[0].strip()
@@ -38,8 +38,8 @@ class Command(BaseCommand):
 
             try:
                 pub_isbn_obj=PublisherIsbn.objects.get(isbn=isbn_ced)
-            except ObjectDoesNotExist, e:
-                print "NE isbn_ced:",isbn_ced
+            except ObjectDoesNotExist as e:
+                print("NE isbn_ced:",isbn_ced)
                 sys.exit()
             pub_isbn_obj.update_preferred()
             pub_obj=pub_isbn_obj.preferred
@@ -48,11 +48,11 @@ class Command(BaseCommand):
                                                     defaults={"title":title,"year":year,"publisher":pub_obj})
 
             if created:
-                print "Created: ",book
+                print("Created: ",book)
 
             book.update_crc()
-            if unicode(book.isbn_crc10)!=isbn_crc:
-                print "Verifica: ",book.isbn10(),isbn_ced,isbn_book,isbn_crc,book
+            if str(book.isbn_crc10)!=isbn_crc:
+                print("Verifica: ",book.isbn10(),isbn_ced,isbn_book,isbn_crc,book)
 
 
         fd.close()

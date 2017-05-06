@@ -38,13 +38,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         bio_art=Category.objects.get(name="biografie artistiche")
 
-        for cat_label in map_categories.keys():
+        for cat_label in list(map_categories.keys()):
             cat_name="biografie artistiche "+cat_label
-            print cat_name
+            print(cat_name)
             place=Place.objects.get(id=map_categories[cat_label])
             for cat_rel in CategoryRelation.objects.filter(father__name=cat_name):
                 child=cat_rel.child
                 obj,created=CategoryPlaceRelation.objects.get_or_create(category=child,place=place)
                 cat_rel.father=bio_art
                 cat_rel.save()
-                print "    ",child
+                print("    ",child)

@@ -20,7 +20,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         lang61=list(Argument.objects.filter(identifier__istartswith="6.1"))
         lang62=list(Argument.objects.filter(identifier__istartswith="6.2"))
-        nolang_ids=map(lambda x: x.id,lang61+lang62)
+        nolang_ids=[x.id for x in lang61+lang62]
         objs=Argument.objects.filter(identifier__istartswith="6.").exclude(id__in=nolang_ids)
         coll=ArgumentSuffixCollection.objects.get(name="language")
         obj_dict={}
@@ -34,4 +34,4 @@ class Command(BaseCommand):
                 suffix,created=ArgumentSuffix.objects.get_or_create(collection=coll,name=obj.name,number=obj.number,parent=parent)
             obj_dict[obj.id]=suffix
             if created:
-                print "created:",suffix
+                print("created:",suffix)

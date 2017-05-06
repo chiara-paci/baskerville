@@ -23,27 +23,27 @@ class Command(BaseCommand):
         lista=[]
         fd=open(elenco,"r")
         for l in fd.readlines():
-            l=unicode(l,'utf-8')
+            l=str(l,'utf-8')
             l=l.strip()
             if not l: continue
-            t=map(lambda x: x.strip(),l.split("|"))
+            t=[x.strip() for x in l.split("|")]
             issn=t[0]
             reg=t[1]
             title=t[2]
             vtype=t[3]
             try:
                 reg_obj=MigrPublisherRiviste.objects.get(registro=reg)
-            except ObjectDoesNotExist, e:
-                print "NER",reg
+            except ObjectDoesNotExist as e:
+                print("NER",reg)
                 continue
             try:
                 vtype_obj=VolumeType.objects.get(label=vtype)
-            except ObjectDoesNotExist, e:
-                print "NEV",vtype
+            except ObjectDoesNotExist as e:
+                print("NEV",vtype)
                 continue
             pub_obj,created=Pubblication.objects.get_or_create(issn=issn,title=title,publisher=reg_obj.publisher,volume_type=vtype_obj)
             if created:
-                print "CPB",pub_obj
+                print("CPB",pub_obj)
                 
 
         fd.close()

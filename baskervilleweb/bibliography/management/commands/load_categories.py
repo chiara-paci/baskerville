@@ -23,10 +23,10 @@ class Command(BaseCommand):
         lista=[]
         fd=open(elenco,"r")
         for l in fd.readlines():
-            l=unicode(l,'utf-8')
+            l=str(l,'utf-8')
             l=l.strip()
             if not l: continue
-            t=map(lambda x: x.strip(),l.split("|"))
+            t=[x.strip() for x in l.split("|")]
             child=t[0].strip()
             father=t[1].strip()
 
@@ -37,7 +37,7 @@ class Command(BaseCommand):
 
             rel,created=CategoryRelation.objects.get_or_create(father=father_obj,child=child_obj)
             if created:
-                print rel
+                print(rel)
                 
 
         fd.close()

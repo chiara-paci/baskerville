@@ -23,20 +23,20 @@ class Command(BaseCommand):
         lista=[]
         fd=open(elenco,"r")
         for l in fd.readlines():
-            l=unicode(l,'utf-8')
+            l=str(l,'utf-8')
             l=l.strip()
             if not l: continue
-            t=map(lambda x: x.strip(),l.split("%"))
+            t=[x.strip() for x in l.split("%")]
             name=t[0]
             isbn=t[1]
             try:
                 ce_obj=Publisher.objects.get(name=name)
-            except ObjectDoesNotExist, e:
-                print "NE",name
+            except ObjectDoesNotExist as e:
+                print("NE",name)
                 continue
             isbn_obj,created=PublisherIsbn.objects.get_or_create(isbn=isbn)
             if created:
-                print "CI",isbn_obj
+                print("CI",isbn_obj)
             ce_obj.isbns.add(isbn_obj)
             ce_obj.save()
                 

@@ -27,7 +27,7 @@ class DateModifierAdmin(admin.ModelAdmin):
     list_editable=["name","pos","reverse"]
 
     def anchor(self,obj):
-        U=unicode(obj).strip()
+        U=str(obj).strip()
         if U: return U
         return "[default]"
 
@@ -76,7 +76,7 @@ class RepositoryCacheBookAdmin(admin.ModelAdmin):
 admin.site.register(RepositoryCacheBook,RepositoryCacheBookAdmin)
 
 class RepositoryCacheAuthorAdmin(admin.ModelAdmin):
-    list_display=["__unicode__","name"]
+    list_display=["__str__","name"]
     list_editable=["name"]
 
 admin.site.register(RepositoryCacheAuthor,RepositoryCacheAuthorAdmin)
@@ -96,7 +96,7 @@ class LanguageVarietyInline(admin.TabularInline):
     extra = 0
 
 class LanguageAdmin(admin.ModelAdmin):
-    list_display=[ "__unicode__","name","families","varieties" ]
+    list_display=[ "__str__","name","families","varieties" ]
     list_editable=[ "name" ]
     inlines = [LanguageFamilyInline,LanguageVarietyInline]
 
@@ -117,14 +117,14 @@ class LanguageFamilyParentsInline(admin.TabularInline):
     verbose_name_plural = "parents"
 
 class LanguageFamilyAdmin(admin.ModelAdmin):
-    list_display=[ "__unicode__","name","parents","children","languages" ]
+    list_display=[ "__str__","name","parents","children","languages" ]
     list_editable=[ "name" ]
     inlines = [LanguageFamilyInline,LanguageFamilyChildrenInline,LanguageFamilyParentsInline]
 
 admin.site.register(LanguageFamily,LanguageFamilyAdmin)
 
 class LanguageVarietyAdmin(admin.ModelAdmin):
-    list_display=[ "__unicode__","name","type","language" ]
+    list_display=[ "__str__","name","type","language" ]
     list_editable=[ "name" ]
 
 admin.site.register(LanguageVariety,LanguageVarietyAdmin)
@@ -132,7 +132,7 @@ admin.site.register(LanguageVariety,LanguageVarietyAdmin)
 ### place
 
 class PlaceTypeAdmin(admin.ModelAdmin):
-    list_display=["__unicode__","name"]
+    list_display=["__str__","name"]
     list_editable=["name"]
 
 
@@ -161,7 +161,7 @@ class AlternatePlaceNameInline(admin.TabularInline):
 class PlaceAdmin(admin.ModelAdmin):
     inlines=[AlternatePlaceNameInline,PlacePlacesInline,PlaceAreasInline]
 
-    list_display=["__unicode__","name","type","areas","places","alternate_names" ]
+    list_display=["__str__","name","type","areas","places","alternate_names" ]
     list_editable=["name"]
     list_filter=["type"]
 
@@ -194,7 +194,7 @@ class CategoryTimeSpanRelationInline(admin.TabularInline):
     verbose_name_plural = "time spans"
 
 class TimeSpanAdmin(admin.ModelAdmin):
-    list_display=["__unicode__","begin","end","categories"]
+    list_display=["__str__","begin","end","categories"]
     inlines=[CategoryTimeSpanRelationInline]
 
 admin.site.register(TimeSpan,TimeSpanAdmin)
@@ -237,7 +237,7 @@ class AlphabeticFilter(admin.SimpleListFilter):
         qset = model_admin.get_queryset(request)
         L=qset.extra(select={"initial": "lower(substr(name,1,1))"},order_by=["initial"]).values("initial").distinct()
         t=[]
-        for ch in map(lambda x: x["initial"],L):
+        for ch in [x["initial"] for x in L]:
             t.append( (ch,ch) )
         return tuple(t)
 
@@ -272,7 +272,7 @@ class CategoryTreeFilter(admin.SimpleListFilter):
         cat_ids=CategoryTreeNode.objects.until_level(2).values("object_id").distinct()
 
         qset = model_admin.get_queryset(request).filter(id__in=cat_ids)
-        t=map(lambda x: (x.id,x.name),list(qset))
+        t=[(x.id,x.name) for x in list(qset)]
         return tuple(t)
 
     def queryset(self, request, queryset):
@@ -307,7 +307,7 @@ class CategoryTreeRootFilter(admin.SimpleListFilter):
         cat_ids=CategoryTreeNode.objects.until_level(0).values("object_id").distinct()
 
         qset = model_admin.get_queryset(request).filter(id__in=cat_ids)
-        t=map(lambda x: (x.id,x.name),list(qset))
+        t=[(x.id,x.name) for x in list(qset)]
         return tuple(t)
 
     def queryset(self, request, queryset):
@@ -326,7 +326,7 @@ class CategoryAdmin(admin.ModelAdmin):
     inlines=[CategoryTimeSpanRelationInline,CategoryPlaceRelationInline,CategoryLanguageRelationInline,
              CategoryPersonRelationInline,
              CategoryParentsInline,CategoryChildrenInline,BookCategoryInline]
-    list_display=["__unicode__","name","num_books","parents","children","time_span","place","language","person"]
+    list_display=["__str__","name","num_books","parents","children","time_span","place","language","person"]
     list_editable=["name"]
     list_filter=[ AlphabeticFilter, CategoryTreeRootFilter, CategoryTreeFilter ]
     fields = ("name","x_tree_nodes","min_level","num_objects","my_branch_depth","my_branch_id")
@@ -361,7 +361,7 @@ admin.site.register(Category,CategoryAdmin)
 
 class CategoryRelationAdmin(admin.ModelAdmin):
     list_filter=["parent","child"]
-    list_display=["__unicode__","parent","child"]
+    list_display=["__str__","parent","child"]
     list_editable=["parent"]
 
 admin.site.register(CategoryRelation,CategoryRelationAdmin)
@@ -374,7 +374,7 @@ class AlphabeticNodeidFilter(AlphabeticFilter):
         qset = model_admin.get_queryset(request)
         L=qset.extra(select={"initial": "lower(substr(node_id,1,1))"},order_by=["initial"]).values("initial").distinct()
         t=[]
-        for ch in map(lambda x: x["initial"],L):
+        for ch in [x["initial"] for x in L]:
             t.append( (ch,ch) )
         return tuple(t)
 
@@ -450,7 +450,7 @@ class PersonAlphabeticFilter(admin.SimpleListFilter):
         qset = PersonCache.objects.all()
         L=qset.extra(select={"initial": "lower(substr(list_name,1,1))"},order_by=["initial"]).values("initial").distinct()
         t=[]
-        for ch in map(lambda x: x["initial"],L):
+        for ch in [x["initial"] for x in L]:
             t.append( (ch,ch) )
         return tuple(t)
 
@@ -584,7 +584,7 @@ class BookAlphabeticFilter(admin.SimpleListFilter):
         qset = model_admin.get_queryset(request)
         L=qset.extra(select={"initial": "lower(substr(title,1,1))"},order_by=["initial"]).values("initial").distinct()
         t=[]
-        for ch in map(lambda x: x["initial"],L):
+        for ch in [x["initial"] for x in L]:
             t.append( (ch,ch) )
         return tuple(t)
 

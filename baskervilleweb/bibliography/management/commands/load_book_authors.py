@@ -22,12 +22,12 @@ class Command(BaseCommand):
         lista=[]
         fd=open(elenco,"r")
         for l in fd.readlines():
-            l=unicode(l,'utf-8')
+            l=str(l,'utf-8')
             l=l.strip()
             if not l: continue
-            t=map(lambda x: x.strip(),l.split("|"))
+            t=[x.strip() for x in l.split("|")]
             if len(t)!=6: 
-                print t
+                print(t)
                 continue
 
             isbn_ced=t[0].strip()
@@ -41,16 +41,16 @@ class Command(BaseCommand):
 
             try:
                 migr_auth_obj=MigrAuthor.objects.get(cod=aut_cod,ind=aut_ind)
-            except ObjectDoesNotExist, e:
-                print "NE author:",aut_cod,aut_ind
+            except ObjectDoesNotExist as e:
+                print("NE author:",aut_cod,aut_ind)
                 sys.exit()
             
             author_obj=migr_auth_obj.author
 
             try:
                 book_obj=Book.objects.get(isbn_ced=isbn_ced,isbn_book=isbn_book)
-            except ObjectDoesNotExist, e:
-                print "NE book:",isbn_ced,isbn_book
+            except ObjectDoesNotExist as e:
+                print("NE book:",isbn_ced,isbn_book)
                 sys.exit()
 
             author_role,created=AuthorRole.objects.get_or_create(label=aut_role,
@@ -58,13 +58,13 @@ class Command(BaseCommand):
 
 
             if created:
-                print "Created: ",author_role
+                print("Created: ",author_role)
 
             author_book_rel,created=BookAuthorRelation.objects.get_or_create(author=author_obj,book=book_obj,
                                                                              author_role=author_role,
                                                                              defaults={"pos":aut_pos})
             if created:
-                print "Created: ",author_book_rel
+                print("Created: ",author_book_rel)
                 
 
         fd.close()

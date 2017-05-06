@@ -24,12 +24,12 @@ class Command(BaseCommand):
         lista=[]
         fd=open(elenco,"r")
         for l in fd.readlines():
-            l=unicode(l,'utf-8')
+            l=str(l,'utf-8')
             l=l.strip()
             if not l: continue
-            t=map(lambda x: x.strip(),l.split("|"))
+            t=[x.strip() for x in l.split("|")]
             if len(t)!=5: 
-                print t
+                print(t)
                 continue
             issn=t[0].strip()
             vol=t[1].strip()
@@ -44,7 +44,7 @@ class Command(BaseCommand):
                                                       number=num,date=day)
 
             if created:
-                print "Created: ",issue
+                print("Created: ",issue)
                 continue
 
         fd.close()

@@ -44,35 +44,35 @@ class TemporaryBook(object):
     def __repr__(self): return self.isbn_ced+"-"+self.isbn_book
 
     def crc10(self):
-        if not unicode(self.isbn_book).isdigit(): return('Y')
-        if not unicode(self.isbn_ced).isdigit(): return('Y')
-        isbn=unicode(self.isbn_ced)+unicode(self.isbn_book)
+        if not str(self.isbn_book).isdigit(): return('Y')
+        if not str(self.isbn_ced).isdigit(): return('Y')
+        isbn=str(self.isbn_ced)+str(self.isbn_book)
         pesi=[10,9,8,7,6,5,4,3,2]
-        cod_lista=map(int,list(isbn))
+        cod_lista=list(map(int,list(isbn)))
         if len(cod_lista)<9:
             L=len(cod_lista)
-            cod_lista+=map(lambda x: 0, range(L,9))
+            cod_lista+=[0 for x in range(L,9)]
         crc=11-(sum(map(lambda x,y: x*y,cod_lista,pesi))%11)
         if (crc==10): return('X')
         if (crc==11): return(0)
         return(crc)
 
     def crc13(self):
-        if not unicode(self.isbn_book).isdigit(): return('Y')
-        if not unicode(self.isbn_ced).isdigit(): return('Y')
-        isbn=unicode(self.isbn_ced)+unicode(self.isbn_book)
+        if not str(self.isbn_book).isdigit(): return('Y')
+        if not str(self.isbn_ced).isdigit(): return('Y')
+        isbn=str(self.isbn_ced)+str(self.isbn_book)
         pesi=[1,3,1,3,1,3,1,3,1,3,1,3]
-        cod_lista=[9,7,8]+map(int,list(isbn))
+        cod_lista=[9,7,8]+list(map(int,list(isbn)))
         if len(cod_lista)<12:
             L=len(cod_lista)
-            cod_lista+=map(lambda x: 0, range(L,12))
+            cod_lista+=[0 for x in range(L,12)]
         crc=10-(sum(map(lambda x,y: x*y,cod_lista,pesi))%10)
         if (crc==10): return(0)
         return(crc)
 
     def isbn_10(self):
         isbn_crc10=self.crc10()
-        isbn10=self.isbn_ced+"-"+self.isbn_book+"-"+unicode(isbn_crc10)
+        isbn10=self.isbn_ced+"-"+self.isbn_book+"-"+str(isbn_crc10)
         return isbn10
 
     def look_for(self,publisher_dict):
@@ -87,24 +87,24 @@ class TemporaryBook(object):
             #print obj.isbn_cache10,obj.isbn_cache13,"db"
             return
 
-        if publisher_dict.has_key(self.isbn_ced):
+        if self.isbn_ced in publisher_dict:
             self.publisher=publisher_dict[self.isbn_ced][0]
 
         isbn_crc10=self.crc10()
         isbn_crc13=self.crc13()
 
-        isbn10=self.isbn_ced+self.isbn_book+unicode(isbn_crc10)
-        isbn13="978"+self.isbn_ced+self.isbn_book+unicode(isbn_crc13)
+        isbn10=self.isbn_ced+self.isbn_book+str(isbn_crc10)
+        isbn13="978"+self.isbn_ced+self.isbn_book+str(isbn_crc13)
 
         for rep in repositories:
             data=rep.get_by_isbn(isbn10,isbn13)
             if data:
                 #print isbn10,isbn13,rep.name
-                if data.has_key("title"):
+                if "title" in data:
                     self.title=data["title"]
-                if data.has_key("year"):
+                if "year" in data:
                     self.year=data["year"]
-                if data.has_key("authors"):
+                if "authors" in data:
                     self.authors=data["authors"]
                 if not self.publisher:
                     self.publisher=(data["publisher"],data["city"],data["addresses"])
@@ -156,13 +156,13 @@ def look_for(isbn_list):
 
     def find_ce(book_isbn,pub_dict):
         for n in range(1,9):
-            if pub_dict.has_key(book_isbn[:n]):
-                print book_isbn,book_isbn[:n],"yes"
+            if book_isbn[:n] in pub_dict:
+                print(book_isbn,book_isbn[:n],"yes")
                 isbn_ced=book_isbn[:n]
                 isbn_book=book_isbn[n:]
                 tmp_book=TemporaryBook(isbn_ced,isbn_book)
                 return tmp_book
-            print book_isbn,book_isbn[:n],"no"
+            print(book_isbn,book_isbn[:n],"no")
         return None
 
     for isbn in unseparated[:]:
@@ -182,8 +182,8 @@ def look_for(isbn_list):
     for uisbn in unseparated:
         ### solo per fargli calcolare crc10 e crc13
         tbook=TemporaryBook(uisbn[:3],uisbn[3:])
-        uisbn10=uisbn+unicode(tbook.crc10())
-        uisbn13="978"+uisbn+unicode(tbook.crc13())
+        uisbn10=uisbn+str(tbook.crc10())
+        uisbn13="978"+uisbn+str(tbook.crc13())
         RepositoryFailedIsbn.objects.get_or_create(isbn10=uisbn10,isbn13=uisbn13)
 
         
@@ -193,7 +193,7 @@ def look_for(isbn_list):
         book.look_for(publisher_dict)
         tpub=TemporaryPublisher(book.isbn_ced)
         publisher_list.append(tpub)
-        if publisher_dict.has_key(tpub.isbn_ced.upper()):
+        if tpub.isbn_ced.upper() in publisher_dict:
             tpub.set_db(publisher_dict[tpub.isbn_ced.upper()][0])
             continue
         tpub.set_no_db(book)

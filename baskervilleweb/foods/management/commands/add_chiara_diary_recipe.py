@@ -52,12 +52,12 @@ def search_measure(measure_name):
     if not measure_list:
         measure_list=MeasureUnit.objects.filter(name__icontains=measure_name)
     if not measure_list:
-        print "Measure %s not available" % measure_name
+        print("Measure %s not available" % measure_name)
         return None
     if len(measure_list) > 1:
-        print "Too many measures:"
+        print("Too many measures:")
         for m in measure_list:
-            print "    ",m
+            print("    ",m)
         return None
     return measure_list.first()
 
@@ -66,12 +66,12 @@ def search_product(product_name):
     if not product_list:
         product_list=Product.objects.filter(name__icontains=product_name)
     if not product_list:
-        print "Product %s not available" % product_name
+        print("Product %s not available" % product_name)
         return None
     if len(product_list) > 1:
-        print "Too many products:"
+        print("Too many products:")
         for m in product_list:
-            print "    ",m
+            print("    ",m)
         return None
     return product_list.first()
 
@@ -105,7 +105,7 @@ class Command(BaseCommand):
         fd.close()
 
         errors=False
-        for product_name in ingredients.keys():
+        for product_name in list(ingredients.keys()):
             measure=search_measure(ingredients[product_name]["measure"])
             product=search_product(product_name)
             if not measure: 
@@ -120,7 +120,7 @@ class Command(BaseCommand):
         if errors: return
 
         totale_iniziale=0
-        for product_name,desc in ingredients.items():
+        for product_name,desc in list(ingredients.items()):
             totale_iniziale+=desc["quantity_real"]
         
         if not finale:
@@ -134,9 +134,9 @@ class Command(BaseCommand):
 
         measure=MeasureUnit.objects.get(name="g")
         
-        for product_name in ingredients.keys():
+        for product_name in list(ingredients.keys()):
             quota=cooking_factor*ingredients[product_name]["quantity_real"]
-            print ingredients[product_name]["product"],quota,"g"
+            print(ingredients[product_name]["product"],quota,"g")
             FoodDiaryEntry.objects.create(user=user,time=d_time,product=ingredients[product_name]["product"],
                                           quantity=quota,measure_unit=measure)
 

@@ -20,7 +20,7 @@ class Command(BaseCommand):
         acqua=MicroNutrient.objects.get(name="acqua")
 
         for rel in sodio.productmicronutrient_set.all():
-            print rel.product
+            print(rel.product)
             rel.product.sodium=rel.quantity/1000.0
             rel.product.save()
 

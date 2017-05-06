@@ -52,12 +52,12 @@ def search_measure(measure_name):
     if not measure_list:
         measure_list=MeasureUnit.objects.filter(name__icontains=measure_name)
     if not measure_list:
-        print "Measure %s not available" % measure_name
+        print("Measure %s not available" % measure_name)
         return None
     if len(measure_list) > 1:
-        print "Too many measures:"
+        print("Too many measures:")
         for m in measure_list:
-            print "    ",m
+            print("    ",m)
         return None
     return measure_list.first()
 
@@ -66,12 +66,12 @@ def search_product(product_name):
     if not product_list:
         product_list=Product.objects.filter(name__icontains=product_name)
     if not product_list:
-        print "Product %s not available" % product_name
+        print("Product %s not available" % product_name)
         return None
     if len(product_list) > 1:
-        print "Too many products:"
+        print("Too many products:")
         for m in product_list:
-            print "    ",m
+            print("    ",m)
         return None
     return product_list.first()
 
@@ -109,7 +109,7 @@ class Command(BaseCommand):
                 recipe.save()
 
         errors=False
-        for product_name in ingredients.keys():
+        for product_name in list(ingredients.keys()):
             measure=search_measure(ingredients[product_name]["measure"])
             product=search_product(product_name)
             if not measure: 
@@ -122,7 +122,7 @@ class Command(BaseCommand):
 
         if errors: return
         
-        for product_name in ingredients.keys():
+        for product_name in list(ingredients.keys()):
             prod,created=RecipeProduct.objects.get_or_create(recipe=recipe,
                                                              product=ingredients[product_name]["product"],
                                                              defaults={"quantity":ingredients[product_name]["quantity"],

@@ -23,17 +23,17 @@ class Command(BaseCommand):
         lista=[]
         fd=open(elenco,"r")
         for l in fd.readlines():
-            l=unicode(l,'utf-8')
+            l=str(l,'utf-8')
             l=l.strip()
             if not l: continue
-            t=map(lambda x: x.strip(),l.split(":"))
+            t=[x.strip() for x in l.split(":")]
             city=t[0]
             state=t[1]
             state_obj,created=PublisherState.objects.get_or_create(name=state)
             if created:
-                print "CS",state_obj
+                print("CS",state_obj)
             city_obj,created=PublisherAddress.objects.get_or_create(city=city,state=state_obj)
             if created:
-                print "CC",city_obj
+                print("CC",city_obj)
         fd.close()
 

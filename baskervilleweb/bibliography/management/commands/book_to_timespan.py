@@ -19,10 +19,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         re_date=re.compile(r'^.*?([0-9]+).*?\-.*?([0-9]+).*?$')
         for book in Book.objects.all():
-            title=unicode(book.title)
+            title=str(book.title)
             if re_date.match(title):
                 t=re_date.findall(title)
-                print title,t[0]
+                print(title,t[0])
                 # begin,created=TimePoint.objects.get_or_create(date=t[0][0])
                 # if created:
                 #     print "TP",begin

@@ -22,10 +22,10 @@ class Command(BaseCommand):
         lista=[]
         fd=open(elenco,"r")
         for l in fd.readlines():
-            l=unicode(l,'utf-8')
+            l=str(l,'utf-8')
             l=l.strip()
             if not l: continue
-            t=map(lambda x: x.strip(),l.split("|"))
+            t=[x.strip() for x in l.split("|")]
             if len(t)!=2: continue
             issn=t[0].strip()
             vol=t[1].strip()
@@ -33,7 +33,7 @@ class Command(BaseCommand):
             pub_obj=Pubblication.objects.get(issn=issn)
             vol_obj,created=Volume.objects.get_or_create(pubblication=pub_obj,label=vol)
             if created:
-                print "Created: ",vol_obj
+                print("Created: ",vol_obj)
                 continue
 
         fd.close()

@@ -26,6 +26,6 @@ class Command(BaseCommand):
 
         arg_obj,created=Argument.objects.get_or_create(parent=parent,number=number,name=name)
         if created:
-            print "Created:",arg_obj
+            print("Created:",arg_obj)
 
 

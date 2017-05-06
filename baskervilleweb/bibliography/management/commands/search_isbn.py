@@ -28,11 +28,11 @@ class Command(BaseCommand):
         fd.close()
         params=booksearch.look_for(isbn_list)
 
-        print "Unseparable:"
+        print("Unseparable:")
         for isbn in params["unseparable"]:
-            print "    ",isbn
+            print("    ",isbn)
             
-        print "Not inserted:"
+        print("Not inserted:")
         L=[]
         for book in params["book_list"]:
             if book.indb: continue
@@ -40,9 +40,9 @@ class Command(BaseCommand):
         L.sort()
         n=0
         for isbn in L:
-            print "    ",isbn
+            print("    ",isbn)
             if n<10:
                 n+=1
                 continue
-            print
+            print()
             n=0
