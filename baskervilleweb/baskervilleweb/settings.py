@@ -97,7 +97,7 @@ STATICFILES_DIRS = [
 STATIC_ROOT= os.path.join( os.path.join(BASE_DIR, "web"), "static")
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASKERVILLE_HOME+'/web/media/'
+MEDIA_ROOT = PARENT_DIR+'/web/media/'
 
 # STATICFILES_DIRS = (
 #     # Put strings here, like "/home/html/static" or "C:/www/django/static".

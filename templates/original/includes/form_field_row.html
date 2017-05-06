@@ -1,5 +1,0 @@
-<tr class="form-field-{% if form_field_error %}error{% else %}row{% endif %}">
-  <th{% if not form_field.field.required %} class="not-required"{% endif %}>{{ form_field.label_tag }}</th>
-  <td>{{ form_field }}</td>
-  {% if form_field_error %}<td>{{ form_field_error }}</td>{% endif %}
-</tr>
