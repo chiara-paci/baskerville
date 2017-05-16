@@ -1,10 +1,11 @@
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 
 # Create your models here.
 
-PHOTO_ARCHIVE_FULL = "/home/chiara/foto/full"
-PHOTO_ARCHIVE_THUMB = "/home/chiara/foto/thumb"
+PHOTO_ARCHIVE_FULL = settings.PHOTO_ARCHIVE_FULL
+PHOTO_ARCHIVE_THUMB = settings.PHOTO_ARCHIVE_THUMB
 
 class ImageFormat(models.Model):
     name = models.CharField(max_length=1024,unique=True)
