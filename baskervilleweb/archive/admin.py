@@ -13,8 +13,13 @@ class PhotoMetaDatumAdmin(admin.ModelAdmin):
 
 admin.site.register(models.PhotoMetaDatum,PhotoMetaDatumAdmin)
 
+class ImageFormatAdmin(admin.ModelAdmin):
+    list_display=["name","description"]
+
+admin.site.register(models.ImageFormat,ImageFormatAdmin)
+
 class PhotoAdmin(admin.ModelAdmin):
-    list_display=["full_path","type"]
+    list_display=["full_path","mimetype","format","width","height","mode"]
     inlines=(PhotoMetaDatumInline,)
 
 admin.site.register(models.Photo,PhotoAdmin)

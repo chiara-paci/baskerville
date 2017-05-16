@@ -50,4 +50,5 @@ class Command(BaseCommand):
         print(dir(im))
         print(im.format,im.format_description,im.size,im.width,im.height,im.info,im.mode)
         
+        imgformat,created=models.ImageFormat.objects.get_or_create(name=im.format,description=im.format_description)
 

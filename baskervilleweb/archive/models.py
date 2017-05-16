@@ -20,7 +20,7 @@ class Photo(models.Model):
     format = models.ForeignKey(ImageFormat)
     mode = models.CharField(max_length=1024)
 
-    type = models.CharField(max_length=1024)
+    mimetype = models.CharField(max_length=1024)
 
     def __str__(self): return self.full_path
 
