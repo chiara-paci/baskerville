@@ -5,4 +5,15 @@ __pycache__
 *.bak
 *.log
 *~
+web/
 settings.py
+baskervilleweb.2/
+bin/
+localbin/
+*.old
+**/*.data
+old/
+docs/
+rawdata/
+graphs/
+backup/
