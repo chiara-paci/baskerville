@@ -6,7 +6,8 @@ __pycache__
 *.log
 *~
 web/
-settings.py
+**/settings.py
+**/settings.py.*
 baskervilleweb.2/
 bin/
 localbin/
