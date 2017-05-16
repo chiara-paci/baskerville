@@ -53,6 +53,7 @@ class Command(BaseCommand):
             photo=store_photo(photo_path,thumb_path)
             if not photo: 
                 print(full_path,"failed")
+                continue
             store_exif_data(photo)
             print(full_path,"ok")
 
