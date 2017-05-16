@@ -39,6 +39,7 @@ class PhotoMetaDatum(models.Model):
 class ExifType(models.Model):
     name = models.CharField(max_length=1024)
     exif_id = models.IntegerField(blank=True)
+    short = models.CharField(max_length=128)
     
     def __str__(self): return self.name
 

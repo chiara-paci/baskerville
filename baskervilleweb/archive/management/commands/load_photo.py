@@ -98,9 +98,12 @@ class Command(BaseCommand):
             print("[%s] %s" % (category,name))
             if type(tags[tag])==bytes:
                 print("bytes")
+                datatype,created=models.ExifType.objects.get_or_create(name="Bytes")
             else:
+                ftype=exifread.tags.FIELD_TYPES[tags[tag].field_type]
                 print(exifread.tags.FIELD_TYPES[tags[tag].field_type][2])
                 print(tags[tag])
+                datatype,created=models.ExifType.objects.get_or_create(name="Bytes")
             #print(dir(tags[tag]))
 
         im.close()
