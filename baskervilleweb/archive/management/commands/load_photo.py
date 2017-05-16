@@ -89,7 +89,7 @@ class Command(BaseCommand):
         im.close()
         im=open(photo,"rb")
 
-        tags=exifread.process_file(im)
+        tags=exifread.process_file(im,details=False)
 
         for tag in tags:
             t=tag.split()
@@ -98,11 +98,31 @@ class Command(BaseCommand):
             if not name: name="-"
             if type(tags[tag])==bytes:
                 datatype,created=models.ExifType.objects.get_or_create(name="Bytes")
-                tag_id="????"
+                tag_id=-1
+                val=tags[tag]
             else:
                 ftype=exifread.tags.FIELD_TYPES[tags[tag].field_type]
                 datatype,created=models.ExifType.objects.get_or_create(name=ftype[2],short=ftype[1],exif_id=ftype[0])
-            print("[%s] %s %s %s" % (category,name,datatype,tag_id))
-            #print(dir(tags[tag]))
+                tag_id=tags[tag].tag
+                val=str(tags[tag])
+            label,created=models.ExifLabel.objects.get_or_create( name=name,category=category,
+                                                                  defaults={"type": datatype, "exif_id": tag_id} )
+            d,created=models.ExifDatum.objects.get_or_create(photo=image,label=label,defaults={"value": val})
+            if not created:
+                d.value=val
+                d.save()
+
+            if label.name == "Orientation":
+                # 1: 'Horizontal (normal)',
+                # 2: 'Mirrored horizontal',
+                # 3: 'Rotated 180',
+                # 4: 'Mirrored vertical',
+                # 5: 'Mirrored horizontal then rotated 90 CCW',
+                # 6: 'Rotated 90 CW',
+                # 7: 'Mirrored horizontal then rotated 90 CW',
+                # 8: 'Rotated 90 CCW'
+                if val.endswith("90 CCW"):
+                    orientation="90 ccw"
+                elif val.endswith("90 CW"):
 
         im.close()

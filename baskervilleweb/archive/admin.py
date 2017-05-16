@@ -39,7 +39,7 @@ class MetaLabelAdmin(admin.ModelAdmin):
 admin.site.register(models.MetaLabel,MetaLabelAdmin)
 
 class ExifLabelAdmin(admin.ModelAdmin):
-    list_display=["type","name"]
+    list_display=["name","category","type","exif_id"]
     inlines=(ExifDatumInline,)
 
 admin.site.register(models.ExifLabel,ExifLabelAdmin)

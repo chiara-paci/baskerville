@@ -19,6 +19,14 @@ class Photo(models.Model):
     height = models.IntegerField()
     format = models.ForeignKey(ImageFormat)
     mode = models.CharField(max_length=1024)
+    rotated = models.CharField(max_length=128, 
+                               choices=( ("no","no"),("90 ccw","90 ccw"),
+                                         ("90 cw","90 cw"),  ("180","180") ), 
+                               default="no")
+    mirrored = models.CharField(max_length=128, 
+                               choices=( ("no","no"),("horizontal","horizontal"),
+                                         ("vertical","vertical") ), 
+                               default="no")
 
     mimetype = models.CharField(max_length=1024)
 
