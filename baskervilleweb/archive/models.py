@@ -36,10 +36,16 @@ class PhotoMetaDatum(models.Model):
 
     def __str__(self): return str(self.photo)+"/"+str(self.label)
 
+class ExifType(models.Model):
+    name = models.CharField(max_length=1024)
+    exif_id = models.IntegerField(blank=True)
+    
+    def __str__(self): return self.name
+
 class ExifLabel(models.Model):
     category = models.CharField(max_length=128)
     name = models.CharField(max_length=1024,blank=True)
-    type = models.CharField(max_length=128)
+    type = models.ForeignKey(ExifType)
 
     def __str__(self):
         if self.name: return self.name

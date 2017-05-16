@@ -89,9 +89,18 @@ class Command(BaseCommand):
         im.close()
         im=open(photo,"rb")
 
-        tags=exifread.process_file(im,details=False)
+        tags=exifread.process_file(im)
 
         for tag in tags:
-            print("%s: %s" % (tag, tags[tag]))
+            t=tag.split()
+            category=t[0]
+            name=" ".join(t[1:])
+            print("[%s] %s" % (category,name))
+            if type(tags[tag])==bytes:
+                print("bytes")
+            else:
+                print(exifread.tags.FIELD_TYPES[tags[tag].field_type][2])
+                print(tags[tag])
+            #print(dir(tags[tag]))
 
         im.close()
