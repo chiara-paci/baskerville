@@ -38,11 +38,12 @@ class PhotoMetaDatum(models.Model):
 
 class ExifLabel(models.Model):
     exif_id = models.IntegerField()
+    type = models.CharField(max_length=128,choices=( ("tag","tag"), ("gps","gps") ) )
     name = models.CharField(max_length=1024,blank=True)
 
     def __str__(self):
         if self.name: return self.name
-        return str(self.exif_id)
+        return self.type+" "+str(self.exif_id)
 
 class ExifDatum(models.Model):
     photo = models.ForeignKey(Photo)
