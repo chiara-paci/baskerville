@@ -22,7 +22,6 @@ import shutil
 
 from .utility import store_exif_data,store_photo
 
-
 class Command(BaseCommand):
     help = 'Used to import a photo.'
     requires_migrations_checks = True
@@ -48,7 +47,7 @@ class Command(BaseCommand):
             full_path=os.path.join(src_dir,fname+ext)
             if not os.path.isfile(full_path): continue
             photo_path=os.path.join(dirphoto,fname+ext)
-            thumb_path=os.path.join(dirphoto,fname+".jpeg")
+            thumb_path=os.path.join(dirthumb,fname+".jpeg")
             shutil.copy2(full_path,photo_path)
             photo=store_photo(photo_path,thumb_path)
             if not photo: 

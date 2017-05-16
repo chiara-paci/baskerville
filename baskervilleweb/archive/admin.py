@@ -27,9 +27,20 @@ class ImageFormatAdmin(admin.ModelAdmin):
 
 admin.site.register(models.ImageFormat,ImageFormatAdmin)
 
+class AlbumPhotoInline(admin.TabularInline):
+    model = models.Album.photos.through
+    extra = 0
+
+
 class PhotoAdmin(admin.ModelAdmin):
-    list_display=["full_path","mimetype","format","width","height","mode","datetime","rotated","mirrored"]
-    inlines=(PhotoMetaDatumInline,ExifDatumInline)
+    list_display=["full_path","thumbnail","mimetype","format","width","height",
+                  "mode","datetime","rotated","mirrored"]
+    inlines=(AlbumPhotoInline,PhotoMetaDatumInline,ExifDatumInline,)
+
+    def thumbnail(self,obj):
+        return u'<img src="%s" />' % obj.thumb_url()
+    thumbnail.short_description = 'Thumbnail'
+    thumbnail.allow_tags = True
 
 admin.site.register(models.Photo,PhotoAdmin)
 
@@ -47,3 +58,9 @@ admin.site.register(models.ExifLabel,ExifLabelAdmin)
 class ExifTypeAdmin(admin.ModelAdmin):
     list_display=["name","short","exif_id"]
 admin.site.register(models.ExifType,ExifTypeAdmin)
+
+
+class AlbumAdmin(admin.ModelAdmin):
+    inlines=(AlbumPhotoInline,)
+
+admin.site.register(models.Album,AlbumAdmin)

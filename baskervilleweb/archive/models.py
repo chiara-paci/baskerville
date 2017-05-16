@@ -87,3 +87,10 @@ class ExifDatum(models.Model):
     def __str__(self): return str(self.photo)+"/"+str(self.label)
 
 
+class Album(models.Model):
+    name = models.CharField(max_length=1024)
+    photos = models.ManyToManyField(Photo,blank=True)
+
+    def __str__(self): return self.name
+
+
