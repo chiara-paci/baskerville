@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include "includes/pagination.html" %}
+
+<table>
+<thead>
+<tr>
+  <th></th>
+  <th>size</th>
+  <th>date</th>
+  <th colspan=2>format</th>
+  <th>description</th>
+</tr>
+</thead>
+
+{% for photo in photo_list %}
+<tbody>
+<tr>
+  <td class="top">
+    <a href="{{ photo.get_absolute_url }}"><img src="{{ photo.thumb_url }}"/></a>
+  </td>
+  <td class="top">{{ photo.width }}x{{ photo.height }}</td>
+  <td class="top">{{ photo.datetime }}</td>
+  <td class="top">{{ photo.mimetype }}</td>
+  <td class="top">{{ photo.format }}</td>
+  <td class="top">{{ photo.description }}</td>
+</tr>
+</tbody>
+{% endfor %}
+</table>
+
+{% include "includes/pagination.html" %}
+
+{% endblock %}
+
