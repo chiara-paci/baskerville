@@ -32,7 +32,23 @@ class MetaLabel(models.Model):
 class PhotoMetaDatum(models.Model):
     photo = models.ForeignKey(Photo)
     label = models.ForeignKey(MetaLabel)
-    value = models.CharField(max_length=1024)
+    value = models.CharField(max_length=8192)
 
-    def __str__(self): return str(self.phot)+"/"+str(self.label)
+    def __str__(self): return str(self.photo)+"/"+str(self.label)
+
+class ExifLabel(models.Model):
+    exif_id = models.IntegerField()
+    name = models.CharField(max_length=1024,blank=True)
+
+    def __str__(self):
+        if self.name: return self.name
+        return str(self.exif_id)
+
+class ExifDatum(models.Model):
+    photo = models.ForeignKey(Photo)
+    label = models.ForeignKey(ExifLabel)
+    value = models.CharField(max_length=8192)
+
+    def __str__(self): return str(self.photo)+"/"+str(self.label)
+
 

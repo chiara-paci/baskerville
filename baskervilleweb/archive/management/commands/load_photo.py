@@ -9,9 +9,11 @@ from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 
 from PIL import Image
+from PIL.ExifTags import TAGS,GPSTAGS
 from archive import models
 
 import os.path,os
+import magic
 
 class Command(BaseCommand):
     help = 'Used to import a photo.'
@@ -47,8 +49,44 @@ class Command(BaseCommand):
 
         im = Image.open(photo)
         
-        print(dir(im))
-        print(im.format,im.format_description,im.size,im.width,im.height,im.info,im.mode)
+        #print(dir(im))
+        #print(im.format,im.format_description,im.size,im.width,im.height,im.info,im.mode)
         
         imgformat,created=models.ImageFormat.objects.get_or_create(name=im.format,description=im.format_description)
 
+        mimetype=magic.from_file(photo, mime=True)
+        image,created=models.Photo.objects.get_or_create(full_path=photo,
+                                                         defaults={
+                                                             "thumb_path": thumb_fname,
+                                                             "width": im.width,
+                                                             "height": im.height,
+                                                             "format": imgformat,
+                                                             "mode": im.mode,
+                                                             "mimetype": mimetype
+                                                         })
+        if not created:
+            image.thumb_path=thumb_fname
+            image.width=im.width
+            image.height=im.height
+            image.format=imgformat
+            image.mode=im.mode
+            image.mimetype=mimetype
+            image.save()
+
+        dpi=str(im.info["dpi"])
+        label,created=models.MetaLabel.objects.get_or_create(name="dpi")
+        d,created=models.PhotoMetaDatum.objects.get_or_create(label=label,photo=image,
+                                                              defaults={"value": dpi})
+        if not created:
+            d.value=dpi
+            d.save()
+
+        if not hasattr(im,"_getexif"): return
+
+        for k in im._getexif():
+            if k in TAGS:
+                print("T",k,TAGS[k])
+            elif k in GPSTAGS:
+                print("G",k,GPSTAGS[k])
+            else:
+                print("N",k)
