@@ -28,7 +28,7 @@ class ImageFormatAdmin(admin.ModelAdmin):
 admin.site.register(models.ImageFormat,ImageFormatAdmin)
 
 class PhotoAdmin(admin.ModelAdmin):
-    list_display=["full_path","mimetype","format","width","height","mode"]
+    list_display=["full_path","mimetype","format","width","height","mode","datetime","rotated","mirrored"]
     inlines=(PhotoMetaDatumInline,ExifDatumInline)
 
 admin.site.register(models.Photo,PhotoAdmin)

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 
@@ -19,6 +20,8 @@ class Photo(models.Model):
     height = models.IntegerField()
     format = models.ForeignKey(ImageFormat)
     mode = models.CharField(max_length=1024)
+    mimetype = models.CharField(max_length=1024)
+    datetime = models.DateTimeField(default=timezone.now)
     rotated = models.CharField(max_length=128, 
                                choices=( ("no","no"),("90 ccw","90 ccw"),
                                          ("90 cw","90 cw"),  ("180","180") ), 
@@ -27,8 +30,6 @@ class Photo(models.Model):
                                choices=( ("no","no"),("horizontal","horizontal"),
                                          ("vertical","vertical") ), 
                                default="no")
-
-    mimetype = models.CharField(max_length=1024)
 
     def __str__(self): return self.full_path
 
