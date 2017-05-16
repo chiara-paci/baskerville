@@ -14,6 +14,7 @@ from archive import models
 
 import os.path,os
 import magic
+import exifread
 
 class Command(BaseCommand):
     help = 'Used to import a photo.'
@@ -81,12 +82,16 @@ class Command(BaseCommand):
             d.value=dpi
             d.save()
 
-        if not hasattr(im,"_getexif"): return
+        if not hasattr(im,"_getexif"): 
+            im.close()
+            return
 
-        for k in im._getexif():
-            if k in TAGS:
-                print("T",k,TAGS[k])
-            elif k in GPSTAGS:
-                print("G",k,GPSTAGS[k])
-            else:
-                print("N",k)
+        im.close()
+        im=open(photo,"rb")
+
+        tags=exifread.process_file(im,details=False)
+
+        for tag in tags:
+            print("%s: %s" % (tag, tags[tag]))
+
+        im.close()
