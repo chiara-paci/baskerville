@@ -16,7 +16,7 @@ import os.path,os
 import magic
 import exifread
 import dateutil.parser
-import libxmp.utils
+# import libxmp.utils
 import datetime,pytz
 import shutil
 
