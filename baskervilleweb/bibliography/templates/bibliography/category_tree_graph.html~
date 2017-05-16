@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<table id="categories">
+{% for catnode in categorytreenode_list %}
+<tr class="sc-tree-data" data-level="{{ catnode.level }}" 
+    data-has_children="{{ catnode.has_children }}"
+    data-label="catroot{{ catnode.label }}"
+    {% if catnode.label_children %}data-label_children="catroot{{ catnode.label_children }}"{% endif %}>
+<td data-label="rif">{% if catnode.is_category %}{{ catnode.content_object.name }}{% else %}{{ catnode.content_object.html|safe }}{% endif %}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}
+
+{% block script %}
+$("#categories").sc_treeview({title_column: "rif",first_label: "catroot"});
+
+{% endblock %}

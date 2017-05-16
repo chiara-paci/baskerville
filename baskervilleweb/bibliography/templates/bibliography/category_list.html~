@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include "includes/pagination.html" %}
+
+<div id="authors">
+  <div id="authors-left" class="shadow-prim tabcontainer">
+    <div class="tabmenu">
+      {% for aut in author_list %}
+      <a href="" data-target_id="#author_{{ aut.id }}" data-label_id="#author_lab{{ aut.id }}" class="tablabel"><div class="tabitem{% if forloop.first %}selected{% endif %}" id="author_lab{{ aut.id }}">{{ aut.list_name }}</div></a>
+      {% endfor %}
+    </div>
+  </div>
+  
+  <div id="authors-right" class="shadow-prim">
+    {% for aut in author_list %}
+    <div id="author_{{ aut.id }}" class="tabscheda removed">
+      <h1>{{ aut.long_name }}</h1>
+
+      <table>
+	{% for year,role,pub in aut.publications %}
+	<tr><td class="top">{{ year }}</td><td class="top">({{ role }})</td><td> {{ pub.html|safe }}</td></tr>
+	{% endfor %}
+      </table>
+
+    </div>
+    {% endfor %}  
+  </div>
+
+</div>
+{% endblock %}
+
+{% block script %}
+
+$("#authors").sc_hpanel({
+right_name: "authors-right",
+left_name: "authors-left",
+big: "right",
+start_width: 50,
+min_height: 0
+});
+
+$(".tabscheda").hide();
+$("#author_{{ author_list.0.id }}").show().removeClass("removed");
+
+$(".tablabel").click(function(event){
+event.preventDefault();
+var label_id=$(this).data("label_id");
+var target_id=$(this).data("target_id");
+$(".tabitemselected").removeClass("tabitemselected").addClass("tabitem");
+$(label_id).removeClass("tabitem").addClass("tabitemselected");
+$(".tabscheda").hide().addClass("removed");
+
+$(target_id).show().removeClass("removed");
+
+});
+
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %} - {% trans "Create author" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "New author" %}</h1>
+
+<form method="post" action="">
+{% csrf_token %}
+
+{% if form.non_field_errors %}
+<p class="errors">{{ form.non_field_errors }}</p>
+{% endif %}
+
+{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+
+<table>
+<tr>
+  <th>{{ form.format_collection.label }}</th>
+  <td>{{ form.format_collection }}</td>
+  <td>{{ form.format_collection.errors }}</td>
+</tr>
+</table>
+
+<h2>Names</h2>
+
+{{ name_formset.management_form }}
+    <table>
+      <tr><th>name type</th><th>value</th></tr>
+      
+      {% for aform in name_formset %}
+      <tr><td>{{ forloop.counter0 }}</td>
+	<td>
+	  {{ aform.name_type }}
+	</td>
+	<td>
+	  {{ aform.value }}
+	</td>
+	<td>
+	  {% if aform.non_field_errors %}
+	  {{ aform.non_field_errors }}
+	  {% endif %}
+	  
+	  {% for hidden in aform.hidden_fields %}{{ hidden }}{% endfor %}
+	  {{ aform.name.errors }}
+	  {{ aform.city_name.errors }}
+	  {{ aform.state.errors }}
+	  {{ aform.state_name.errors }}
+	</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+<hr/>
+
+<input type="submit" value="{% trans "save" %}" />
+<input type="reset" value="{% trans "reset" %}" />
+
+</form>
+</div> 
+</div> 
+
+{% endblock %}
+
+

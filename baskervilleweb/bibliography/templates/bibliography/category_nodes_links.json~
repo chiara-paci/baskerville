@@ -1,0 +1,12 @@
+{
+    "nodes": [
+	{% for cat in category_list %}
+	{"name": "{{ cat.name }}","group": {{ cat.min_level }}}{% if forloop.last %}{% else %},{% endif %}
+	{% endfor %}
+    ],
+    "links": [
+	{% for source,target in rel_list %}
+	{"source":{{ source }},"target":{{ target }}, "value": 1}{% if forloop.last %}{% else %},{% endif %}
+	{% endfor %}
+    ]
+}

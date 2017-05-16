@@ -1,0 +1,62 @@
+{% extends "documents/base_documents.html" %}
+{% load i18n %}
+{% load humanize %}
+
+{% block title %} - {% trans "Insert books" %}{% endblock %}
+
+{% block content %}
+
+<div class="contentbox blue">
+<h1>{% trans "New folder" %}</h1>
+
+<div class="form">
+<form method="post" action="">
+{% csrf_token %}
+
+{% if form.non_field_errors %}
+<p class="errors">{{ form.non_field_errors }}</p>
+{% endif %}
+
+{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+
+{{ form.errors }}
+
+<table>
+  <tr>
+    <th colspan="2">{% trans form.title.label_tag %}</th>
+    <td colspan="4">{{ form.title }}</td>
+    <td{% if form.errors.title %}class="errors"{% endif %}>{{ form.errors.title }}</td>
+  </tr>
+  <tr><td colspan="7">&nbsp;</td></tr>
+  <tr>
+    <th colspan="2">{% trans form.parent.label_tag %}</th>
+    <td colspan="4" class="left">{{ form.parent }}</td>
+    <td{% if form.errors.parent %}class="errors"{% endif %}>{{ form.errors.parent }}</td>
+  </tr>
+  <tr><td colspan="7">&nbsp;</td></tr>
+  <tr>
+    <th>{% trans form.level.label_tag %}</th>
+    <td>{{ form.level }}</td>
+    <th>{% trans form.pos.label_tag %}</th>
+    <td>{{ form.pos }}</td>
+    <td>{{ form.numbered }} {% trans "Numbered" %}</td>
+    <td>{{ form.visible }} {% trans "Visible" %}</td>
+  <tr>
+    <td colspan="2"{% if form.level.errors %} class="errors"{% endif %}>{{ form.level.errors }}</td>
+    <td colspan="2"{% if form.pos.errors %} class="errors"{% endif %}>{{ form.pos.errors }}</td>
+    <td{% if form.numbered.errors %} class="errors"{% endif %}>{{ form.numbered.errors }}</td>
+    <td{% if form.visible.errors %} class="errors"{% endif %}>{{ form.visible.errors }}</td>
+  </tr>
+
+</table>
+
+<input type="submit" value="{% trans "save" %}" />
+<input type="reset" value="{% trans "reset" %}" />
+<a class="button" href="/accounts/control_panel/">{% trans "undo" %}</a>
+</form>
+</div> 
+</div> 
+
+{% endblock %}
+
+

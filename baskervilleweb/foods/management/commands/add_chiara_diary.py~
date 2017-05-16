@@ -1,0 +1,13 @@
+#! /usr/bin/python
+# -*- coding: utf-8 -*-
+
+from django.core.management.base import BaseCommand, CommandError
+
+from foods.models import 
+
+class Command(BaseCommand):
+    args = '<fdir>'
+    help = 'Load USDA National Nutrient Database'
+
+    def handle(self, *args, **options):
+        pass

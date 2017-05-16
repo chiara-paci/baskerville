@@ -1,0 +1,5 @@
+[
+    {% for catnode in categorytreenode_list %}
+    
+    {% endfor %}
+]

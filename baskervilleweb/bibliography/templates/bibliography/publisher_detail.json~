@@ -1,0 +1,20 @@
+{
+    "id": {{ publisher.id }},
+    "name": "{{ publisher.name }}",
+    "url": "{{ publisher.url }}",
+    "note": "{{ publisher.note }}",
+    "full_name": "{{ publisher.full_name }}",
+    "alias": {{ publisher.alias|lower }},
+    "isbn": [
+	{% for isbn in publisher.isbns.all %}
+	"{{ isbn }}"
+	{% if forloop.last %}{% else %},{% endif %}
+	{% endfor %}
+    ],
+    "addresses": [
+	{% for adr in publisher.addresses.all %}
+	"{{ adr }}"
+	{% if forloop.last %}{% else %},{% endif %}
+	{% endfor %}
+    ]
+}

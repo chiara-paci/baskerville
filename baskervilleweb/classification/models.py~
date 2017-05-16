@@ -1,0 +1,308 @@
+from django.db import models
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
+
+# Create your models here.
+
+class Argument(models.Model):
+    parent = models.ForeignKey("self")
+    name = models.CharField(max_length=4096)
+    number = models.CharField(max_length=1024)
+    identifier = models.CharField(max_length=4096,editable=False,unique=True)
+
+    class Meta:
+        ordering = [ 'identifier' ]
+
+    def __unicode__(self):
+        return unicode(self.identifier)+" "+unicode(self.name)
+
+    def parent_identifier(self): return self.parent.identifier
+
+    def save(self, *args, **kwargs):
+        self.identifier=unicode(self.parent.identifier)+unicode(self.number)
+        super(Argument,self).save(*args, **kwargs)
+
+class ArgumentSuffixCollection(models.Model):
+    roots = models.ManyToManyField(Argument)
+    name = models.SlugField(max_length=4096)
+    description = models.CharField(max_length=4096)
+
+    class Meta:
+        ordering = [ 'name' ]
+
+    def __unicode__(self):
+        return unicode(self.name)
+
+class ArgumentSuffix(models.Model):
+    parent = models.ForeignKey("self")
+    collection = models.ForeignKey(ArgumentSuffixCollection)
+    name = models.CharField(max_length=4096)
+    number = models.CharField(max_length=1024)
+    identifier = models.CharField(max_length=4096,editable=False,unique=True)
+
+    class Meta:
+        ordering = [ 'identifier' ]
+
+    def __unicode__(self):
+        return unicode(self.identifier)+" "+unicode(self.name)
+
+    def save(self, *args, **kwargs):
+        self.identifier=unicode(self.parent.identifier)+unicode(self.number)
+        super(Argument,self).save(*args, **kwargs)
+
+    def parent_identifier(self): return self.parent.identifier
+
+
+class DecimalNumberAbstract(models.Model):
+    number = models.CharField(max_length=1024,unique=True)
+    name = models.CharField(max_length=4096)
+
+    def __unicode__(self):
+        return self.identifier()+" "+unicode(self.name)
+
+    def identifier(self):
+        return unicode(self.number)
+
+    def description(self):
+        return unicode(self.name)
+
+    class Meta:
+        abstract = True
+        ordering = [ "number" ]
+
+class ArgumentClassification(DecimalNumberAbstract):
+    class Meta:
+        ordering = [ "number" ]
+
+
+class LanguageAuxiliaryNumber(DecimalNumberAbstract):
+    class Meta:
+        ordering = [ "number" ]
+
+class LanguageNumber(DecimalNumberAbstract):
+    class Meta:
+        ordering = [ "number" ]
+
+class LanguageClassification(models.Model):
+    language = models.ForeignKey(LanguageNumber)
+    auxiliaries = models.ManyToManyField(LanguageAuxiliaryNumber,blank=True)
+    
+    def __unicode__(self):
+        return self.identifier()+" "+self.description()
+
+    def identifier(self):
+        I=self.language.identifier()
+        for aux in self.auxiliaries.all():
+            I+="'"+aux.identifier()
+        return I
+
+    def description(self):
+        D=unicode(self.language.name)
+        for aux in self.auxiliaries.all():
+            D+="/"+unicode(aux.description())
+        return D
+            
+class PlaceAuxiliaryNumber(DecimalNumberAbstract):
+    class Meta:
+        ordering = [ "number" ]
+
+class PlaceNumber(DecimalNumberAbstract):
+    class Meta:
+        ordering = [ "number" ]
+
+class PlaceClassification(models.Model):
+    place = models.ForeignKey(PlaceNumber)
+    auxiliaries = models.ManyToManyField(PlaceAuxiliaryNumber,blank=True)
+
+    def __unicode__(self):
+        return self.identifier()+" "+self.description()
+
+    def identifier(self):
+        I=self.place.identifier()
+        for aux in self.auxiliaries.all():
+            I+="'"+aux.identifier()
+        return I
+
+    def description(self):
+        D=unicode(self.place.name)
+        for aux in self.auxiliaries.all():
+            D+="/"+unicode(aux.name)
+        return D
+    
+class TimeClassification(DecimalNumberAbstract):
+    date_start = models.DateField()
+    date_end = models.DateField()
+
+    class Meta:
+        ordering = [ "number" ]
+    
+class FormClassification(DecimalNumberAbstract):
+    class Meta:
+        ordering = [ "number" ]
+
+class ShortClassificationManager(models.Manager):
+    def match_classification(self,classification):
+        for sc in self.order_by("priority"):
+            if sc.id==0:
+                continue
+
+            prefix=unicode(sc.argument.number)
+            if unicode(classification.argument.number)[0:len(prefix)]!=prefix: 
+                continue
+
+            sc_ids=sc.forms.all().values("id")
+            tg_ids=classification.forms.all().values("id")
+            if bool(filter(lambda x: x not in tg_ids,sc_ids)): 
+                continue
+
+            sc_ids=sc.languages.all().values("id")
+            tg_ids=classification.languages.all().values("id")
+            if bool(filter(lambda x: x not in tg_ids,sc_ids)): 
+                continue
+
+            sc_ids=sc.places.all().values("id")
+            tg_ids=classification.places.all().values("id")
+            if bool(filter(lambda x: x not in tg_ids,sc_ids)): 
+                continue
+
+            sc_ids=sc.times.all().values("id")
+            tg_ids=classification.times.all().values("id")
+            if bool(filter(lambda x: x not in tg_ids,sc_ids)): 
+                continue
+
+            return sc
+
+        return self.get(id=0)
+
+class ShortClassification(models.Model):
+    argument = models.ForeignKey(ArgumentClassification)
+    languages = models.ManyToManyField(LanguageClassification,blank=True)
+    places = models.ManyToManyField(PlaceClassification,blank=True)
+    times = models.ManyToManyField(TimeClassification,blank=True)
+    forms = models.ManyToManyField(FormClassification,blank=True)
+    label = models.CharField(max_length=1024,unique=True)
+    priority = models.PositiveIntegerField()
+    objects = ShortClassificationManager()
+
+    class Meta:
+        ordering = [ "priority" ]
+
+    def description(self):
+        D=self.argument.description()
+        for aux in self.languages.all():
+            D+=", "+aux.description()
+        for aux in self.places.all():
+            D+=", "+aux.description()
+        for aux in self.times.all():
+            D+=", "+aux.description()
+        for aux in self.forms.all():
+            D+=", "+aux.description()
+        return D
+        
+    def identifier(self):
+        return unicode(self.label)
+
+    def reduced_identifier(self):
+        return self.identifier()
+        
+    def reduced_description(self):
+        return unicode(self.name)
+
+    def __unicode__(self):
+        return self.identifier()+" "+self.description()
+
+    def get_short_identifier(self,classification):
+        if self.id==0:
+            return classification.identifier()
+
+        sub=unicode(sc.argument.number)
+        prefix=unicode(self.label)+unicode(classification.argument.number)[len(sub):]
+
+        sc_ids=sc.forms.all().values("id")
+        tg_ids=classification.forms.all().values("id")
+        form_ids=filter(lambda x: x not in sc_ids,tg_ids) 
+        
+        sc_ids=sc.languages.all().values("id")
+        tg_ids=classification.languages.all().values("id")
+        language_ids=filter(lambda x: x not in sc_ids,tg_ids)
+        
+        sc_ids=sc.places.all().values("id")
+        tg_ids=classification.places.all().values("id")
+        place_ids=filter(lambda x: x not in sc_ids,tg_ids)
+        
+        sc_ids=sc.times.all().values("id")
+        tg_ids=classification.times.all().values("id")
+        time_ids=filter(lambda x: x not in sc_ids,tg_ids)
+
+        for aux in classification.languages.filter(id__in=language_ids):
+            I+="="+aux.identifier()
+        for aux in classification.places.filter(id__in=place_ids):
+            I+="|"+aux.identifier()
+        for aux in classification.times.filter(id__in=time_ids):
+            I+="["+aux.identifier()+"]"
+        for aux in classification.forms.filter(id__in=form_ids):
+            I+="("+aux.identifier()+")"
+        return I
+
+class Classification(models.Model):
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type','object_id')
+
+    argument = models.ForeignKey(ArgumentClassification)
+    object_classification = models.CharField(max_length=1024)
+    object_copy = models.PositiveIntegerField(default=0)
+
+    languages = models.ManyToManyField(LanguageClassification,blank=True)
+    places = models.ManyToManyField(PlaceClassification,blank=True)
+    times = models.ManyToManyField(TimeClassification,blank=True)
+    forms = models.ManyToManyField(FormClassification,blank=True)
+
+    short = models.ForeignKey(ShortClassification,editable=False)
+    short_identifier = models.CharField(max_length=4096,editable=False)
+
+    class Meta:
+        unique_together = [ ("argument", "object_classification","object_copy") ]
+
+    def save(self, *args, **kwargs):
+        self.short=ShortClassification.objects.match_classification(self)
+        self.short_identifier=self.short.get_short_identifier(self)
+        super(Classification, self).save(*args, **kwargs)
+
+    def identifier(self):
+        I=self.argument.identifier()+":"+unicode(self.object_classification)
+        if self.object_copy > 0:
+            I+=":%02d" % self.object_copy
+        for aux in self.languages.all():
+            I+="="+aux.identifier()
+        for aux in self.places.all():
+            I+="|"+aux.identifier()
+        for aux in self.times.all():
+            I+="["+aux.identifier()+"]"
+        for aux in self.forms.all():
+            I+="("+aux.identifier()+")"
+        return I
+
+    def reduced_identifier(self):
+        I=self.argument.identifier()+":"+unicode(self.object_classification)
+        return I
+        
+    def description(self):
+        D=self.argument.description()
+        for aux in self.languages.all():
+            D+=", "+aux.description()
+        for aux in self.places.all():
+            D+=", "+aux.description()
+        for aux in self.times.all():
+            D+=", "+aux.description()
+        for aux in self.forms.all():
+            D+=", "+aux.description()
+        return D
+        
+    def reduced_description(self):
+        return self.argument.description()
+
+    def __unicode__(self):
+        return self.identifier()+" "+self.description()
+

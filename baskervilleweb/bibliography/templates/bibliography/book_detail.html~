@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<table>
+<tr>
+  <th>format_collection</th>
+  <td>{{ author.format_collection }}</td>
+</tr>
+{% for rel in author.authornamerelation_set.all %}
+<tr>
+  <th>{{ rel.name_type }}</th>
+  <td>{{ rel.value }}</td>
+</tr>
+{% endfor %}
+<tr><th>long name</th><td>{{ author.long_name }}</td></tr>
+<tr><th>short name</th><td>{{ author.short_name }}</td></tr>
+<tr><th>ordering name</th><td>{{ author.ordering_name }}</td></tr>
+<tr><th>list name</th><td>{{ author.list_name }}</td></tr>
+</table>
+
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

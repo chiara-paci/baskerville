@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %} - {% trans "Create book" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "New book" %}</h1>
+
+<form method="post" action="">
+{% csrf_token %}
+
+{% if form.non_field_errors %}
+<p class="errors">{{ form.non_field_errors }}</p>
+{% endif %}
+
+{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+
+<table>
+<tr>
+  <th>{{ form.isbn_ced.label }}</th>
+  <td>{{ form.isbn_ced }}</td>
+  <td>{{ form.isbn_ced.errors }}</td>
+</tr>
+<tr>
+  <th>{{ form.isbn_book.label }}</th>
+  <td>{{ form.isbn_book }}</td>
+  <td>{{ form.isbn_book.errors }}</td>
+</tr>
+<tr>
+  <th>{{ form.title.label }}</th>
+  <td>{{ form.title }}</td>
+  <td>{{ form.title.errors }}</td>
+</tr>
+<tr>
+  <th>{{ form.year.label }}</th>
+  <td>{{ form.year }}</td>
+  <td>{{ form.year.errors }}</td>
+</tr>
+<tr>
+  <th>{{ form.publisher.label }}</th>
+  <td>{{ form.publisher }}</td>
+  <td>{{ form.publisher.errors }}</td>
+</tr>
+</table>
+
+<h2>Authors</h2>
+
+{{ author_formset.management_form }}
+    <table>
+      <tr><th></th><th>author</th><th>author_role</th></tr>
+      
+      {% for aform in author_formset %}
+      <tr><td>{{ forloop.counter0 }}</td>
+	<td>
+	  {{ aform.author }}
+	</td>
+	<td>
+	  {{ aform.author_role }}
+	</td>
+	<td>
+	  {% if aform.non_field_errors %}
+	  {{ aform.non_field_errors }}
+	  {% endif %}
+	  
+	  {% for hidden in aform.hidden_fields %}{{ hidden }}{% endfor %}
+	  {{ aform.author.errors }}
+	  {{ aform.author_role.errors }}
+	</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+<hr/>
+
+<input type="submit" value="{% trans "save" %}" />
+<input type="reset" value="{% trans "reset" %}" />
+
+</form>
+</div> 
+</div> 
+
+{% endblock %}
+
+
