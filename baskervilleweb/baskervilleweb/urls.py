@@ -178,4 +178,5 @@ urlpatterns += staticfiles_urlpatterns()
 
 urlpatterns += [
     url(r'^bibliography/',include('bibliography.urls')),
+    url(r'^archive/',include('archive.urls')),
 ]

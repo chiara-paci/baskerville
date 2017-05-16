@@ -103,13 +103,13 @@ def get_template_vars(request=None):
                        ( MenuRow(_("Lists"),"/bibliography/"), [] ),
                        ( MenuRow(_("Tools"),""), 
                          [ 
-                MenuRow(_("Insert"),"/bibliography/insert/"),
-                MenuRow(_("Create publisher"),"/bibliography/publisher/create/"),
-                MenuRow(_("Create author"),"/bibliography/author/create/"),
-                MenuRow(_("Create book"),"/bibliography/book/create/"),
-                MenuRow(_("Categorizer: category to category"),"/bibliography/categories/categorizer/"),
-                MenuRow(_("Categorizer: book to category"),"/bibliography/books/categorizer/"),
-                ] ),
+                             MenuRow(_("Insert"),"/bibliography/insert/"),
+                             MenuRow(_("Create publisher"),"/bibliography/publisher/create/"),
+                             MenuRow(_("Create author"),"/bibliography/author/create/"),
+                             MenuRow(_("Create book"),"/bibliography/book/create/"),
+                             MenuRow(_("Categorizer: category to category"),"/bibliography/categories/categorizer/"),
+                             MenuRow(_("Categorizer: book to category"),"/bibliography/books/categorizer/"),
+                         ] ),
                        ]
 
     home_sections=[ ( HomeTitle("Bacheca","default_section.png"),

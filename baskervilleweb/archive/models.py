@@ -10,7 +10,9 @@ class ImageFormat(models.Model):
     name = models.CharField(max_length=1024,unique=True)
     description = models.CharField(max_length=8192)
 
-    def __str__(self): return self.name
+    def __str__(self): 
+        if not self.description: return self.name
+        return self.description
 
 class Photo(models.Model):
     full_path =  models.FilePathField(path=PHOTO_ARCHIVE_FULL,recursive=True,max_length=1024)
@@ -32,6 +34,20 @@ class Photo(models.Model):
                                default="no")
 
     def __str__(self): return self.full_path
+
+    def thumb_url(self):
+        return "/archive/photo/%d.thumb.jpeg" % self.id
+
+    def image_url(self):
+        t=self.mimetype.split("/")
+        return "/archive/photo/%d.%s" % (self.id,t[1])
+        
+    def get_absolute_url(self):
+        return "/archive/photo/%d/" % (self.id,)
+        
+
+    class Meta:
+        ordering = [ "datetime" ]
 
 class MetaLabel(models.Model):
     name = models.CharField(max_length=1024)
