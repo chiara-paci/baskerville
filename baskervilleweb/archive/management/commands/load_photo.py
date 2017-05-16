@@ -95,15 +95,14 @@ class Command(BaseCommand):
             t=tag.split()
             category=t[0]
             name=" ".join(t[1:])
-            print("[%s] %s" % (category,name))
+            if not name: name="-"
             if type(tags[tag])==bytes:
-                print("bytes")
                 datatype,created=models.ExifType.objects.get_or_create(name="Bytes")
+                tag_id="????"
             else:
                 ftype=exifread.tags.FIELD_TYPES[tags[tag].field_type]
-                print(exifread.tags.FIELD_TYPES[tags[tag].field_type][2])
-                print(tags[tag])
-                datatype,created=models.ExifType.objects.get_or_create(name="Bytes")
+                datatype,created=models.ExifType.objects.get_or_create(name=ftype[2],short=ftype[1],exif_id=ftype[0])
+            print("[%s] %s %s %s" % (category,name,datatype,tag_id))
             #print(dir(tags[tag]))
 
         im.close()
