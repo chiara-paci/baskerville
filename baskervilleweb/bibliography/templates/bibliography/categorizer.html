@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<form method="post" action="">
+{% csrf_token %}
+
+    {{ formset.management_form }}
+<input type="submit" value="{% trans "save" %}" />
+<input type="reset" value="{% trans "reset" %}" />
+    <table>
+      <tr><th>delete</th><th>category</th><th>parents</th></tr>
+    {% for form in formset %}
+        {{ form.id }}
+        <tr>
+          {% if formset.can_delete %}
+          <td>{{ form.DELETE }}</td>
+          {% endif %}
+          <td>{{ form.name }}</td>
+          <td>{{ form.parents }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+<input type="submit" value="{% trans "save" %}" />
+<input type="reset" value="{% trans "reset" %}" />
+
+</form>
+
+
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

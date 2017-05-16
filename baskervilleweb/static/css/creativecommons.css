@@ -1,0 +1,9 @@
+@font-face{
+    font-family: CC;
+    src: url('../fonts/cc-icons.ttf'), 
+         url('../fonts/cc-icons.eot'); 
+} 
+
+.cc {
+    font: 12pt CC;
+}

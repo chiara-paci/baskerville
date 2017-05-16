@@ -1,0 +1,97 @@
+.twocolumn {
+    columns: auto 2;
+    -webkit-columns: auto 2;
+    -moz-columns: auto 2;
+}
+
+.twocolumn div {
+    display: inline-block;
+}
+
+.link {
+    cursor: pointer;
+}
+
+.noindent {
+    text-indent: 0px;
+}
+
+.rotate {
+    -webkit-transform: rotate(-90deg); 
+    -moz-transform: rotate(-90deg);
+    display: block;
+}
+
+.left, .left p {
+    text-align: left;
+}
+
+.justify, .justify p {
+    text-align: justify;
+}
+
+.center, .center p {
+    text-align: center;
+}
+
+.right, .right p {
+    text-align: right;
+}
+
+.iconlittle, .icon16 {
+    width: 16px;
+}
+
+.icontiny, .icon12 {
+    width: 12px;
+}
+
+.iconlist, .icon32 {
+    width: 32px;
+}
+
+.iconmedium, .icon48 {
+    width: 48px;
+}
+
+.iconbig, .icon160 {
+    width: 160px;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.overline {
+    text-decoration: overline;
+}
+
+.linethrough {
+    text-decoration: line-through;
+}
+
+.smallcaps {
+    font-variant:small-caps;
+} 
+
+.hidden {
+    display: none;
+}
+
+.bottom {
+    vertical-align: bottom;
+}
+
+.top {
+    vertical-align: top;
+}
+
+.script-minor, .minor {
+    font-style: italic;
+    font-size: 80%;
+}
+
+.script-tiny, .tiny {
+    font-size: 0.7em;
+}
+

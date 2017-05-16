@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<table>
+{% for format in object_list %}
+<tbody>
+<tr>
+  <th rowspan=2>{{ format }}</th>
+  <td rowspan=2>{{ format.description }}</td>
+  <td rowspan=2>{{ format.preferred }}</td>
+  <td rowspan=2>{{ format.fields|length }}</td>
+  <td rowspan=2>{{ format.fields }}</td>
+  <td>{{ format.long_format }}</td>
+  <td>{{ format.short_format }}</td>
+  <td>{{ format.list_format }}</td>
+  <td>{{ format.ordering_format }}</td>
+</tr>
+<tr>
+  <td>{{ format.long_format.pattern }}</td>
+  <td>{{ format.short_format.pattern }}</td>
+  <td>{{ format.list_format.pattern }}</td>
+  <td>{{ format.ordering_format.pattern }}</td>
+</tr>
+</tbody>
+{% endfor %}
+</table>
+
+{% endblock %}
+
+

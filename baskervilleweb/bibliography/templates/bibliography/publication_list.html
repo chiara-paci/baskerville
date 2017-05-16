@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<table>
+<thead>
+<tr>
+  <th>issn</th>
+  <th>publisher</th>
+  <th>title</th>
+  <th>volume_type</th>
+</tr>
+</thead>
+
+{% for pub in object_list %}
+<tbody>
+  <tr>
+    <td class="top">{{ pub.issn }} {{ pub.issn_crc }}</td>
+    <td class="top">{{ pub.publisher }}</td>
+    <td class="top"><a href="{{ pub.get_absolute_url }}">{{ pub.title }}</a></td>
+    <td class="top">{{ pub.volume_type }}{% if pub.volume_type.read_as %} ({{ pub.volume_type.read_as }}){% endif %}</td>
+  </tr>
+</tbody>
+{% endfor %}
+</table>
+
+{% endblock %}
+

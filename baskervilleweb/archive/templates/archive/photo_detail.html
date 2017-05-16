@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<table>
+<tr>
+  <td rowspan=7>
+    <a href="{{ photo.image_url }}">
+      <img src="{{ photo.image_url }}" width="600"/>
+    </a>
+  </td>
+  <td colspan=2>{{ photo.datetime }}</td>
+</tr>
+<tr><td colspan=2>{{ photo.width }}x{{ photo.height }}</td></tr>
+<tr><td>rotated:</td><td>{{ photo.rotated }}</td></tr>
+<tr><td> mirrored:</td><td>{{ photo.mirrored }}</td></tr>
+<tr><td colspan=2>{{ photo.mimetype }} {{ photo.format }} </td></tr>
+<tr><td colspan=2> {{ photo.description }} </td></tr>
+<tr><td colspan=2></td></tr>
+</table>
+
+<br/>
+<br/>
+
+<h2>Metadata</h2>
+
+<table>
+{% for datum in photo.photometadatum_set.all %}
+<tbody>
+<tr>
+  <td class="top">{{ datum.label }}</td>
+  <td class="top">{{ datum.value }}</td>
+</tr>
+</tbody>
+{% endfor %}
+{% for datum in photo.exifdatum_set.all %}
+<tbody>
+<tr>
+  <td class="top">{{ datum.label }}</td>
+  <td class="top">{{ datum.value }}</td>
+</tr>
+</tbody>
+{% endfor %}
+</table>
+
+{% endblock %}
+

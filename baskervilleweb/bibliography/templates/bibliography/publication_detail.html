@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{{ publication.title }}</h1>
+
+<table>
+<tr>
+  <th>issn</th>
+  <td>{{ publication.issn }}-{{ publication.issn_crc }}</td>
+</tr>
+<tr><th>publisher</th><td>{{ publication.publisher }}</td></tr>
+<tr><th>volume type</th><td>{{ publication.volume_type }}</td></tr>
+</table>
+
+<form method="post" action="{% url 'bibliography:publication-issues-author-search' publication.id %}">
+{% csrf_token %}
+<input type="submit" value="{% trans "add author" %}" />
+{{ add_author_form.search }} {{ add_author_form.search.errors }}
+</form>
+
+<a href='{% url "bibliography:publication-issues-author-add" publication.id %}'>Add author</a>
+
+<h1>{% trans "Issues" %}</h1>
+
+<table>
+<thead>
+  <th>{{ publication.volume_type }}</th>
+  <th colspan="2">number</th>
+  <th>data</th>
+  <th>title</th>
+  <th>type</th>
+  <th colspan="2">authors</th>
+</thead>
+
+{% for issue in publication.issue_set %}
+<tbody>
+{% if not issue.issueauthorrelation_set.count %}
+<tr>
+  <th>{{ issue.volume.label }}</th>
+  <th>[{{ issue.issn_num }}]</th>
+  <th>{{ issue.number }}</th>
+  <td>{{ issue.show_date }}</td>
+  <td>{{ issue.title }}</td>
+  <td>{{ issue.issue_type }}</td>
+  <td colspan="2"> &nbsp; </td>
+</tr>
+{% else %}
+<tr>
+  <th rowspan="{{ issue.issueauthorrelation_set.count }}">
+    {{ issue.volume.label }}</th>
+  <th rowspan="{{ issue.issueauthorrelation_set.count }}">
+    [{{ issue.issn_num }}]</th>
+  <th rowspan="{{ issue.issueauthorrelation_set.count }}">
+    {{ issue.number }}</th>
+  <td rowspan="{{ issue.issueauthorrelation_set.count }}">
+    {{ issue.show_date }}</td>
+  <td rowspan="{{ issue.issueauthorrelation_set.count }}">
+    {{ issue.title }}</td>
+  <td rowspan="{{ issue.issueauthorrelation_set.count }}">
+    {{ issue.issue_type }}</td>
+  
+  {% for rel in issue.issueauthorrelation_set.all %}
+  {% if not forloop.first %}<tr>{% endif %}
+    <td>{{ rel.author }}</td>
+    <td>({{ rel.author_role }})</td>
+  </tr>
+  {% endfor %}
+
+</tr>
+
+{% endif %}
+</tbody>
+{% endfor %}
+
+</table>
+
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

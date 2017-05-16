@@ -1,0 +1,37 @@
+{
+    "max_level": {{ max_level }},
+    "min_level": {{ min_level }},
+    "num_branch": {{ num_branch }},
+    "max_num_objects": {{ max_num_objects }},
+    "nodes": [
+	{% for node in nodes %}
+	{
+	    "cat_id": {{ node.category.id }}, 
+	    "name": "{{ node.name|safe }}",
+	    "level": {{ node.category.min_level }},
+	    "group":{{ node.group }},
+	    "branch": "{{ node.branch|safe }}",
+	    "num_objects": {{ node.category.num_objects }},
+            "is_node_base": {{ node.is_node_base|lower }},
+            "node_type": "{{ node.node_type }}",
+            "base_index": {{ node.base_index }},
+            "posX": {{ node.posX }}, 
+            "posY": {{ node.posY }}, 
+            "side": {{ node.side }}
+	}{% if forloop.last %}{% else %},{% endif %}
+	{% endfor %}
+    ],
+    "links": [
+	{% for link in links %}
+	{
+	    "source":{{ link.parent_node.index }},
+            "target":{{ link.child_node.index }},
+	    "group":{{ link.group }},
+	    "is_in_branch": {{ link.is_in_branch|lower }},
+	    "is_internal": {{ link.is_internal|lower }},
+	    "num_objects": {{ link.num_objects }},
+	    "parent_level": {{ link.parent_level }}
+	}{% if forloop.last %}{% else %},{% endif %}
+	{% endfor %}
+    ]
+}

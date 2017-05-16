@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include "includes/pagination.html" %}
+
+<form>
+<table>
+{% for child in child_list %}
+<tr><td>{{ child }}</td><td>
+    <input size="300" type="text" class="categorizer" id="parent{{ child.id }}" value="{{ child.parents }}"/></td>
+  <td><a href="" class="button categorizer" data-child_id="{{ child.id }}" data-parents_input="parent{{ child.id }}">save</a></td>
+</tr>
+{% endfor %}
+</table>
+</form>
+
+
+{% include "includes/pagination.html" %}
+
+{% endblock content %}
+
+{% block script %}
+
+$("a.categorizer").click(function(event){
+    event.preventDefault();
+    var child_id=$(this).data("child_id");
+    var url="/bibliography/json/category/"+child_id+"/change_parents/";
+    var parents_input_id=$(this).data("parents_input");
+    var parents=$("#"+parents_input_id).val();
+
+    var data={
+	"categories": parents
+    }
+
+    $.post(url,data)	
+        .done( function(obj) {
+	    console.log("ok");
+	    console.log(obj);
+	    $("#"+parents_input_id).val(obj.parents);
+            if (obj.parents)
+		$("#"+parents_input_id).css({ "background": "white" });
+	    else
+		$("#"+parents_input_id).css({ "background": "blue" });
+	})
+	.fail( function(data) {
+	    console.log("fail");
+	    console.log(data);
+	    console.log(data.responseText);
+	    alert(data.responseText);
+	});
+
+});
+
+
+$("input").change(function(event){
+    console.log($(this));
+    $(this).css({ "background": "red" });
+});
+
+$("input").each(function(event){
+    var val=$(this).val();
+    if (!val) $(this).css({ "background": "blue" });
+});
+
+
+{% endblock script %}

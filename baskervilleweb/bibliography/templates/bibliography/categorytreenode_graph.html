@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<canvas width='2000' height='3000' id="category-tree-graph"></canvas>
+
+{% endblock %}
+
+{% block script %}
+
+/****/
+
+$.jCanvas.extend({
+    name: 'drawGrid',
+    type: 'grid',
+    fn: function(ctx,params){
+	var p = params;
+	var x,y;
+	// Draw heart
+	ctx.beginPath();
+	for(x=p.startX;x<=p.endX;x+=p.step){
+	    ctx.moveTo(x, p.startY);
+	    ctx.lineTo(x, p.endY);
+	}
+	for(y=p.startY;y<=p.endY;y+=p.step){
+	    ctx.moveTo(p.startX,y);
+	    ctx.lineTo(p.endX,y);
+	}
+	// Call the detectEvents() function to enable jCanvas events
+	// Be sure to pass it these arguments, too!
+	$.jCanvas.detectEvents(this, ctx, p);
+	// Call the closePath() functions to fill, stroke, and close the path
+	// This function also enables masking support and events
+	// It accepts the same arguments as detectEvents()    
+	$.jCanvas.closePath(this, ctx, p);
+    }
+});
+
+/*
+$('#category-tree-graph').drawGrid({
+    layer: true,
+    strokeStyle: 'rgba(00,255,255,1)',
+    strokeWidth: .1,
+    step: 10,
+    startX: 0, 
+    startY: 0,
+    endX: 1000,
+    endY: 400
+}).drawGrid({
+    layer: true,
+    strokeStyle: 'rgba(00,255,255,1)',
+    strokeWidth: .5,
+    step: 50,
+    startX: 0, 
+    startY: 0,
+    endX: 1000,
+    endY: 400
+});
+*/
+
+var poschx;
+var poschy;
+var x_t;
+var y_t;
+var x_i;
+var y_i;
+var x_b;
+var y_b;
+
+var n;
+
+var Wtext;
+var Htext;
+var Winfo;
+var Hinfo;
+var Wbox;
+var Hbox;
+
+var Wchildren;
+var Hchildren;
+var Wparents;
+var Hparents;
+
+var W;
+var H;
+var Mx;
+var My;
+var step=10;
+var circle_radius=2.5;
+var border=3*2*circle_radius;
+
+var posx=step;
+var posy=step;
+
+var textnode;
+var groupname;
+var num_children;
+var catnodeid;
+
+var canvas=$('#category-tree-graph');
+
+{% for catnode in categorytreenode_list %}
+
+textnode='{{ catnode.content_object.name }}';
+textinfo='objects: {{ catnode.num_objects }} ({{ catnode.direct_size }})';
+num_children={{ catnode.direct_size }};
+groupname='groupcatnode{{ catnode.id }}';
+catnodeid='catnode{{ catnode.id }}';
+
+canvas
+    .drawText({
+	layer: true,
+	draggable: true,
+	name: catnodeid,
+	fillStyle: '{{ COLOR_TEXT_FORE }}',
+	strokeWidth: 1,
+	x: posx, 
+	y: posy,
+	fontSize: 12,
+	groups: [groupname],
+	dragGroups: [groupname],
+	text: textnode,
+	maxWidth: 100
+    })
+    .drawText({
+	layer: true,
+	draggable: true,
+	name: catnodeid+'info',
+	fillStyle: '{{ COLOR_TEXT_FORE }}',
+	strokeWidth: 1,
+	x: posx, 
+	y: posy,
+	fontSize: 9,
+	groups: [groupname],
+	dragGroups: [groupname],
+	text: textinfo,
+	maxWidth: 100
+    });
+
+Wtext=canvas.measureText(catnodeid).width;
+Htext=canvas.measureText(catnodeid).height;
+Winfo=canvas.measureText(catnodeid+'info').width;
+Hinfo=canvas.measureText(catnodeid+'info').height;
+
+Wchildren=border;
+Hchildren=Math.max(num_children*border,Htext+Hinfo);
+
+Wparents=Wchildren;
+Hparents=Hchildren;
+
+Wbox=Math.max(Wtext, Winfo)+4*border;
+Hbox=Hchildren+2*border; 
+
+canvas
+    .drawPath({
+	shadowColor: '#000',
+	shadowBlur: 3,
+	groups: [groupname],
+	dragGroups: [groupname],
+	draggable: true,
+	name: catnodeid+'box',
+	layer: true,
+	fillStyle: '#ffff00',
+	strokeStyle: '#000',
+	strokeWidth: 1,
+	closed: true,
+	x: posx+200,
+	y: posy,
+	index: 0,
+	p1: {
+	    type: 'arc',
+	    x: Wbox/2-border,
+	    y: -(Hbox/2-border),
+	    start: 0, end: 90,
+	    radius: border
+	},
+	p2: {
+	    type: 'arc',
+	    x: (Wbox/2-border),
+	    y: (Hbox/2-border),
+	    start: 90, end: 180,
+	    radius: border
+	},
+	p3: {
+	    type: 'arc',
+	    x: -(Wbox/2-border),
+	    y: (Hbox/2-border),
+	    start: 180, end: 270,
+	    radius: border
+	},
+	p4: {
+	    type: 'arc',
+	    x: -(Wbox/2-border),
+	    y: -(Hbox/2-border),
+	    start: 270, end: 0,
+	    radius: border
+	}
+    });
+
+x_b= posx+Wbox/2;
+y_b= posy+Hbox/2;
+x_t= x_b;
+y_t= posy+border+Htext/2;
+x_i= x_b;
+y_i= posy+border+Htext+Hinfo/2;
+
+canvas
+    .setLayer(catnodeid+'box',{ 
+	x: x_b,
+	y: y_b
+    })
+    .setLayer(catnodeid,{ 
+	x: x_t,
+	y: y_t,
+	text: textnode
+    })
+    .setLayer(catnodeid+'info',{ 
+	x: x_i,
+	y: y_i,
+	fontSize: 9,
+	text: textinfo,
+	maxWidth: 100
+    })
+    .drawLayers();
+
+poschx=posx+Wbox-border;
+
+for(n=0,poschy=posy+border+border/2;n<num_children;n++,poschy+=border) {
+    canvas.drawArc({
+	strokeStyle: '#000',
+	strokeWidth: 1,
+	x: poschx, y: poschy,
+	radius: circle_radius,
+	start: 0, end: 360,
+	groups: [groupname],
+	dragGroups: [groupname],
+	draggable: true,
+	name: catnodeid+'child'+n,
+	layer: true
+    });
+}
+
+canvas.drawLayers();
+
+posy+=Hbox+step;
+
+{% endfor %}
+
+			     
+{% endblock %}

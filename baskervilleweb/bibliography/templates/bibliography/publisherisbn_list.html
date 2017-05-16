@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<table>
+<thead>
+<tr>
+  <th rowspan=2>isbn</th>
+  <th colspan=4>publishers</th>
+</tr>
+<tr>
+  <th>name</th>
+  <th>addresses</th>
+  <th>url</th>
+  <th>note</th>
+</tr>
+</thead>
+
+{% for isbn in object_list %}
+<tbody>
+<tr>
+  <td class="top" rowspan="{{ isbn.publisher_set.count }}">
+    {{ isbn }}
+  </td>
+  {% for publisher in isbn.publisher_set.all %}
+  {% if not forloop.first %}<tr>{% endif %}
+    <td  class="top" >{{ publisher.show_name }}</td>
+    <td class="top" >
+      {% for address in  publisher.addresses.all %}
+      {{ address }}<br/>
+      {% endfor %}
+    </td>
+    <td class="top">{% if publisher.url != "--" %}<a href="{{ publisher.url }}">{{ publisher.url }}</a>{% endif %}</td>
+    <td class="top">{{ publisher.note|truncatewords:16 }}</td>
+  </tr>
+  {% endfor %}
+</tbody>
+{% endfor %}
+</table>
+
+{% endblock %}
+
