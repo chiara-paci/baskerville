@@ -44,3 +44,6 @@ class ExifLabelAdmin(admin.ModelAdmin):
 
 admin.site.register(models.ExifLabel,ExifLabelAdmin)
 
+class ExifTypeAdmin(admin.ModelAdmin):
+    list_display=["name","exif_id"]
+admin.site.register(models.ExifType,ExifTypeAdmin)
