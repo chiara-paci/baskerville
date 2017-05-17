@@ -81,6 +81,8 @@ class Filter(object):
 
     def get_params(self,querydict):
         querydict=querydict.copy()
+        if "page" in querydict:
+            querydict.pop("page")
         ret=[self.empty(querydict)]
         if self.q_name in querydict:
             selected=querydict.pop(self.q_name)
@@ -174,5 +176,9 @@ class PhotoListView(ListView):
                 "name": f.name,
                 "params": f.get_params(self.request.GET)
             })
+        qcopy=self.request.GET.copy()
+        if "page" in qcopy:
+            qcopy.pop("page")
+        ctx["parameters"]=qcopy.urlencode()
         return ctx
         
