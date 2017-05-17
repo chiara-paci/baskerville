@@ -101,6 +101,9 @@ class Album(models.Model):
     name = models.CharField(max_length=1024)
     photos = models.ManyToManyField(Photo,blank=True)
 
+    class Meta:
+        ordering = ["name"]
+
     def __str__(self): return self.name
 
     def photos_count(self):
