@@ -4,29 +4,37 @@
 
 {% include "includes/pagination.html" %}
 
-<table>
-<thead>
-<tr>
-  <th></th>
-  <th>size</th>
-  <th>date</th>
-  <th colspan=2>format</th>
-  <th>description</th>
-</tr>
-</thead>
+<div class="filter">
+<ul>
+  {% for filter in filter_list %}
+  <li><h1>Filter by {{ filter.name }}</h1>
+    <ul>
+    {% for label,selected,query in filter.params %}
+    {% if selected %}
+    <li class="selected"><div>{{ label }}</div></li>
+    {% else %}
+    <li><a href="{% url 'archive:photo_list' %}?{{ query }}"><div>{{ label }}</div></a></li>
+    {% endif %}
+    {% endfor %}
+    </ul>
+  </li>
+  {% endfor %}
+</ul>
+</div>
 
+<table class="images">
 {% for photo in photo_list %}
 <tbody>
 <tr>
-  <td class="top">
+  <td rowspan="4" class="center">
     <a href="{{ photo.get_absolute_url }}"><img src="{{ photo.thumb_url }}"/></a>
   </td>
-  <td class="top">{{ photo.width }}x{{ photo.height }}</td>
-  <td class="top">{{ photo.datetime }}</td>
-  <td class="top">{{ photo.mimetype }}</td>
-  <td class="top">{{ photo.format }}</td>
-  <td class="top">{{ photo.description }}</td>
+  <td>{{ photo.width }}x{{ photo.height }}</td>
+  <td rowspan="4">{{ photo.description }}</td>
 </tr>
+<tr><td>{{ photo.datetime }}</td></tr>
+<tr><td>{{ photo.mimetype }}</td></tr>
+<tr><td>{{ photo.format }}</td></tr>
 </tbody>
 {% endfor %}
 </table>

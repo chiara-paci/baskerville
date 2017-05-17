@@ -1,0 +1,36 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% comment %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label="products" %}">Products</a>
+&rsaquo; <a href="/admin/products/operatingsystem">Operating systems</a>
+&rsaquo; {% trans 'Copy package list' %}
+</div>
+{% endblock %}
+{% endcomment %}
+
+{% block content %}
+
+<form action="{{ path }}" method="post">
+  {% csrf_token %}
+  <div>
+    {{ form }}
+    <input type="hidden" name="action" value="add_to_album" />
+    <input type="hidden" name="post" value="yes" />
+    <input type="submit" name="select" value="{% trans "Select" %}" />
+  </div>
+</form>
+
+<p>
+  {% trans "Apply to" %}:
+  <ul>
+    {% for obj in  objects %}
+    <li>{{ obj }} <img src="{{ obj.thumb_url }}"/></li>
+    {% endfor %}
+  </ul>
+</p>
+
+{% endblock %}

@@ -312,3 +312,68 @@ main tbody:nth-of-type(odd) a:hover {
   background: #9b8a00;
   color: #fff8be;
 }
+table.images img {
+  padding: 1em;
+  margin: 1em;
+  background-color: white;
+  border: 1px solid #9b8a00;
+}
+div.filter {
+  float: right;
+  background-color: #ddf0b2;
+  color: #669100;
+  left: 0;
+  right: 0;
+  margin-bottom: .5em;
+  line-height: 1em;
+  padding: 1em;
+  padding-top: .5em;
+  padding-bottom: .5em;
+}
+div.filter ul {
+  list-style-type: none;
+}
+div.filter ul li {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+div.filter ul li ul li {
+  margin-top: .5em;
+  margin-bottom: .5em;
+}
+div.filter h1 {
+  background-color: #669100;
+  color: #ddf0b2;
+  font-size: 1em;
+  font-weight: normal;
+  padding-left: 1em;
+  padding-right: 1em;
+  border-radius: 0px;
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+}
+div.filter div {
+  display: inline-block;
+  border-radius: 1em;
+  -moz-border-radius: 1em;
+  -webkit-border-radius: 1em;
+  border: 1px solid #669100;
+  padding-left: 1em;
+  padding-right: 1em;
+  width: calc(100% - 2em);
+}
+div.filter li.selected div {
+  color: #ddf0b2;
+  background-color: #669100;
+}
+div.filter a {
+  color: #669100;
+  text-decoration: none;
+  border-radius: 1em;
+  -moz-border-radius: 1em;
+  -webkit-border-radius: 1em;
+}
+div.filter a:hover {
+  color: #ddf0b2;
+  background-color: #669100;
+}

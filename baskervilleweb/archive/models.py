@@ -15,6 +15,10 @@ class ImageFormat(models.Model):
         if not self.description: return self.name
         return self.description
 
+class PhotoManager(models.Manager):
+    def get_years(self):
+        return list(map(lambda x: x.year,self.all().dates("datetime","year")))
+
 class Photo(models.Model):
     full_path =  models.FilePathField(path=PHOTO_ARCHIVE_FULL,recursive=True,max_length=1024)
     thumb_path = models.FilePathField(path=PHOTO_ARCHIVE_THUMB,recursive=True,max_length=1024)
@@ -34,6 +38,8 @@ class Photo(models.Model):
                                          ("vertical","vertical") ), 
                                default="no")
 
+    objects=PhotoManager()
+
     def __str__(self): return self.full_path
 
     def thumb_url(self):
@@ -45,6 +51,10 @@ class Photo(models.Model):
         
     def get_absolute_url(self):
         return "/archive/photo/%d/" % (self.id,)
+
+    def albums(self):
+        L=list(map(lambda x: x["name"], self.album_set.all().values("name")))
+        return ",".join(L)
         
 
     class Meta:
@@ -93,4 +103,6 @@ class Album(models.Model):
 
     def __str__(self): return self.name
 
+    def photos_count(self):
+        return self.photos.count()
 
