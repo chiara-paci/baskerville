@@ -115,8 +115,8 @@ class AlbumListFilter(admin.SimpleListFilter):
         human-readable name for the option that will appear
         in the right sidebar.
         """
-
-        ret=[ (str(x.id),str(x)) for x in models.Album.objects.all() ]
+        ret=[ ("0","None") ]
+        ret+=[ (str(x.id),str(x)) for x in models.Album.objects.all() ]
         return ret
 
     def queryset(self, request, queryset):
@@ -127,6 +127,9 @@ class AlbumListFilter(admin.SimpleListFilter):
         """
         val=self.value()
         if not val: return queryset
+        if val=="0":
+            albums=[ x.id for x in models.Album.objects.all() ]
+            return queryset.exclude(album__id__in=albums)
         val=int(val)
         return queryset.filter(album__id=val)
 
