@@ -139,6 +139,8 @@ class WRWorldCat(WebRepository):
         WebRepository.__init__(self,"http://worldcatlibraries.org/isbn/")
 
     def parse_html(self,html):
+        if type(html)==bytes:
+            html=html.decode("utf-8")
         L=re.compile('<span class="Z3988".*</span></div>').findall(html)
         if not L: return({})
         S=L[0]
