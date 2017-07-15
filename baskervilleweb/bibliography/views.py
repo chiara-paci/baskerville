@@ -17,6 +17,7 @@ from . import forms
 from . import booksearch
 
 import json
+import time
 
 class JsonDetailView(DetailView): 
     def render_to_response(self, context, **kwargs):
@@ -727,6 +728,16 @@ class BooksInsertView(View):
         return render(request, self.template_name_isbn, {'form': form})
 
     def post(self, request, *args, **kwargs):
+        class T(object):
+            def __init__(self):
+                self._t0=time.time()
+
+            def __call__(self,msg):
+                t1=time.time()
+                print("%s %.2f" % (msg,t1-self._t0))
+                self._t0=t1
+
+        timer=T()
         form = forms.IsbnForm(request.POST)
         if not form.is_valid():
             return render(request, self.template_name_isbn, {'form': form})
@@ -738,9 +749,11 @@ class BooksInsertView(View):
             r=r.strip()
             t=r.split(" ")
             isbn_list+=t
+        timer("A")
 
         ## quello che viene ritornato, arrichito da quello che segue sotto
         params=booksearch.look_for(isbn_list)
+        timer("B")
 
         ## publisher da creare [ (str(n),pub.name,pubform,pubadrsformset) ]
         new_publisher_list=[]
@@ -765,6 +778,8 @@ class BooksInsertView(View):
             pubadrsformset=forms.PublisherAddressFormSet(prefix="newpublisher"+str(n)+"-address",initial=initial)
             new_publisher_list.append( (str(n),pub.name,pubform, pubadrsformset) )
             n+=1
+
+        timer("C")
 
         # book il cui publisher/author non esiste [ book ]
         suspended_book_list=[]
@@ -812,6 +827,9 @@ class BooksInsertView(View):
             bookauthorformset=forms.BookAuthorFormSet(prefix="newbook"+str(n)+"-author",initial=initial)
             new_book_list.append( (str(n),book.isbn_10().replace("-","")+" "+str(book.title),bookform, bookauthorformset) )
             n+=1
+        timer("D")
+
+
         n=0
         for aut in temp_author_list:
             t=[x for x in [x.strip() for x in aut.strip().split(" ")] if bool(x)]
@@ -836,6 +854,7 @@ class BooksInsertView(View):
             autnamesformset=forms.AuthorNameFormSet(prefix="newauthor"+str(n)+"-name",initial=initial)
             new_author_list.append( (str(n),aut,autform,autnamesformset) )
             n+=1
+        timer("E")
 
         params["new_book_list"]=new_book_list
         params["suspended_book_list"]=suspended_book_list
@@ -845,7 +864,10 @@ class BooksInsertView(View):
         params["new_publisher_list"]=new_publisher_list
         params["old_publisher_list"]=old_publisher_list
 
-        return render(request, self.template_name_insert, params)
+        ret=render(request, self.template_name_insert, params)
+
+        timer("F")
+        return ret
 
 #### publication
 
