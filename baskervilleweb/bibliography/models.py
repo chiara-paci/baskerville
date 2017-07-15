@@ -14,6 +14,11 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save,post_delete,pre_save,pre_delete
 from django.db.models.signals import m2m_changed
 
+import django.dispatch
+
+position_changed = django.dispatch.Signal(providing_args=["instance"])
+valid_changed = django.dispatch.Signal(providing_args=["instance"])
+
 #from santaclara_base.models import PositionAbstract
 
 import re
