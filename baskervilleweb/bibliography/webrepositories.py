@@ -4,7 +4,7 @@
 import urllib.request, urllib.error, urllib.parse
 import re
 
-from bibliography.models import PublisherAddress,PersonCache,RepositoryCacheBook,RepositoryCacheAuthor,Author
+from bibliography.models import PublisherAddress,RepositoryCacheBook,RepositoryCacheAuthor,Author
 
 URL_CONVERSION = [
     ( ["+"]                 , " " ),
@@ -22,7 +22,7 @@ URL_CONVERSION = [
     ( [" %3A","%3A"," %3a","%3a"], ":" ),
     ( [" %2C","%2C"," %2c","%2c"], "," ),
 
- ]
+]
 
 def url_ripulisci(stringa):
     for (lista,val) in URL_CONVERSION:
@@ -37,8 +37,8 @@ class BookRepository(object):
         self.name=name
 
     def get_addresses(self,city):
-        objs=PublisherAddress.objects.filter(city=city)
-        if objs: return objs
+        #objs=PublisherAddress.objects.filter(city=city)
+        #if objs: return objs
         return None
 
     def get_by_isbn(self,isbn10,isbn13): return({})
@@ -47,11 +47,12 @@ class BookRepository(object):
         ret=[]
         n=0
         for aut in data:
-            qset=Author.objects.filter_by_name(aut)
-            if qset.count():
-                ret.append( ("author",n,qset.first()) )
-            else:
-                ret.append( ("author",n,aut) )
+            # qset=Author.objects.filter_by_name(aut)
+            # if qset.count():
+            #     ret.append( ("author",n,qset.first()) )
+            # else:
+            #     ret.append( ("author",n,aut) )
+            ret.append( ("author",n,aut) )
             n+=1
         return ret
 
@@ -90,11 +91,12 @@ class CacheRepository(BookRepository):
         for aut in obj.repositorycacheauthor_set.order_by("pos"):
             t=[x for x in [x.strip() for x in aut.name.strip().split(" ")] if bool(x)]
             autname=" ".join(t)
-            qset=Author.objects.filter_by_name(autname)
-            if qset.count():
-                authors.append( (aut.role,aut.pos,qset.first()) )
-            else:
-                authors.append( (aut.role,aut.pos,autname) )
+            # qset=Author.objects.filter_by_name(autname)
+            # if qset.count():
+            #     authors.append( (aut.role,aut.pos,qset.first()) )
+            # else:
+            #     authors.append( (aut.role,aut.pos,autname) )
+            authors.append( (aut.role,aut.pos,autname) )
 
 
         R["authors"]=authors

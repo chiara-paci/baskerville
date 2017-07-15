@@ -747,6 +747,7 @@ class BooksInsertView(View):
         isbn_list=[]
         for r in elenco.split("\n"):
             r=r.strip()
+            if not r: continue
             t=r.split(" ")
             isbn_list+=t
         timer("A")
@@ -759,13 +760,13 @@ class BooksInsertView(View):
         new_publisher_list=[]
 
         ## publisher che esistono già [pub]
-        old_publisher_list=[]            
+        # old_publisher_list=[]            
 
         n=0
         for pub in params["publisher_list"]:
-            if pub.indb:
-                old_publisher_list.append(pub)
-                continue
+            # if pub.indb:
+            #     old_publisher_list.append(pub)
+            #     continue
             initial={ "isbn": pub.isbn_ced, "name": pub.name, "full_name": pub.name }
             pubform=forms.PublisherForm(prefix="newpublisher"+str(n),initial=initial)
             initial=[]
@@ -788,7 +789,7 @@ class BooksInsertView(View):
         new_book_list=[]
 
         # book che esistono già [ book ]
-        old_book_list=[]
+        # old_book_list=[]
 
         # author da creare [ (str(n),aut,autform,autnamesformset) ]
         new_author_list=[]
@@ -796,25 +797,12 @@ class BooksInsertView(View):
         # author che esistono già [ aut ]
         old_author_list=[]
 
-        temp_author_list=[]
         n=0
         for book in params["book_list"]:
-            if book.indb:
-                old_book_list.append(book)
-                continue
-            suspended=False
-            for role,pos,aut in book.authors:
-                if type(aut) not in [str,str]:
-                    old_author_list.append(aut)
-                    continue
-                temp_author_list.append(aut)
-                suspended=True
-            if suspended:
+            if book.suspended():
                 suspended_book_list.append(book)
                 continue
-            if type(book.publisher)!=Publisher:
-                suspended_book_list.append(book)
-                continue
+
             initial={ "isbn_ced": book.isbn_ced, "isbn_book": book.isbn_book, 
                       "title": book.title, "year": book.year, "publisher": book.publisher }
             bookform=forms.BookForm(prefix="newbook"+str(n),initial=initial)
@@ -829,9 +817,8 @@ class BooksInsertView(View):
             n+=1
         timer("D")
 
-
         n=0
-        for aut in temp_author_list:
+        for aut in params["author_list"]:
             t=[x for x in [x.strip() for x in aut.strip().split(" ")] if bool(x)]
             print(t,len(t))
             initial=[]
@@ -856,13 +843,21 @@ class BooksInsertView(View):
             n+=1
         timer("E")
 
+        #publisher_list=Publisher.objects.filter(id__in=[pub.id for pub in publisher_list]).prefetch_related("addresses","isbns")
+        #old_book_list=Book.objects.add_prefetch([ obj.db_object for obj in old_book_list ])
+        #old_author_list=Author.objects.add_prefetch(old_author_list)
+        #old_publisher_list=Publisher.objects.add_prefetch([ obj.db_object for obj in old_publisher_list ])
+
+        #params["old_book_list"]=old_book_list
+        #params["old_publisher_list"]=old_publisher_list
+
+        #params["old_author_list"]=old_author_list
+
         params["new_book_list"]=new_book_list
-        params["suspended_book_list"]=suspended_book_list
-        params["old_book_list"]=old_book_list
         params["new_author_list"]=new_author_list
-        params["old_author_list"]=old_author_list
         params["new_publisher_list"]=new_publisher_list
-        params["old_publisher_list"]=old_publisher_list
+
+        params["suspended_book_list"]=suspended_book_list
 
         ret=render(request, self.template_name_insert, params)
 

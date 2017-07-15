@@ -537,30 +537,26 @@ class PersonManager(models.Manager):
     def search_names(self,names):
         qset=self.all()
         if len(names)==0: return qset
-        D=[]
+        #D=[]
         for name in names:
             if name.endswith("."):
                 name=name[:-1]
-                S=set([x.person.id for x in PersonNameRelation.objects.filter(value__istartswith=name)])
+                qset=qset.filter(personnamerelation__value__istartswith=name)
             elif len(name)==1:
-                S=set([x.person.id for x in PersonNameRelation.objects.filter(value__istartswith=name)])
+                qset=qset.filter(personnamerelation__value__istartswith=name)
             else:
-                S=set([x.person.id for x in PersonNameRelation.objects.filter(value__iexact=name)])
-            D.append(S)
-        for id_set in D:
-            qset=qset.filter(id__in=list(id_set))
-        if qset.count()>0: return qset
-        if len(names)==1: return qset
-        if len(names)==2:
-            newnames=[ " ".join(names) ]
-            return self.search_names(newnames)
-        L=len(names)
-        for n in range(0,L-1):
-            newnames=names[0:n] + [ " ".join(names[n:n+2])] + names[n+2:L]
-            qset=self.search_names(newnames)
-            if qset.count()>0: return qset
-        return qset
-        
+                qset=qset.filter(personnamerelation__value__iexact=name)
+        # if qset.count()>0: return qset.select_related("cache")
+        # if len(names)==1: return qset.select_related("cache")
+        # if len(names)==2:
+        #     newnames=[ " ".join(names) ]
+        #     return self.search_names(newnames)
+        # L=len(names)
+        # for n in range(0,L-1):
+        #     newnames=names[0:n] + [ " ".join(names[n:n+2])] + names[n+2:L]
+        #     qset=self.search_names(newnames)
+        #     if qset.count()>0: return qset.select_related("cache")
+        return qset.select_related("cache")
     
     def filter_by_name(self,search):
         search=search.replace(" , "," ")
@@ -575,6 +571,17 @@ class PersonManager(models.Manager):
 
         t_name=search.lower().split(" ")
         return self.search_names(t_name)
+
+    def look_for(self,name_list):
+        old={}
+        new=[]
+        for name in name_list:
+            qset=self.filter_by_name(name)
+            if qset.count():
+                old[name]=(qset.first())
+            else:
+                new.append(name)
+        return old,new
 
     def create_by_names(self,format_collection,**kwargs):
         obj=self.create(format_collection=format_collection)
@@ -627,7 +634,7 @@ class Person(models.Model):
 class PersonNameRelation(models.Model):
     person = models.ForeignKey(Person)
     name_type = models.ForeignKey(NameType)
-    value = models.CharField(max_length=4096,default="-")
+    value = models.CharField(max_length=4096,default="-",db_index=True)
 
     def __str__(self): return str(self.value)
 
@@ -1222,8 +1229,32 @@ class PublisherIsbnManager(models.Manager):
     def isbn_alpha(self):
         return self.all().filter(isbn__iregex=r'^[a-z].*')
 
+    def split_isbn(self,unseparated):
+        if not unseparated: return [],[]
+        isbn_list=[]
+        for isbn in unseparated:
+            for n in range(1,9):
+                isbn_list.append(isbn[:n])
+        L=[ v.isbn for v in self.filter(isbn__in=isbn_list) ]
+        if not L:
+            return [],unseparated
+        uns=[]
+        sep=[]
+        for isbn in unseparated:
+            trovato=False
+            for db_isbn in L:
+                if isbn.startswith(db_isbn):
+                    trovato=True
+                    isbn_book=isbn[len(db_isbn):]
+                    sep.append( (db_isbn,isbn_book) )
+                    break
+            if not trovato:
+                uns.append(isbn)
+        return sep,uns
+
+
 class PublisherIsbn(models.Model):
-    isbn = models.CharField(max_length=4096,unique=True)
+    isbn = models.CharField(max_length=4096,unique=True,db_index=True)
     preferred = models.ForeignKey("Publisher",editable=False,blank=True)
     objects = PublisherIsbnManager()
 
@@ -1253,6 +1284,20 @@ class PublisherIsbn(models.Model):
     def publishers(self):
         return "; ".join(map(str, self.publisher_set.all()))
 
+class PublisherManager(models.Manager):
+    def add_prefetch(self,obj_list):
+        qset=self.filter(id__in=[obj.id for obj in obj_list])
+        qset=qset.prefetch_related("addresses")
+        return qset
+
+    def look_for(self,isbn_list):
+        qset=PublisherIsbn.objects.filter(isbn__in=isbn_list)
+        for pub in qset:
+            isbn_list.remove( pub.isbn )
+        isbn_ids=[ obj.id for obj in qset ]
+        p_qset=self.filter(isbns__id__in=isbn_ids).prefetch_related("isbns","addresses")
+        return p_qset,isbn_list
+
 class Publisher(models.Model):
     name = models.CharField(max_length=4096)
     full_name = models.CharField(max_length=4096,blank=True)
@@ -1261,6 +1306,8 @@ class Publisher(models.Model):
     addresses = models.ManyToManyField(PublisherAddress,through='PublisherAddressPublisherRelation',blank=True)
     alias = models.BooleanField(default=False)
     isbns = models.ManyToManyField(PublisherIsbn,blank=True)
+
+    objects=PublisherManager()
 
     class Meta:
         ordering = ["name"]
@@ -1286,8 +1333,14 @@ class Publisher(models.Model):
             H+=", "+adrs
         return H
 
+    @cached_property
     def isbn_prefix(self):
         return ", ".join([str(x.isbn) for x in self.isbns.all()])
+
+    @cached_property
+    def isbn_list(self):
+        return [str(x.isbn) for x in self.isbns.all()]
+    
 
 class PublisherAddressPublisherRelation(PositionAbstract):
     address = models.ForeignKey(PublisherAddress)
@@ -1525,6 +1578,22 @@ class BookManager(models.Manager):
     def isbn_alpha(self):
         return self.all().filter(isbn_crc10='Y').order_by("isbn_ced","isbn_book","year","title")
 
+    def add_prefetch(self,obj_list):
+        qset=self.filter(id__in=[book.id for book in obj_list])
+        qset=qset.select_related("publisher").prefetch_related("authors")
+        return qset
+
+    def look_for(self,isbn_list):
+        q=models.Q()
+        for isbn_ced,isbn_book in isbn_list:
+            q=q|models.Q(isbn_ced=isbn_ced,isbn_book=isbn_book)
+        qset=self.filter(q).select_related("publisher").prefetch_related("authors")
+        new_isbn_list=[]
+        for book in qset:
+            isbn_list.remove( (book.isbn_ced,book.isbn_book) )
+        return qset,isbn_list
+        
+
 class Book(CategorizedObject):
     isbn_ced = models.CharField(max_length=9,db_index=True)
     isbn_book = models.CharField(max_length=9,db_index=True)
@@ -1538,6 +1607,11 @@ class Book(CategorizedObject):
     authors = models.ManyToManyField(Author,through='BookAuthorRelation',blank=True)
 
     objects=BookManager()
+
+    class Meta:
+        ordering=["title","year","publisher"]
+        index_together=[ ["isbn_ced","isbn_book"] ]
+
 
     def get_authors(self):
         return ", ".join([str(x.author.long_name()) for x in self.bookauthorrelation_set.filter(author_role__cover_name=True).order_by("pos")])
@@ -1566,9 +1640,6 @@ class Book(CategorizedObject):
             comma=True
 
         return ret
-
-    class Meta:
-        ordering=["title","year","publisher"]
 
     def __str__(self): return str(self.title)+" ("+str(self.year)+")"
 

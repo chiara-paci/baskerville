@@ -36,10 +36,10 @@
   <tr>
     <td>{{ book.isbn_ced }}</td>
     <td>{{ book.isbn_book }}</td>
-    <td>{% if book.authors %}{% for rel in book.authors %}{{ rel.author.cache.long_name }}{% if forloop.last %}{% else %}, {% endif %}{% endfor %}{% endif %}</td>
+    <td>{{ book.get_authors }}</td>
     <td>{{ book.title }}</td>
     <td>{{ book.year }}</td>
-    <td>{% if book.publisher %}{{ book.publisher }}{% endif %}</td>
+    <td>{{ book.publisher }}</td>
   </tr>
   {% endfor %}
 
@@ -75,8 +75,9 @@
   <tr><th>isbn</th><th>publisher</th><th>address</th></tr>
     {% for pub in old_publisher_list %}
   <tr>
-    <td>{{ pub.isbn_ced }}</td>
-    <td>{{ pub.name }}</td><td>{% for adr in pub.addresses %}{% if forloop.first %}{% else %}, {% endif %}{{ adr }}{% endfor %}</td>
+    <td>{{ pub.isbn_prefix }}</td>
+    <td>{{ pub.name }}</td>
+    <td>{{ pub.address }}</td>
   </tr>
 {% endfor %}
 </table>
