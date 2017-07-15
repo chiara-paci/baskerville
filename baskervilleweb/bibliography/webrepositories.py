@@ -155,8 +155,10 @@ class WRWorldCat(WebRepository):
 
         if "rft.btitle" in tokens:
             R["title"]=url_ripulisci(tokens["rft.btitle"])
-        else:
+        elif "rft.title" in tokens:
             R["title"]=url_ripulisci(tokens["rft.title"])
+        else:
+            R["title"]=""
         if "rft.place" in tokens:
             R["city"]=url_ripulisci(tokens["rft.place"])
         else:
