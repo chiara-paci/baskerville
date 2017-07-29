@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.conf.urls import include, url
 from django import forms
+from django.db import models
 
 # Register your models here.
 
@@ -448,10 +449,10 @@ class PersonAlphabeticFilter(admin.SimpleListFilter):
         """
 
         qset = PersonCache.objects.all()
-        L=qset.extra(select={"initial": "lower(substr(list_name,1,1))"},order_by=["initial"]).values("initial").distinct()
+        L=qset.extra(select={"initial": "upper(substr(list_name,1,1))"},order_by=["initial"]).values("initial").distinct()
         t=[]
         for ch in [x["initial"] for x in L]:
-            t.append( (ch,ch) )
+            t.append( (ch.upper()+","+ch.lower(),ch.upper()+","+ch.lower()) )
         return tuple(t)
 
     def queryset(self, request, queryset):
@@ -462,7 +463,10 @@ class PersonAlphabeticFilter(admin.SimpleListFilter):
         """
 
         if not self.value(): return queryset
-        return queryset.filter(cache__list_name__istartswith=self.value())
+
+        upper,lower=self.value().split(",")
+
+        return queryset.filter( models.Q(cache__list_name__startswith=upper) | models.Q(cache__list_name__startswith=lower) )
 
 class PersonAdmin(admin.ModelAdmin):
     list_display= ['long_name','short_name','list_name','ordering_name']

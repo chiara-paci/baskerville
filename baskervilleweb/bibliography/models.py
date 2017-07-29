@@ -488,9 +488,9 @@ class NameFormatCollection(LabeledAbstract):
                     vons_t.append(x.lower())
                 else:
                     if len(x)==1 and x.isalpha():
-                        vons_t.append(x+".")
+                        vons_t.append(x.upper()+".")
                     else:
-                        vons_t.append(x)
+                        vons_t.append(x.capitalize())
                 if len(x)==1 and x.isalpha():
                     norm_t.append(x+".")
                 else:
@@ -551,6 +551,9 @@ class PersonManager(models.Manager):
                 qset=qset.filter(personnamerelation__value__istartswith=name)
             else:
                 qset=qset.filter(personnamerelation__value__iexact=name)
+
+        
+
         # if qset.count()>0: return qset.select_related("cache")
         # if len(names)==1: return qset.select_related("cache")
         # if len(names)==2:
