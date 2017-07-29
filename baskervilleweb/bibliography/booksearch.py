@@ -1,6 +1,20 @@
 from bibliography.models import PublisherIsbn,Book,RepositoryFailedIsbn,Publisher,Author
 from bibliography.webrepositories import repositories
 
+import threading
+
+class LookForBookThread(threading.Thread):
+    def __init__(self,isbn_ced,isbn_book,publisher_dict):
+        threading.Thread.__init__(self)
+        self.isbn_ced=isbn_ced
+        self.isbn_book=isbn_book
+        self.publisher_dict=publisher_dict
+        self.book=None
+
+    def run(self):
+        self.book=TemporaryBook(self.isbn_ced,self.isbn_book)
+        self.book.look_for(self.publisher_dict)
+
 class TemporaryAuthor(object):
     def __init__(self):
         pass
@@ -67,18 +81,6 @@ class TemporaryBook(object):
         return isbn10
 
     def look_for(self,publisher_dict):
-        # objs=Book.objects.filter(isbn_ced__iexact=self.isbn_ced,isbn_book__iexact=self.isbn_book)
-        # if len(objs)>0:
-        #     obj=objs[0]
-        #     self.authors=obj.bookauthorrelation_set.all()
-        #     self.title=obj.title
-        #     self.year=obj.year
-        #     self.publisher=obj.publisher
-        #     self.indb=True
-        #     self.db_object=obj
-        #     #print obj.isbn_cache10,obj.isbn_cache13,"db"
-        #     return
-
         if self.isbn_ced in publisher_dict:
             self.publisher=publisher_dict[self.isbn_ced][0]
 
@@ -282,15 +284,40 @@ def look_for(isbn_list):
                 publisher_dict[key]=[]
             publisher_dict[key].append(pub)
         
+
+    # for isbn_ced,isbn_book in new_book_isbn_list:
+    #     book=TemporaryBook(isbn_ced,isbn_book)
+    #     book.look_for(publisher_dict)
+
+    #     book_list.append(book)
+    #     author_list+=book.authors
+    #     if isinstance(book.publisher,Publisher): continue
+    #     if book.isbn_ced in publisher_list: continue
+    #     tpub=TemporaryPublisher(book)
+    #     publisher_list[book.isbn_ced]=tpub
+    #     address_list.append(tpub.addresses)
+
+    threads=[]
+    for isbn_ced,isbn_book in new_book_isbn_list:
+        th=LookForBookThread(isbn_ced,isbn_book,publisher_dict)
+        th.start()
+        threads.append(th)
+
+    terminated=False
+    while not terminated:
+        terminated=True
+        for th in threads:
+            if th.is_alive(): 
+                terminated=False
+                break
+
     book_list=[]
     author_list=[]
     publisher_list={}
     address_list=[]
-
-    for isbn_ced,isbn_book in new_book_isbn_list:
-        book=TemporaryBook(isbn_ced,isbn_book)
+    for th in threads:
+        book=th.book
         book_list.append(book)
-        book.look_for(publisher_dict)
         author_list+=book.authors
         if isinstance(book.publisher,Publisher): continue
         if book.isbn_ced in publisher_list: continue
