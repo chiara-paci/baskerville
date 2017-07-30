@@ -1287,6 +1287,11 @@ class PublisherIsbn(models.Model):
         self.preferred=self.get_preferred()
         super(PublisherIsbn, self).clean(*args, **kwargs)
 
+    def save(self,*args,**kwargs):
+        self.preferred=self.get_preferred()
+        super(PublisherIsbn, self).save(*args, **kwargs)
+
+
     def __str__(self): return str(self.isbn)
 
     def publishers(self):
