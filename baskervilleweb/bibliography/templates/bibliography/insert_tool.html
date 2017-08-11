@@ -1,75 +1,132 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
 
-<a href="" class="button" id="repostbutton">Update</a>
-
-<div id="tabs">
- <ul>
-   <li><a href="#tabs-data">Data</a></li>
-   <li><a href="#tabs-newbooks">New Books</a></li>
-   <li><a href="#tabs-publishers">Publishers</a></li>
-   <li><a href="#tabs-authors">Authors</a></li>
- </ul>
-
-<div id="tabs-data">
-
-<h2>ISBN Input</h2>
-
-{% for isbn in isbn_list %}
-<p>{{ isbn }}</p>
+<form action="" method="post">
+{% csrf_token %}
+<input type="submit" value="{% trans "Update" %}" />
+<textarea id="id_elenco" name="elenco" class="fixed" rows="6" cols="20">
+{% for isbn in isbn_list %}{{ isbn }}
 {% endfor %}
+</textarea>
+</form>
 
-<p>Unseparable:
-{% for isbn in unseparable %}
-{{ isbn }}
+<div id="tabs" class="notebook">
+  <ul class="tabs">
+    <li><a href="#tabs-books" class="tab-button">Books</a></li>
+    <li><a href="#tabs-publishers" class="tab-button">Publishers</a></li>
+    <li><a href="#tabs-authors" class="tab-button">Authors</a></li>
+  </ul>
+  
+  <div id="tabs-books">
+    
+    <h1>Books</h1>
+    
+    <h2>Unseparable</h2>
+    
+    <ul>
+      {% for isbn in unseparable %}
+      <li>{{ isbn }}</li>
+      {% endfor %}
+    </ul>
+    
+    <h2>Old Books</h2>
+    
+    <table id="oldbooks">
+      
+      <tr><th colspan="2">ISBN</th><th>authors</th><th>title</th><th>year</th><th>publisher</th></tr>
+      
+      {% for book in old_book_list %}
+      <tr>
+	<td>{{ book.isbn_ced }}</td>
+	<td>{{ book.isbn_book }}</td>
+	<td>{{ book.get_authors }}</td>
+	<td>{{ book.title }}</td>
+	<td>{{ book.year }}</td>
+	<td>{{ book.publisher }}</td>
+      </tr>
+      {% endfor %}
+      
+    </table>
+    
+    <h2>Suspended Books</h2>
+    
+    <table>
+      
+      <tr><th colspan="3">ISBN</th><th>title</th><th>year</th><th>publisher</th><th>authors</th></tr>
+      
+      {% for book in suspended_book_list %}
+      <tr>
+	<td>{{ book.isbn_10 }}</td>
+	<td>{{ book.isbn_ced }}</td>
+	<td>{{ book.isbn_book }}</td>
+	<td>{{ book.title }}</td>
+	<td>{{ book.year }}</td>
+	<td>{% if book.publisher %}{{ book.publisher }}{% endif %}</td>
+	<td>{% if book.authors %}{{ book.authors }}{% endif %}</td>
+      </tr>
+      {% endfor %}
+      
+    </table>
+    
+    <h2>New Books</h2>
+    
+    {% for bookid,name,form,author_formset in new_book_list %}
+    <div class="newbook form" id="newbook{{ bookid }}">
+      <h1>
+      <a href="" class="newbook newobject" data-target_id="newbook{{ bookid }}">Add</a>
+      New book: {{ name }} </h1>
+
+      <p>{{ form.alias }} {{ form.alias.label }}</p>
+      
+      <table>
+	<tr>
+	  <th>{{ form.isbn_ced.label }}</th>
+	  <td>{{ form.isbn_ced }}</td>
+	</tr>
+	<tr>
+	  <th>{{ form.isbn_book.label }}</th>
+	  <td>{{ form.isbn_book }}</td>
+	</tr>
+	<tr>
+	  <th>{{ form.title.label }}</th>
+	  <td>{{ form.title }}</td>
+	</tr>
+	<tr>
+	  <td>{{ form.year.label }}</td>
+	  <td>{{ form.year }}</td>
+	</tr>
+	<tr>
+	  <td>{{ form.publisher.label }}</td>
+	  <td>{{ form.publisher }}</td>
+	</tr>
+      </table>
+
+      {{ author_formset.management_form }}
+      <table>
+	<tr><th></th><th>author</th><th>author role</th></tr>
+	
+	{% for aform in author_formset %}
+	<tr><td>{{ forloop.counter0 }}</td>
+	  <td>
+	    {{ aform.author }}
+	  </td>
+	  <td>
+	    {{ aform.author_role }}
+	  </td>
+	</tr>
+	{% endfor %}
+      </table>
+    </div>
+
 {% endfor %}
-</p>
-
-<h2>Old Books</h2>
-
-<table id="oldbooks">
-  
-  <tr><th colspan="2">ISBN</th><th>authors</th><th>title</th><th>year</th><th>publisher</th></tr>
-
-  {% for book in old_book_list %}
-  <tr>
-    <td>{{ book.isbn_ced }}</td>
-    <td>{{ book.isbn_book }}</td>
-    <td>{{ book.get_authors }}</td>
-    <td>{{ book.title }}</td>
-    <td>{{ book.year }}</td>
-    <td>{{ book.publisher }}</td>
-  </tr>
-  {% endfor %}
-
-</table>
-
-<h2>Suspended Books</h2>
-
-<table>
-  
-  <tr><th colspan="3">ISBN</th><th>title</th><th>year</th><th>publisher</th><th>authors</th></tr>
-
-  {% for book in suspended_book_list %}
-  <tr>
-    <td>{{ book.isbn_10 }}</td>
-    <td>{{ book.isbn_ced }}</td>
-    <td>{{ book.isbn_book }}</td>
-    <td>{{ book.title }}</td>
-    <td>{{ book.year }}</td>
-    <td>{% if book.publisher %}{{ book.publisher }}{% endif %}</td>
-    <td>{% if book.authors %}{{ book.authors }}{% endif %}</td>
-  </tr>
-  {% endfor %}
-
-</table>
 
 </div>
 
 <div id="tabs-publishers">
 
-<h2>Publishers</h2>
+<h1>Publishers</h1>
 
 <table id="oldpublishers">
   <tr><th>isbn</th><th>publisher</th><th>address</th></tr>
@@ -84,9 +141,9 @@
 
 {% for pubid,name,form,address_formset in new_publisher_list %}
 <div class="newpublisher form" id="newpublisher{{ pubid }}">
-<h1>New publisher: {{ name }}</h1>
+<h1> <a href="" class="newpublisher newobject" data-target_id="newpublisher{{ pubid }}">Add</a> New publisher: {{ name }}</h1>
 
-<a href="" class="newpublisher" data-target_id="newpublisher{{ pubid }}">Add {{ name }}</a>
+
 
 <p>{{ form.alias }} {{ form.alias.label }}</p>
 
@@ -145,7 +202,7 @@
 
 <div id="tabs-authors">
 
-<h2>Authors</h2>
+<h1>Authors</h1>
 
 <table id="oldauthors">
     {% for author in old_author_list %}
@@ -157,9 +214,9 @@
 
 {% for autid,name,form,name_formset in new_author_list %}
 <div class="newauthor form" id="newauthor{{ autid }}">
-<h1>New author: {{ name }}</h1>
+<h1><a href="" class="newauthor  newobject" data-target_id="newauthor{{ autid }}">Add</a> New author: {{ name }}</h1>
 
-<a href="" class="newauthor" data-target_id="newauthor{{ autid }}">Add {{ name }}</a>
+
 
 <table>
 <tr>
@@ -188,62 +245,6 @@
 
 </div>
 
-<div id="tabs-newbooks">
-
-
-<h2>New Books</h2>
-
-{% for bookid,name,form,author_formset in new_book_list %}
-<div class="newbook form" id="newbook{{ bookid }}">
-<h1>New book: {{ name }}</h1>
-
-<a href="" class="newbook" data-target_id="newbook{{ bookid }}">Add: <i>{{ name }}</i></a>
-
-<p>{{ form.alias }} {{ form.alias.label }}</p>
-
-<table>
-<tr>
-  <th>{{ form.isbn_ced.label }}</th>
-  <td>{{ form.isbn_ced }}</td>
-</tr>
-<tr>
-  <th>{{ form.isbn_book.label }}</th>
-  <td>{{ form.isbn_book }}</td>
-</tr>
-<tr>
-  <th>{{ form.title.label }}</th>
-  <td>{{ form.title }}</td>
-</tr>
-<tr>
-  <td>{{ form.year.label }}</td>
-  <td>{{ form.year }}</td>
-</tr>
-<tr>
-  <td>{{ form.publisher.label }}</td>
-  <td>{{ form.publisher }}</td>
-</tr>
-</table>
-
-{{ author_formset.management_form }}
-<table>
-  <tr><th></th><th>author</th><th>author role</th></tr>
-  
-  {% for aform in author_formset %}
-  <tr><td>{{ forloop.counter0 }}</td>
-    <td>
-      {{ aform.author }}
-    </td>
-    <td>
-      {{ aform.author_role }}
-    </td>
-  </tr>
-  {% endfor %}
-</table>
-</div>
-
-{% endfor %}
-
-</div>
 </div>
 
 {% endblock %}
@@ -252,6 +253,7 @@
 
 $( "#tabs" ).tabs();
 
+/*
 $("#repostbutton").click(function(event){
     event.preventDefault();
     var elenco="";
@@ -266,6 +268,7 @@ $("#repostbutton").click(function(event){
     form.hide();
     $(form).submit(); 
 });
+*/
 
 
 /** new publisher **/

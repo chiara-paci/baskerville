@@ -55,7 +55,8 @@ def custom_model_list(model_list):
         if model_dict["model_label"] in [ "placetype","place","alternateplacename","placerelation" ]:
             ret["Place"].append(model_dict)
             continue
-        if model_dict["model_label"] in [ "article","articleauthorrelation","issuetype","issue","publication","volumetype","volume" ]:
+        if model_dict["model_label"] in [ "article","articleauthorrelation","issuetype",
+                                          "issue","publication","volumetype","volume" ]:
             ret["Publication"].append(model_dict)
             continue
         if model_dict["model_label"] in [ "nameformat","nametype","nameformatcollection","personcache",
@@ -63,7 +64,8 @@ def custom_model_list(model_list):
             ret["Person"].append(model_dict)
             continue
         if model_dict["model_label"] in [ "categorytreenode","category","categoryrelation",
-                                          "categorytimespanrelation", "categoryplacerelation", "categorypersonrelation", 
+                                          "categorytimespanrelation", "categoryplacerelation", 
+                                          "categorypersonrelation", 
                                           "categorylanguagerelation" ]:
             ret["Category"].append(model_dict)
             continue
@@ -552,8 +554,6 @@ class PersonManager(models.Manager):
             else:
                 qset=qset.filter(personnamerelation__value__iexact=name)
 
-        
-
         # if qset.count()>0: return qset.select_related("cache")
         # if len(names)==1: return qset.select_related("cache")
         # if len(names)==2:
@@ -893,7 +893,8 @@ class CategoryTreeNode(models.Model):
 
     def branch_level_size(self,level,only_cat=True):
         if only_cat:
-            return CategoryTreeNode.objects.filter(node_id__istartswith=self.node_id+":",level=level,is_category=True).count()
+            return CategoryTreeNode.objects.filter(node_id__istartswith=self.node_id+":",
+                                                   level=level,is_category=True).count()
         return CategoryTreeNode.objects.filter(node_id__istartswith=self.node_id+":",level=level).count()
         
     def branch(self,only_cat=True):

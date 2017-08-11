@@ -74,7 +74,7 @@
   padding: 0;
 }
 body {
-  font-family: Liberation Sans, sans-serif;
+  font-family: Libertine, Liberation Sans, sans-serif;
   font-size: 12pt;
   background: #ffffff;
   color: #000000;
@@ -188,6 +188,17 @@ main h1 {
   border-radius: 1em;
   -moz-border-radius: 1em;
   -webkit-border-radius: 1em;
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+main h2 {
+  color: #9b8a00;
+  background-color: #fff8be;
+  font-size: 1.2em;
+  padding-top: .1em;
+  padding-bottom: .1em;
+  padding-left: 1em;
+  border-bottom: 1px solid #9b8a00;
   margin-bottom: 1em;
   margin-top: 1em;
 }
@@ -311,6 +322,72 @@ main tbody:nth-of-type(odd) a {
 main tbody:nth-of-type(odd) a:hover {
   background: #9b8a00;
   color: #fff8be;
+}
+textarea.fixed {
+  font-size: 14pt;
+  font-family: Courier;
+}
+div.notebook {
+  border: 1px solid #9b8a00;
+}
+div.notebook table {
+  margin: auto;
+  width: 90%;
+}
+div.notebook .tab-button {
+  padding: 1em;
+  border: 1px solid #9b8a00;
+  color: #9b8a00;
+  background-color: #fff8be;
+}
+div.notebook .tab-button:hover {
+  background-color: #9b8a00;
+  color: #fff8be;
+}
+div.notebook .ui-tabs-active .tab-button,
+div.notebook .ui-tabs-active .tab-button:active {
+  background: white !important;
+  color: #9b8a00 !important;
+}
+div.notebook ul.tabs {
+  padding-bottom: 0;
+  margin: 0;
+  border-bottom: 1px solid #9b8a00;
+  width: 100%;
+}
+div.notebook h1 {
+  font-size: 1.2em;
+  padding-top: .2em;
+  padding-bottom: .2em;
+}
+div.notebook h2 {
+  font-size: 1em;
+  padding-left: 0;
+}
+div.notebook .form h1 {
+  font-size: 1em;
+  background: none;
+  border: 0px solid white;
+}
+div.notebook .form a.newobject {
+  margin: .5em;
+  padding: .5em;
+  background-color: #9b8a00;
+  color: #fff8be;
+  border-radius: 2em;
+  -moz-border-radius: 2em;
+  -webkit-border-radius: 2em;
+  display: inline-block;
+  text-decoration: none;
+  border: 1px solid #9b8a00;
+}
+div.notebook .form a.newobject:hover {
+  color: #9b8a00;
+  background-color: #fff8be;
+  border: 1px solid #9b8a00;
+}
+form * {
+  vertical-align: top;
 }
 table.images img {
   padding: 1em;

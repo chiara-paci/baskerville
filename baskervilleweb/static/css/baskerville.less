@@ -54,7 +54,7 @@
 }
 
 body {
-    font-family: Liberation Sans, sans-serif;
+    font-family: Libertine, Liberation Sans, sans-serif;
     font-size: 12pt;
     background: @textbackcolor;
     color: @textforecolor;
@@ -188,6 +188,18 @@ main {
 	margin-top: 1em;
     }
 
+    h2 {
+	color: @primhard4;
+	background-color: @prim2;
+	font-size: 1.2em;
+	padding-top: .1em;
+	padding-bottom: .1em;
+	padding-left: 1em;
+	border-bottom: 1px solid @primhard4;
+	margin-bottom: 1em;
+	margin-top: 1em;
+    }
+
     :first-child { 
      	margin-top: 0;
     }
@@ -313,6 +325,89 @@ main {
 
     }
 
+}
+
+textarea.fixed {
+    font-size: 14pt;
+    font-family: Courier;
+}
+
+div.notebook {
+    border: 1px solid @primhard4;
+
+
+    table {
+	margin: auto;
+	width: 90%;
+    }
+
+    .tab-button {
+	padding: 1em;
+	border: 1px solid @primhard4;
+	color: @primhard4;
+	background-color: @prim2;
+    }
+
+    .tab-button:hover {
+	background-color: @primhard4;
+	color: @prim2;
+    }
+
+    .ui-tabs-active .tab-button,
+    .ui-tabs-active .tab-button:active {
+	background: white !important;
+	color: @primhard4 !important;
+    }
+
+    ul.tabs {
+	padding-bottom: 0;
+	margin: 0;
+	border-bottom: 1px solid @primhard4;
+	width: 100%;
+    }
+
+    h1 {
+	font-size: 1.2em;
+	padding-top: .2em;
+	padding-bottom: .2em;
+    }
+
+    h2 {
+	font-size: 1em;
+	padding-left: 0;
+    }
+
+    .form {
+	h1 {
+	    font-size: 1em;
+	    background: none;
+	    border: 0px solid white;
+	}
+
+	a.newobject {
+	    margin: .5em;
+	    padding: .5em;
+	    background-color: @primhard4;
+	    color: @prim2;
+	    .borderradius(2em);
+	    display: inline-block;
+	    text-decoration: none;
+	    border: 1px solid @primhard4;
+	}
+
+	a.newobject:hover {
+	    color: @primhard4;
+	    background-color: @prim2;
+	    border: 1px solid @primhard4;
+	}
+    }
+
+}
+
+form {
+    * {
+	vertical-align: top;
+    }
 }
 
 table.images {

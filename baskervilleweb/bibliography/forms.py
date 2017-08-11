@@ -103,7 +103,7 @@ class CategoriesForm(forms.Form):
     categories = forms.CharField(required=False)
 
 class IsbnForm(forms.Form):
-    elenco = forms.CharField(widget=forms.Textarea(attrs={"height":400,"width":50}))
+    elenco = forms.CharField(widget=forms.Textarea(attrs={"rows":20,"cols":20,"class":"fixed"}))
 
 class IssueAuthorForm(BookAuthorForm):
     pos = forms.IntegerField()
