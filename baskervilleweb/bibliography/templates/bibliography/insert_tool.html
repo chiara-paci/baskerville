@@ -5,11 +5,12 @@
 
 <form action="" method="post">
 {% csrf_token %}
-<input type="submit" value="{% trans "Update" %}" />
 <textarea id="id_elenco" name="elenco" class="fixed" rows="6" cols="20">
 {% for isbn in isbn_list %}{{ isbn }}
 {% endfor %}
 </textarea>
+<input type="submit" value="{% trans "Update" %}" />
+<a href=".">New Insert</a>
 </form>
 
 <div id="tabs" class="notebook">
