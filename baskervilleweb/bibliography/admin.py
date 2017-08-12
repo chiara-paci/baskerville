@@ -519,8 +519,12 @@ class MigrPublisherRivisteInline(admin.TabularInline):
     model = MigrPublisherRiviste
     extra = 0
 
+class BookInline(admin.TabularInline):
+    model = Book
+    extra = 0
+
 class PublisherAdmin(admin.ModelAdmin):
-    inlines=(PublisherAddressPublisherInline,PublisherIsbnInline,MigrPublisherRivisteInline)
+    inlines=(PublisherAddressPublisherInline,PublisherIsbnInline,BookInline,MigrPublisherRivisteInline)
     list_display=["name","address","isbn_prefix","alias"]
     list_editable=["alias"]
     exclude = [ 'isbns' ]
