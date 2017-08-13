@@ -84,6 +84,9 @@ class TemporaryBook(object):
         if self.isbn_ced in publisher_dict:
             self.publisher=publisher_dict[self.isbn_ced][0]
 
+        if not str(self.isbn_book).isdigit(): return
+        if not str(self.isbn_ced).isdigit(): return
+
         isbn_crc10=self.crc10()
         isbn_crc13=self.crc13()
 
@@ -274,8 +277,6 @@ def look_for(isbn_list):
 
     old_publishers,new_publisher_isbn_list=Publisher.objects.look_for(isbn_ced_list)
 
-    #publisher_isbn_list=PublisherIsbn.objects.filter(isbn__in=isbn_ced_list)
-
     publisher_dict={}
     for pub in old_publishers:
         for pisbn in pub.isbn_list:
@@ -283,19 +284,6 @@ def look_for(isbn_list):
             if key not in publisher_dict:
                 publisher_dict[key]=[]
             publisher_dict[key].append(pub)
-        
-
-    # for isbn_ced,isbn_book in new_book_isbn_list:
-    #     book=TemporaryBook(isbn_ced,isbn_book)
-    #     book.look_for(publisher_dict)
-
-    #     book_list.append(book)
-    #     author_list+=book.authors
-    #     if isinstance(book.publisher,Publisher): continue
-    #     if book.isbn_ced in publisher_list: continue
-    #     tpub=TemporaryPublisher(book)
-    #     publisher_list[book.isbn_ced]=tpub
-    #     address_list.append(tpub.addresses)
 
     threads=[]
     for isbn_ced,isbn_book in new_book_isbn_list:
@@ -330,8 +318,6 @@ def look_for(isbn_list):
 
     for book in book_list:
         book.set_old_authors(old_author_dict)
-
-    print(address_list)
 
     publisher_list=publisher_list.values()
     old_author_list=old_author_dict.values()

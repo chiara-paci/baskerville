@@ -525,7 +525,7 @@ class BookInline(admin.TabularInline):
 
 class PublisherAdmin(admin.ModelAdmin):
     inlines=(PublisherAddressPublisherInline,PublisherIsbnInline,BookInline,MigrPublisherRivisteInline)
-    list_display=["name","address","isbn_prefix","alias"]
+    list_display=["short_name","name","address","isbn_prefix","alias"]
     list_editable=["alias"]
     exclude = [ 'isbns' ]
 

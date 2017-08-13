@@ -1326,6 +1326,17 @@ class Publisher(models.Model):
     class Meta:
         ordering = ["name"]
 
+    def short_name(self):
+        name=self.show_name().lower()
+        tname=name.replace(".","").replace(",","").split()
+        for s in [ "srl", "spa","editore","editrice","edizioni","verlag","publisher","inc",
+                   "éditions","editions","edition","editorial","editori","editoriale","ltd",
+                   "gruppo","publishing","yayın","yayınları","co","publications","press","editoriali"]:
+            if s in tname:
+                tname.remove(s)
+        tname=[ s.capitalize() for s in tname ]
+        return " ".join(tname)
+
     def clean(self,*args,**kwargs):
         if not self.full_name:
             self.full_name=self.name
