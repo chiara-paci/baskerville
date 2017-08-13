@@ -386,6 +386,9 @@ div.notebook .form a.newobject:hover {
   background-color: #fff8be;
   border: 1px solid #9b8a00;
 }
+div.notebook .form input[type=text] {
+  width: 100%;
+}
 form * {
   vertical-align: top;
 }

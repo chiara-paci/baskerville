@@ -84,23 +84,24 @@
       <table>
 	<tr>
 	  <th>{{ form.isbn_ced.label }}</th>
-	  <td>{{ form.isbn_ced }}</td>
+	  <td colspan="2">{{ form.isbn_ced }}</td>
 	</tr>
 	<tr>
 	  <th>{{ form.isbn_book.label }}</th>
-	  <td>{{ form.isbn_book }}</td>
+	  <td colspan="2">{{ form.isbn_book }}</td>
 	</tr>
 	<tr>
 	  <th>{{ form.title.label }}</th>
-	  <td>{{ form.title }}</td>
+	  <td colspan="2">{{ form.title }}</td>
 	</tr>
 	<tr>
 	  <td>{{ form.year.label }}</td>
-	  <td>{{ form.year }}</td>
+	  <td width="30%">{{ form.year }}</td>
+	  <td style="text-align:left">ipotetic: {{ form.year_ipotetic }}</td>
 	</tr>
 	<tr>
 	  <td>{{ form.publisher.label }}</td>
-	  <td>{{ form.publisher }}</td>
+	  <td colspan="2">{{ form.publisher }}</td>
 	</tr>
       </table>
 
