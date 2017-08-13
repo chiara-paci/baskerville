@@ -1629,6 +1629,7 @@ class Book(CategorizedObject):
     isbn_cache13 = models.CharField(max_length=20,editable=False,default="")
     title = models.CharField(max_length=4096)
     year = models.IntegerField()
+    year_ipotetic = models.BooleanField(default=False)
     publisher = models.ForeignKey(Publisher)
     authors = models.ManyToManyField(Author,through='BookAuthorRelation',blank=True)
 
