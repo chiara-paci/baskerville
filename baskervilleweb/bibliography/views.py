@@ -554,6 +554,22 @@ class JsonAuthorCreateView(AuthorCreateView):
                       content_type='application/json')
 
 
+### 
+
+class BookByIsbnPubListView(ListView):
+    model=Book
+
+    def get_queryset(self, *args, **kwargs):
+        #qset=super(CategoryChildrenView, self).get_queryset(*args, **kwargs)
+        if "isbn" not in self.kwargs:
+            return ListView.get_queryset(self,*args,**kwargs)
+        if not self.kwargs["isbn"]:
+            return ListView.get_queryset(self,*args,**kwargs)
+        return Book.objects.by_isbn_pub(self.kwargs["isbn"])
+
+    #         ListView.as_view(model=models.Book,queryset=models.Book.objects.isbn_alpha()),
+
+
 ### Create Book
 
 class BookCreateView(CreateView):

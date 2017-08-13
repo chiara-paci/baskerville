@@ -1609,6 +1609,10 @@ class BookManager(models.Manager):
     def isbn_alpha(self):
         return self.all().filter(isbn_crc10='Y').order_by("isbn_ced","isbn_book","year","title")
 
+    def by_isbn_pub(self,isbn):
+        print("ISBN:",isbn)
+        return self.all().filter(isbn_ced__iexact=isbn).order_by("isbn_ced","isbn_book","year","title")
+
     def add_prefetch(self,obj_list):
         qset=self.filter(id__in=[book.id for book in obj_list])
         qset=qset.select_related("publisher").prefetch_related("authors")

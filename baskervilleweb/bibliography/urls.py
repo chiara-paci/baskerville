@@ -68,6 +68,9 @@ urlpatterns = [
     url( r'^books/alpha/?$',
          ListView.as_view(model=models.Book,queryset=models.Book.objects.isbn_alpha()),
          name="book-list-alpha"),
+    url( r'^books/byisbnpub/(?P<isbn>.+?)/?$',
+         views.BookByIsbnPubListView.as_view(),
+         name="book-by-isbn-pub"),
 
     url( r'^publications/?$',
          ListView.as_view(model=models.Publication),

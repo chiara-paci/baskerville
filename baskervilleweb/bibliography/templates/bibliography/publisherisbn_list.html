@@ -20,7 +20,7 @@
 <tbody>
 <tr>
   <td class="top" rowspan="{{ isbn.publisher_set.count }}">
-    {{ isbn }}
+    <a href="/bibliography/books/byisbnpub/{{ isbn }}/">{{ isbn }}</a>
   </td>
   {% for publisher in isbn.publisher_set.all %}
   {% if not forloop.first %}<tr>{% endif %}
