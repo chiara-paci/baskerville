@@ -1467,6 +1467,7 @@ class Issue(models.Model):
     number = models.CharField(max_length=256)
     title = models.CharField(max_length=4096,blank=True,default="")
     date = models.DateField()
+    date_ipotetic = models.BooleanField(default=False)
     authors = models.ManyToManyField(Author,through='IssueAuthorRelation',blank=True)
 
     objects=IssueManager()
@@ -1478,7 +1479,10 @@ class Issue(models.Model):
         return self.volume.publication.issn
 
     def show_date(self):
-        return self.date.strftime(self.volume.publication.date_format)
+        D=self.date.strftime(self.volume.publication.date_format)
+        if self.date_ipotetic:
+            return D+"?"
+        return D
 
     def html(self):
         H=self.volume.html()
@@ -1490,6 +1494,8 @@ class Issue(models.Model):
             H+=", <i>"+tit+"</i>"
         H+=", "
         H+=self.date.strftime("%B %Y")
+        if self.date_ipotetic:
+            H+="?"
         return H
 
     def __str__(self):
@@ -1668,7 +1674,10 @@ class Book(CategorizedObject):
 
         return ret
 
-    def __str__(self): return str(self.title)+" ("+str(self.year)+")"
+    def __str__(self): 
+        if not self.year_ipotetic:
+            return str(self.title)+" ("+str(self.year)+")"
+        return str(self.title)+" ("+str(self.year)+"?)"
 
     def html(self):
         H=""
@@ -1683,6 +1692,7 @@ class Book(CategorizedObject):
         if pub:
             H+=pub+", "
         H+=str(self.year)
+        if self.year_ipotetic: H+="?"
         return H
 
     def clean(self,*args,**kwargs):

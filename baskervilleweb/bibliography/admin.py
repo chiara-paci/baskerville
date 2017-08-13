@@ -608,7 +608,9 @@ class BookAlphabeticFilter(admin.SimpleListFilter):
 
 
 class BookAdmin(admin.ModelAdmin):
-    list_display=["isbn_cache10","isbn_cache13","isbn_crc13","get_authors","get_secondary_authors","title","year","publisher"]
+    list_display=["isbn_cache10","isbn_cache13","isbn_crc13","get_authors","get_secondary_authors",
+                  "title","year","year_ipotetic","publisher"]
+    list_editable=["year_ipotetic"]
     inlines=[BookAuthorRelationInline,BookCategoryInline]
     exclude = ["categories","authors"]
     list_filter=[ BookAlphabeticFilter ]
