@@ -613,7 +613,7 @@ class BookAdmin(admin.ModelAdmin):
     list_editable=["year_ipotetic"]
     inlines=[BookAuthorRelationInline,BookCategoryInline]
     exclude = ["categories","authors"]
-    list_filter=[ BookAlphabeticFilter ]
+    list_filter=[ BookAlphabeticFilter,"isbn_ced" ]
 
 admin.site.register(Book,BookAdmin)
 
