@@ -1598,6 +1598,7 @@ class BookManager(models.Manager):
         return qset
 
     def look_for(self,isbn_list):
+        if not isbn_list: return None,[]
         q=models.Q()
         for isbn_ced,isbn_book in isbn_list:
             q=q|models.Q(isbn_ced=isbn_ced,isbn_book=isbn_book)
