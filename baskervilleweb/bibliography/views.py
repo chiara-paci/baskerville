@@ -813,7 +813,8 @@ class BooksInsertView(View):
                 aut_role=AuthorRole.objects.get(label=role)
                 initial.append({"author":author,"author_role":aut_role})
             bookauthorformset=forms.BookAuthorFormSet(prefix="newbook"+str(n)+"-author",initial=initial)
-            new_book_list.append( (str(n),book.isbn_10().replace("-","")+" "+str(book.title),bookform, bookauthorformset) )
+            new_book_list.append( (str(n),book.isbn_10().replace("-","")+" "+str(book.title),
+                                   bookform, bookauthorformset) )
             n+=1
         timer("D")
 

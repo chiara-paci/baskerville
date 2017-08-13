@@ -97,7 +97,7 @@ class BookAuthorForm(forms.Form):
     author = forms.ModelChoiceField(queryset=models.Author.objects.all().select_related("cache"),required=False)
     author_role = forms.ModelChoiceField(queryset=models.AuthorRole.objects.all(),required=False)
 
-BookAuthorFormSet = formset_factory(BookAuthorForm,extra=2,can_delete=True)
+BookAuthorFormSet = formset_factory(BookAuthorForm,extra=5,can_delete=True)
 
 class CategoriesForm(forms.Form):
     categories = forms.CharField(required=False)
