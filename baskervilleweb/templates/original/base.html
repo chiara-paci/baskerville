@@ -30,7 +30,9 @@
 
   <header>
     <div id="headerlogo">
+      <a href="/">
       <img src="{% static "images/logo-baskerville.png" %}"/>
+      </a>
     </div>
     <div id="headerbanner">
       Baskerville
@@ -40,53 +42,49 @@
   <nav>
 
     <a href="{% url 'home' %}">{% trans "Home" %}</a>
-    <a href="{% url 'bibliography:catalog' %}">{% trans "Catalog" %}</a>
-    <a href="{% url 'bibliography:categories' %}">{% trans "Categories" %}</a>
-    <a href="{% url 'archive:photo_list' %}">{% trans "Photos" %}</a>
 
     <div class="submenu">
-      <h1>{% trans "Publishers" %}</h1>
+      <h1>{% trans "Library" %}</h1>
       <div class="items">
-	<a href="{% url 'bibliography:publisher-list' %}">Case editrici</a><br/>
-	<a href="{% url 'bibliography:publisherisbn-list' %}">ISBN</a><br/>
-	<a href="{% url 'bibliography:publisherisbn-alpha' %}">Case editrici con ISBN non numerico</a><br/>
-      </div>
-    </div>
-
-    <div class="submenu">
-      <h1>{% trans "Books" %}</h1>
-      <div class="items">
-	<a href="{% url 'bibliography:book-list-alpha' %}">Libri con ISBN non numerico</a><br/>
-	<a href="{% url 'bibliography:book-serie-without-isbn' %}">Collane senza ISBN</a>
-      </div>
-    </div>
-
-    <div class="submenu">
-      <h1>{% trans "Publications" %}</h1>
-      <div class="items">
+	<a href="{% url 'bibliography:catalog' %}">{% trans "Catalog" %}</a><br/>
+	<a href="{% url 'bibliography:categories' %}">{% trans "Categories" %}</a><br/>
+	<a href="{% url 'bibliography:publisher-list' %}">{% trans "Publishers" %}</a><br/>
 	<a href="{% url 'bibliography:publication-list' %}">{% trans "Publications" %}</a><br/>
-	<a href="{% url 'bibliography:publication-list-alpha' %}">{% trans "Publications without ISSN" %}</a>
+	<a href="{% url 'bibliography:author-list' %}">{% trans "Authors" %}</a><br/>
+	<a href="{% url 'bibliography:nameformatcollection-list' %}">{% trans "Name Format Collections" %}</a><br/>
+	<a href="{% url 'bibliography:publisherisbn-list' %}">ISBN Case editrici</a><br/>
+	<a href="{% url 'bibliography:publisherisbn-alpha' %}">Case editrici con ISBN non numerico</a><br/>
+	<a href="{% url 'bibliography:book-list-alpha' %}">Libri con ISBN non numerico</a><br/>
+	<a href="{% url 'bibliography:book-serie-without-isbn' %}">Collane senza ISBN</a><br/>
+	<a href="{% url 'bibliography:publication-list-alpha' %}">{% trans "Publications without ISSN" %}</a><br/>
       </div>
     </div>
 
     <div class="submenu">
-      <h1>{% trans "Authors" %}</h1>
+      <h1>{% trans "Recipe Book" %}</h1>
       <div class="items">
-	<a href="{% url 'bibliography:author-list' %}">{% trans "Authors" %}</a><br/>
-	<a href="{% url 'bibliography:nameformatcollection-list' %}">{% trans "Name Format Collections" %}</a>
+	<a href="{% url 'archive:photo_list' %}">{% trans "Photos" %}</a>
+      </div>
+    </div>
+
+    <div class="submenu">
+      <h1>{% trans "Archive" %}</h1>
+      <div class="items">
+	<a href="{% url 'archive:photo_list' %}">{% trans "Photos" %}</a>
       </div>
     </div>
 
     <div class="submenu">
       <h1>{% trans "Tools" %}</h1>
       <div class="items">
-	<a href="{% url 'bibliography:insert' %}">{% trans "Insert" %}</a><br/>
+	<a href="{% url 'bibliography:insert' %}">{% trans "Insert book" %}</a><br/>
 	<a href="{% url 'bibliography:author-search' %}">{% trans "Search author" %}</a><br/>
 	<a href="{% url 'bibliography:author-insert' %}">{% trans "Insert author" %}</a><br/>
 	<a href="{% url 'bibliography:publisher-create' %}">{% trans "Create publisher" %}</a><br/>
 	<a href="{% url 'bibliography:author-create' %}">{% trans "Create author" %}</a><br/>
 	<a href="{% url 'bibliography:book-create' %}">{% trans "Create book" %}</a><br/>
-	<a href="{% url 'bibliography:categories-categorizer' %}">{% trans "Categorizer: category to category" %}</a><br/>
+	<a href="{% url 'bibliography:categories-categorizer' %}">
+	  {% trans "Categorizer: category to category" %}</a><br/>
 	<a href="{% url 'bibliography:books-categorizer' %}">{% trans "Categorizer: book to category" %}</a>
       </div>
     </div>

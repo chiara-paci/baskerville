@@ -172,12 +172,14 @@ admin.sites.site=admin.site
 urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', RedirectView.as_view(url='/bibliography/catalog',permanent=False),name="home"),
+    #url(r'^$', RedirectView.as_view(url='/bibliography/catalog',permanent=False),name="home"),
+    url(r'^$', RedirectView.as_view(url='/home/',permanent=False),name="home"),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
 
 urlpatterns += [
+    url(r'^home/',include('home.urls')),
     url(r'^bibliography/',include('bibliography.urls')),
     url(r'^archive/',include('archive.urls')),
 ]

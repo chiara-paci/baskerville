@@ -102,6 +102,7 @@ nav {
     padding: 1em;
     padding-top: .5em;
     padding-bottom: .5em;
+    text-align: center;
 
     * {
 	display: inline-block;
@@ -111,9 +112,9 @@ nav {
     a {
 	color: @seca2;
 	.borderradius(1em);
-	padding-left: 1em;
-	padding-right: 1em;
 	text-decoration: none;
+	width: 10em;
+	test-align: center;
     }
     
     a:hover {
@@ -132,12 +133,15 @@ nav {
     .submenu {
 	background-color: @secahard4;
 	color: @seca2;
+	width: 10em;
 	h1 {
 	    font-size: 1em;
 	    font-weight: normal;
 	    .borderradius(1em);
-	    padding-left: 1em;
-	    padding-right: 1em;
+	    text-align: center;
+	    width: 100%;
+	    padding: 0;
+	    margin: 0;
 	}
 
 	h1:hover {
@@ -146,10 +150,23 @@ nav {
 	}
 
 	.items {
-	    padding: .5em;
+	    padding: .3em;
+	    margin: 0;
+	    margin-top: .5em;
 	    display: none;
 	    position: relative;
 	    background-color: @secahard4;
+	    font-size: .9em;
+	    line-height: .9em;
+	    text-align: left;
+	    * {
+		padding: 0;
+		margin: 0;
+		margin-top: .2em;
+		margin-bottom: .2em;
+		display: block;
+		.borderradius(0);
+	    }
 	}
 
     }

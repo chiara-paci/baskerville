@@ -116,6 +116,7 @@ nav {
   padding: 1em;
   padding-top: .5em;
   padding-bottom: .5em;
+  text-align: center;
 }
 nav * {
   display: inline-block;
@@ -126,9 +127,9 @@ nav a {
   border-radius: 1em;
   -moz-border-radius: 1em;
   -webkit-border-radius: 1em;
-  padding-left: 1em;
-  padding-right: 1em;
   text-decoration: none;
+  width: 10em;
+  test-align: center;
 }
 nav a:hover {
   background-color: #ddf0b2;
@@ -143,6 +144,7 @@ nav .left {
 nav .submenu {
   background-color: #669100;
   color: #ddf0b2;
+  width: 10em;
 }
 nav .submenu h1 {
   font-size: 1em;
@@ -150,18 +152,35 @@ nav .submenu h1 {
   border-radius: 1em;
   -moz-border-radius: 1em;
   -webkit-border-radius: 1em;
-  padding-left: 1em;
-  padding-right: 1em;
+  text-align: center;
+  width: 100%;
+  padding: 0;
+  margin: 0;
 }
 nav .submenu h1:hover {
   background-color: #ddf0b2;
   color: #669100;
 }
 nav .submenu .items {
-  padding: .5em;
+  padding: .3em;
+  margin: 0;
+  margin-top: 1em;
   display: none;
   position: relative;
   background-color: #669100;
+  font-size: .9em;
+  line-height: .9em;
+  text-align: left;
+}
+nav .submenu .items * {
+  padding: 0;
+  margin: 0;
+  margin-top: .2em;
+  margin-bottom: .2em;
+  display: block;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
 }
 nav .submenu:hover {
   z-index: 200;
@@ -238,10 +257,8 @@ main nav.paginator .disabled {
 main nav.tabmenu {
   -webkit-column-count: 3;
   /* Chrome, Safari, Opera */
-
   -moz-column-count: 3;
   /* Firefox */
-
   column-count: 3;
   display: inline-block;
   padding: 0;
