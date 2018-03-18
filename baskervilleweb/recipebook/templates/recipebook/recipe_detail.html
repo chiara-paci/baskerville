@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<h1>{{ recipe }}</h1>
+
+<h2>{% trans "Ingredients" %}</h2>
+
+<table>
+{% for ing in recipe.ingredient_set.all %}
+<tr>
+  <td>{{ ing.food }}{% if ing.quantity %}:{% endif %}</td>
+  <td>{% if ing.quantity %}{{ ing.quantity|floatformat:"-2" }} {% if ing.measure %}{{ ing.measure }}{% endif %}{% endif %}</td>
+</tr>
+{% endfor %}
+</table>
+
+<h2>{% trans "Tools" %}<h2>
+
+<table>
+  {% for tool,num in recipe.tools %}
+  <tr>
+    <td>{{ tool }}:</td>
+    <td>{{ num }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+<h2>{% trans "Ingredients preparation" %}</h2>
+
+<ol>
+{% for ing in recipe.ingredient_set.all %}
+{% for step in ing.format_preparation %}
+<li>{{ step }}</li>
+
+{% endfor %}
+{% endfor %}
+</ol>
+
+<h2>{% trans "Execution" %}</h2>
+
+<ol>
+{% for step in recipe.execution.steps %}
+<li>{{ step }}</li>
+
+{% endfor %}
+</ol>
+
+{% endblock content %}

@@ -9,14 +9,14 @@
 
 <link rel="icon" href='{% static "images/logo-baskerville-piccolo.png" %}' type="image/png"/>
 
-<link rel="stylesheet" type="text/css" href='{% static "css/creativecommons.css" %}'/>
+<!-- <link rel="stylesheet" type="text/css" href='{% static "css/creativecommons.css" %}'/>
 <link rel="stylesheet" type="text/css" href='{% static "css/font-libertine.css" %}'/>
-<link rel="stylesheet" type="text/css" href='{% static "css/font-sniglet.css" %}'/>
+<link rel="stylesheet" type="text/css" href='{% static "css/font-sniglet.css" %}'/> -->
 <link rel="stylesheet" type="text/css" href='{% static "css/font-awesome.min-4.6.3.css" %}'/>
 <link rel="stylesheet" type="text/css" href='{% static "css/common.css" %}'/>
 <link rel="stylesheet" type="text/css" href='{% static "css/baskerville.css" %}'/>
 <link rel="stylesheet" type="text/css" href='{% static "css/jquery-ui-1.11.0.bookcolor.css" %}'/>
-<link rel="stylesheet" type="text/css" href='{% static "css/jquery-ui-santaclara-widgets.css" %}'/>
+<!-- <link rel="stylesheet" type="text/css" href='{% static "css/jquery-ui-santaclara-widgets.css" %}'/> -->
 
 </head>
 
@@ -60,12 +60,7 @@
       </div>
     </div>
 
-    <div class="submenu">
-      <h1>{% trans "Recipe Book" %}</h1>
-      <div class="items">
-	<a href="{% url 'archive:photo_list' %}">{% trans "Photos" %}</a>
-      </div>
-    </div>
+    <a href="{% url 'recipebook:recipecategory_list' %}">{% trans "Recipe Book" %}</a>
 
     <div class="submenu">
       <h1>{% trans "Archive" %}</h1>
@@ -108,8 +103,10 @@
   
 <script type="text/javascript" src='{% static "js/jquery-3.1.1.min.js" %}'></script>
 <script type="text/javascript" src='{% static "js/jquery-ui-1.11.0.custom.js" %}'></script>
-<script type="text/javascript" src='{% static "js/jcanvas-14.08.16.min.js" %}'></script>
-<script type="text/javascript" src='{% static "js/jquery-ui-santaclara-widgets.js" %}'></script>
+<!-- 
+     <script type="text/javascript" src='{% static "js/jcanvas-14.08.16.min.js" %}'></script>
+     <script type="text/javascript" src='{% static "js/jquery-ui-santaclara-widgets.js" %}'></script>
+-->
 
 <script>//<![CDATA[    
 $(document).ready(function() {

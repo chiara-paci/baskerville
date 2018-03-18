@@ -1,0 +1,184 @@
+from django.db import models
+from django.core import validators
+from django.utils.functional import cached_property
+
+# Create your models here.
+
+class NameAbstract(models.Model):
+    name = models.CharField(max_length=4096)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self): 
+        return self.name
+
+class Tool(NameAbstract): pass
+class FoodCategory(NameAbstract): pass
+
+class StepSequence(NameAbstract):
+    parent = models.ForeignKey('self',on_delete=models.SET_NULL,blank=True,null=True)
+
+    class Meta:
+        order_with_respect_to = 'parent'
+
+    def tools(self):
+        tools={}
+        for step in self.step_set.all():
+            for tool in step.tools.all():
+                if not tool.name in tools: tools[tool.name]=0
+                tools[tool.name]+=1
+        for seq in self.stepsequence_set.all():
+            for tool_name,num in seq.tools():
+                if not tool_name in tools: tools[tool_name]=0
+                tools[tool_name]+=num
+        return tools.items()
+
+    def steps(self):
+        steps=[]
+        for step in self.step_set.all():
+            steps.append(step)
+        for seq in self.stepsequence_set.all():
+            for step in seq.steps():
+                steps.append(step)
+        return steps
+
+
+class Step(models.Model):
+    description = models.CharField(max_length=8192)
+    sequence = models.ForeignKey(StepSequence)
+    tools = models.ManyToManyField(Tool,blank=True)
+
+    class Meta:
+        order_with_respect_to = 'sequence'
+
+    def __str__(self): return self.description
+
+class RecipeCategory(NameAbstract): pass
+    
+class Recipe(NameAbstract):
+    category = models.ForeignKey(RecipeCategory)
+    serving = models.PositiveIntegerField(blank=True,default=4,
+                                          validators=[validators.MinValueValidator(1)])
+    execution = models.ForeignKey(StepSequence)
+
+    def ingredients(self):
+        t=[str(x) for x in self.ingredient_set.all().filter(inlist=True)]
+        return ", ".join(t)
+
+    def tools(self):
+        tools={}
+        for tool_name,num in self.execution.tools():
+            if not tool_name in tools: tools[tool_name]=0
+            tools[tool_name]+=num
+
+        for ing in self.ingredient_set.all():
+            if not ing.preparation: continue
+            for tool_name,num in ing.preparation.tools():
+                if not tool_name in tools: tools[tool_name]=0
+                tools[tool_name]+=num
+        return tools.items()
+
+
+class MeasureUnit(NameAbstract):
+    base = models.CharField(max_length=128,default='g',choices = ( ( "g", "g" ),
+                                                                   ( "ml", "ml" ) ))
+    factor = models.FloatField(validators=[validators.MinValueValidator(0.0)])
+    
+    class Meta:
+        ordering = [ 'name' ]
+
+class Food(NameAbstract):
+    category = models.ForeignKey(FoodCategory)
+    plural = models.CharField(max_length=4096,blank=True,null=True)
+    gender = models.CharField(max_length=128,default='masculine',choices = ( 
+        ( "masculine", "masculine" ),
+        ( "neuter", "neuter" ),
+        ( "feminine", "feminine" ) ))
+
+    def __str__(self):
+        if self.plural: return self.plural
+        return self.name
+
+    @cached_property
+    def il_plural(self):
+        if not self.plural: return self.il_singular
+        if self.gender=="feminine":
+            return "le %s" % self.plural
+        if self.plural[0] in [ "a","e","i","o","u","y","z","x" ]:
+            return "gli %s" % self.plural
+        if self.plural[0:2] in [ "ps","pn","gn" ]:
+            return "gli %s" % self.plural
+        if self.plural[0]=="s":
+            if self.plural[1] in [ "a","e","i","o","u","y" ]:
+                return "i %s" % self.plural
+            return "gli %s" % self.plural
+        return "i %s" % self.plural
+
+    @cached_property
+    def il_singular(self):
+        if self.name[0] in [ "a","e","i","o","u" ]:
+            return "l'%s" % self.name
+        if self.gender=="feminine":
+            return "la %s" % self.name
+        if self.name[0] in [ "y","z","x" ]:
+            return "lo %s" % self.name
+        if self.name[0:2] in [ "ps","pn","gn" ]:
+            return "lo %s" % self.name
+        if self.name[0]=="s":
+            if self.name[1] in [ "a","e","i","o","u","y" ]:
+                return "il %s" % self.name
+            return "lo %s" % self.name
+        return "il %s" % self.name
+                
+    @cached_property
+    def lo_plural(self):
+        if not self.plural: return self.lo_singular
+        if self.gender=="feminine":
+            return "le"
+        return "li"
+
+    @cached_property
+    def lo_singular(self):
+        if self.gender=="feminine":
+            return "la"
+        return "lo"
+
+class Ingredient(models.Model):
+    food = models.ForeignKey(Food)
+    recipe = models.ForeignKey(Recipe)
+    quantity = models.FloatField(validators=[validators.MinValueValidator(0.0)],
+                                 blank=True,null=True)
+    measure = models.ForeignKey(MeasureUnit,
+                                blank=True,null=True)
+    preparation = models.ForeignKey(StepSequence,blank=True,null=True)
+    inlist=models.BooleanField(default=True,blank=True)
+
+    def __str__(self): 
+        return str(self.food)
+
+    @cached_property
+    def il(self):
+        singular=(self.quantity==1 and self.measure==self.food.name)
+        if singular:
+            return self.food.il_singular
+        return self.food.il_plural
+
+    @cached_property
+    def lo(self):
+        singular=(self.quantity==1 and self.measure==self.food.name)
+        if singular:
+            return self.food.lo_singular
+        return self.food.lo_plural
+
+    @cached_property
+    def format_preparation(self):
+        if not self.preparation: return []
+        params={
+            "il": self.il,
+            "lo": self.lo
+        }
+        ret=[]
+        for step in self.preparation.step_set.all():
+            ret.append(str(step) % params)
+        return ret

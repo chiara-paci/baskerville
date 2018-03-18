@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% for cat in object_list %}
+<h1>{{ cat }}</h1>
+<ul>
+{% for recipe in cat.recipe_set.all %}
+<li><a href="{% url 'recipebook:recipe_detail' recipe.id %}">{{ recipe }}</a></li>
+
+{% endfor %}
+</ul>
+{% endfor %}
+
+{% endblock content %}
