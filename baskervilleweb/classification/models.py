@@ -63,7 +63,7 @@ class ArgumentManager(models.Manager):
 
 
 class Argument(models.Model):
-    parent = models.ForeignKey("self")
+    parent = models.ForeignKey("self",on_delete=models.PROTECT)
     name = models.CharField(max_length=4096)
     number = models.CharField(max_length=1024)
     identifier = models.CharField(max_length=4096,editable=False,unique=True)
@@ -113,15 +113,15 @@ class ArgumentSuffixCollection(models.Model):
 
 class ArgumentSelector(models.Model):
     pattern = models.CharField(max_length=4096,unique=True)
-    collection = models.ForeignKey(ArgumentSuffixCollection)
+    collection = models.ForeignKey(ArgumentSuffixCollection,on_delete=models.PROTECT)
 
     def __str__(self):
         return self.pattern
 
 
 class ArgumentSuffix(models.Model):
-    parent = models.ForeignKey("self")
-    collection = models.ForeignKey(ArgumentSuffixCollection)
+    parent = models.ForeignKey("self",on_delete=models.PROTECT)
+    collection = models.ForeignKey(ArgumentSuffixCollection,on_delete=models.PROTECT)
     name = models.CharField(max_length=4096)
     number = models.CharField(max_length=1024)
     identifier = models.CharField(max_length=4096,editable=False)
@@ -229,7 +229,7 @@ class LanguageNumber(DecimalNumberAbstract):
         ordering = [ "number" ]
 
 class LanguageClassification(models.Model):
-    language = models.ForeignKey(LanguageNumber)
+    language = models.ForeignKey(LanguageNumber,on_delete=models.PROTECT)
     auxiliaries = models.ManyToManyField(LanguageAuxiliaryNumber,blank=True)
     
     def __str__(self):
@@ -256,7 +256,7 @@ class PlaceNumber(DecimalNumberAbstract):
         ordering = [ "number" ]
 
 class PlaceClassification(models.Model):
-    place = models.ForeignKey(PlaceNumber)
+    place = models.ForeignKey(PlaceNumber,on_delete=models.PROTECT)
     auxiliaries = models.ManyToManyField(PlaceAuxiliaryNumber,blank=True)
 
     def __str__(self):
@@ -320,7 +320,7 @@ class ShortClassificationManager(models.Manager):
         return self.get(id=0)
 
 class ShortClassification(models.Model):
-    argument = models.ForeignKey(ArgumentClassification)
+    argument = models.ForeignKey(ArgumentClassification,on_delete=models.PROTECT)
     languages = models.ManyToManyField(LanguageClassification,blank=True)
     places = models.ManyToManyField(PlaceClassification,blank=True)
     times = models.ManyToManyField(TimeClassification,blank=True)
@@ -390,11 +390,11 @@ class ShortClassification(models.Model):
         return I
 
 class Classification(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType,on_delete=models.PROTECT)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type','object_id')
 
-    argument = models.ForeignKey(ArgumentClassification)
+    argument = models.ForeignKey(ArgumentClassification,on_delete=models.PROTECT)
     object_classification = models.CharField(max_length=1024)
 
     copies_number = models.PositiveIntegerField(default=1)
@@ -404,7 +404,7 @@ class Classification(models.Model):
     times = models.ManyToManyField(TimeClassification,blank=True)
     forms = models.ManyToManyField(FormClassification,blank=True)
 
-    short = models.ForeignKey(ShortClassification,editable=False)
+    short = models.ForeignKey(ShortClassification,editable=False,on_delete=models.PROTECT)
     short_identifier = models.CharField(max_length=4096,editable=False)
 
     class Meta:

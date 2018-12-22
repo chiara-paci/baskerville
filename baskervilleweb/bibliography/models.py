@@ -188,7 +188,7 @@ class DateModifier(PositionAbstract):
 
 class TimePoint(models.Model):
     date = models.IntegerField()
-    modifier = models.ForeignKey(DateModifier,blank=True,default=0)
+    modifier = models.ForeignKey(DateModifier,blank=True,default=0,on_delete=models.PROTECT)
 
     class Meta:
         ordering = [ 'modifier','date' ]
@@ -222,8 +222,8 @@ class TimePoint(models.Model):
         return "; ".join(L)
 
 class TimeSpan(models.Model):
-    begin = models.ForeignKey(TimePoint,related_name="begin_set")
-    end   = models.ForeignKey(TimePoint,related_name="end_set")
+    begin = models.ForeignKey(TimePoint,related_name="begin_set",on_delete=models.PROTECT)
+    end   = models.ForeignKey(TimePoint,related_name="end_set",on_delete=models.PROTECT)
     name  = models.CharField(max_length=4096,blank=True)
 
     def __str__(self):
@@ -266,15 +266,15 @@ class LanguageFamily(models.Model):
         return "; ".join([str(x.language) for x in self.languagefamilyrelation_set.all()])
 
 class LanguageFamilyRelation(models.Model):
-    language = models.ForeignKey(Language)
-    family = models.ForeignKey(LanguageFamily)
+    language = models.ForeignKey(Language,on_delete=models.PROTECT)
+    family = models.ForeignKey(LanguageFamily,on_delete=models.PROTECT)
 
     def __str__(self): 
         return str(self.family)+"/"+str(self.language)
 
 class LanguageFamilyFamilyRelation(models.Model):
-    parent = models.ForeignKey(LanguageFamily,related_name="child_set")
-    child = models.ForeignKey(LanguageFamily,related_name="parent_set")
+    parent = models.ForeignKey(LanguageFamily,related_name="child_set",on_delete=models.PROTECT)
+    child = models.ForeignKey(LanguageFamily,related_name="parent_set",on_delete=models.PROTECT)
 
     def __str__(self): 
         return str(self.parent)+"/"+str(self.child)
@@ -290,8 +290,8 @@ class LanguageVarietyType(models.Model):
 
 class LanguageVariety(models.Model):
     name = models.CharField(max_length=4096,blank=True)
-    language = models.ForeignKey(Language)
-    type = models.ForeignKey(LanguageVarietyType,default=1)
+    language = models.ForeignKey(Language,on_delete=models.PROTECT)
+    type = models.ForeignKey(LanguageVarietyType,default=1,on_delete=models.PROTECT)
 
     def __str__(self):
         if self.type.id==1:
@@ -309,7 +309,7 @@ class PlaceType(models.Model):
 
 class Place(models.Model):
     name = models.CharField(max_length=4096,unique=True)
-    type = models.ForeignKey(PlaceType)
+    type = models.ForeignKey(PlaceType,on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name
@@ -327,7 +327,7 @@ class Place(models.Model):
         ordering = [ "name" ]
 
 class AlternatePlaceName(models.Model):
-    place = models.ForeignKey(Place)
+    place = models.ForeignKey(Place,on_delete=models.PROTECT)
     name = models.CharField(max_length=4096)
     note = models.CharField(max_length=65536,blank=True)
 
@@ -335,8 +335,8 @@ class AlternatePlaceName(models.Model):
         return self.name
 
 class PlaceRelation(models.Model):
-    place = models.ForeignKey(Place,related_name="area_set")
-    area = models.ForeignKey(Place,related_name="place_set")
+    place = models.ForeignKey(Place,related_name="area_set",on_delete=models.PROTECT)
+    area = models.ForeignKey(Place,related_name="place_set",on_delete=models.PROTECT)
 
     def __str__(self): 
         return str(self.area)+"/"+str(self.place)
@@ -427,10 +427,10 @@ class NameFormatCollectionManager(models.Manager):
         return self.get_preferred(len(names)),names
 
 class NameFormatCollection(LabeledAbstract):
-    long_format = models.ForeignKey(NameFormat,related_name='long_format_set')
-    short_format = models.ForeignKey(NameFormat,related_name='short_format_set')
-    list_format = models.ForeignKey(NameFormat,related_name='list_format_set')
-    ordering_format = models.ForeignKey(NameFormat,related_name='ordering_format_set')
+    long_format = models.ForeignKey(NameFormat,related_name='long_format_set',on_delete=models.PROTECT)
+    short_format = models.ForeignKey(NameFormat,related_name='short_format_set',on_delete=models.PROTECT)
+    list_format = models.ForeignKey(NameFormat,related_name='list_format_set',on_delete=models.PROTECT)
+    ordering_format = models.ForeignKey(NameFormat,related_name='ordering_format_set',on_delete=models.PROTECT)
 
     preferred = models.BooleanField(default=False)
 
@@ -604,8 +604,8 @@ class PersonManager(models.Manager):
 
 
 class Person(models.Model):
-    format_collection = models.ForeignKey(NameFormatCollection)
-    cache = models.OneToOneField(PersonCache,editable=False,null=True)
+    format_collection = models.ForeignKey(NameFormatCollection,on_delete=models.PROTECT)
+    cache = models.OneToOneField(PersonCache,editable=False,null=True,on_delete=models.PROTECT)
     names = models.ManyToManyField(NameType,through='PersonNameRelation',blank=True)
 
     objects = PersonManager()
@@ -640,8 +640,8 @@ class Person(models.Model):
         self.cache.save()
 
 class PersonNameRelation(models.Model):
-    person = models.ForeignKey(Person)
-    name_type = models.ForeignKey(NameType)
+    person = models.ForeignKey(Person,on_delete=models.PROTECT)
+    name_type = models.ForeignKey(NameType,on_delete=models.PROTECT)
     value = models.CharField(max_length=4096,default="-",db_index=True)
 
     def __str__(self): return str(self.value)
@@ -868,7 +868,7 @@ class CategoryTreeNodeManager(models.Manager):
         return self.filter(is_category=True).aggregate(Max('level'))["level__max"]
 
 class CategoryTreeNode(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType,on_delete=models.PROTECT)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type','object_id')
 
@@ -1098,8 +1098,8 @@ class Category(models.Model):
         return big_parent_id
 
 class CategoryRelation(models.Model):
-    child = models.ForeignKey(Category,related_name="parent_set")
-    parent = models.ForeignKey(Category,related_name="child_set")
+    child = models.ForeignKey(Category,related_name="parent_set",on_delete=models.PROTECT)
+    parent = models.ForeignKey(Category,related_name="child_set",on_delete=models.PROTECT)
 
     def __str__(self): 
         return str(self.parent)+"/"+str(self.child)
@@ -1108,29 +1108,29 @@ class CategoryRelation(models.Model):
         ordering = ["parent","child"]
 
 class CategoryTimeSpanRelation(models.Model):
-    time_span=models.ForeignKey(TimeSpan)
-    category=models.ForeignKey(Category)
+    time_span=models.ForeignKey(TimeSpan,on_delete=models.PROTECT)
+    category=models.ForeignKey(Category,on_delete=models.PROTECT)
 
     def __str__(self):
         return str(self.time_span)+"/"+str(self.category)
 
 class CategoryPlaceRelation(models.Model):
-    place=models.ForeignKey(Place)
-    category=models.ForeignKey(Category)
+    place=models.ForeignKey(Place,on_delete=models.PROTECT)
+    category=models.ForeignKey(Category,on_delete=models.PROTECT)
 
     def __str__(self):
         return str(self.place)+"/"+str(self.category)
 
 class CategoryPersonRelation(models.Model):
-    person=models.ForeignKey(Person)
-    category=models.ForeignKey(Category)
+    person=models.ForeignKey(Person,on_delete=models.PROTECT)
+    category=models.ForeignKey(Category,on_delete=models.PROTECT)
 
     def __str__(self):
         return str(self.person)+"/"+str(self.category)
 
 class CategoryLanguageRelation(models.Model):
-    language=models.ForeignKey(LanguageVariety)
-    category=models.ForeignKey(Category)
+    language=models.ForeignKey(LanguageVariety,on_delete=models.PROTECT)
+    category=models.ForeignKey(Category,on_delete=models.PROTECT)
 
     def __str__(self):
         return str(self.language)+"/"+str(self.category)
@@ -1169,9 +1169,9 @@ class AuthorRole(LabeledAbstract):
     pos = models.IntegerField(unique=True)
 
 class AuthorRelation(models.Model):
-    author = models.ForeignKey(Author)
-    author_role = models.ForeignKey(AuthorRole)
-    content_type = models.ForeignKey(ContentType,editable=False,null=True)
+    author = models.ForeignKey(Author,on_delete=models.PROTECT)
+    author_role = models.ForeignKey(AuthorRole,on_delete=models.PROTECT)
+    content_type = models.ForeignKey(ContentType,editable=False,null=True,on_delete=models.PROTECT)
     year = models.IntegerField(editable=False,db_index=True)
     #year_label = models.CharField(max_length=10,editable=False)
 
@@ -1211,7 +1211,7 @@ class AuthorRelation(models.Model):
 class MigrAuthor(models.Model):
     cod = models.CharField(max_length=1,default="-",db_index=True)
     ind = models.IntegerField(db_index=True)
-    author = models.ForeignKey(Author)
+    author = models.ForeignKey(Author,on_delete=models.PROTECT)
 
     def __str__(self): return str(self.cod)+str(self.ind)+" "+str(self.author)
 
@@ -1227,7 +1227,7 @@ class PublisherState(models.Model):
 
 class PublisherAddress(models.Model):
     city = models.CharField(max_length=4096)
-    state = models.ForeignKey(PublisherState)
+    state = models.ForeignKey(PublisherState,on_delete=models.PROTECT)
 
     def __str__(self): return str(self.city)+" - "+str(self.state)
 
@@ -1264,7 +1264,7 @@ class PublisherIsbnManager(models.Manager):
 
 class PublisherIsbn(models.Model):
     isbn = models.CharField(max_length=4096,unique=True,db_index=True)
-    preferred = models.ForeignKey("Publisher",editable=False,blank=True)
+    preferred = models.ForeignKey("Publisher",editable=False,blank=True,on_delete=models.PROTECT)
     objects = PublisherIsbnManager()
 
     class Meta:
@@ -1368,14 +1368,14 @@ class Publisher(models.Model):
     
 
 class PublisherAddressPublisherRelation(PositionAbstract):
-    address = models.ForeignKey(PublisherAddress)
-    publisher = models.ForeignKey(Publisher)
+    address = models.ForeignKey(PublisherAddress,on_delete=models.PROTECT)
+    publisher = models.ForeignKey(Publisher,on_delete=models.PROTECT)
 
     def __str__(self): return str(self.publisher)+" ["+str(self.pos)+"] "+str(self.address)
 
 class MigrPublisherRiviste(models.Model):
     registro = models.CharField(max_length=4096)
-    publisher = models.ForeignKey(Publisher)
+    publisher = models.ForeignKey(Publisher,on_delete=models.PROTECT)
 
     def __str__(self): return str(self.registro)
 
@@ -1391,9 +1391,9 @@ class PublicationManager(models.Manager):
 class Publication(models.Model):
     issn = models.CharField(max_length=128) #7
     issn_crc = models.CharField(max_length=1,editable=False,default="Y")
-    publisher = models.ForeignKey(Publisher)
+    publisher = models.ForeignKey(Publisher,on_delete=models.PROTECT)
     title = models.CharField(max_length=4096)
-    volume_type = models.ForeignKey(VolumeType)
+    volume_type = models.ForeignKey(VolumeType,on_delete=models.PROTECT)
     date_format = models.CharField(max_length=4096,default="%Y-%m-%d")
 
     objects=PublicationManager()
@@ -1438,7 +1438,7 @@ class Publication(models.Model):
 
 class Volume(models.Model):
     label = models.CharField(max_length=256,db_index=True)
-    publication = models.ForeignKey(Publication)
+    publication = models.ForeignKey(Publication,on_delete=models.PROTECT)
 
     def __str__(self): return str(self.publication)+" - "+str(self.label)
 
@@ -1461,8 +1461,8 @@ class IssueManager(models.Manager):
         return self.all().filter(volume__publication__id=publication.id).order_by("date")
 
 class Issue(models.Model):
-    volume = models.ForeignKey(Volume)
-    issue_type = models.ForeignKey(IssueType)
+    volume = models.ForeignKey(Volume,on_delete=models.PROTECT)
+    issue_type = models.ForeignKey(IssueType,on_delete=models.PROTECT)
     issn_num = models.CharField(max_length=8)
     number = models.CharField(max_length=256)
     title = models.CharField(max_length=4096,blank=True,default="")
@@ -1509,7 +1509,7 @@ class Issue(models.Model):
         return self.date.year
 
 class IssueAuthorRelation(AuthorRelation,PositionAbstract):
-    issue = models.ForeignKey(Issue)
+    issue = models.ForeignKey(Issue,on_delete=models.PROTECT)
 
     def __str__(self): return str(self.author)+", "+str(self.issue)
 
@@ -1532,7 +1532,7 @@ class IssueAuthorRelation(AuthorRelation,PositionAbstract):
 
 class Article(models.Model):
     title = models.CharField(max_length=4096)
-    issue = models.ForeignKey(Issue)
+    issue = models.ForeignKey(Issue,on_delete=models.PROTECT)
     page_begin = models.CharField(max_length=10,blank=True,default="x")
     page_end = models.CharField(max_length=10,blank=True,default="x")
     authors = models.ManyToManyField(Author,through='ArticleAuthorRelation',blank=True)
@@ -1588,7 +1588,7 @@ class Article(models.Model):
         return H
 
 class ArticleAuthorRelation(AuthorRelation,PositionAbstract):
-    article = models.ForeignKey(Article)
+    article = models.ForeignKey(Article,on_delete=models.PROTECT)
 
     def __str__(self): return str(self.author)+", "+str(self.article)
 
@@ -1640,7 +1640,7 @@ class Book(CategorizedObject):
     title = models.CharField(max_length=4096)
     year = models.IntegerField()
     year_ipotetic = models.BooleanField(default=False)
-    publisher = models.ForeignKey(Publisher)
+    publisher = models.ForeignKey(Publisher,on_delete=models.PROTECT)
     authors = models.ManyToManyField(Author,through='BookAuthorRelation',blank=True)
 
     objects=BookManager()
@@ -1754,7 +1754,7 @@ class Book(CategorizedObject):
         return(crc)
 
 class BookAuthorRelation(AuthorRelation,PositionAbstract):
-    book = models.ForeignKey(Book)
+    book = models.ForeignKey(Book,on_delete=models.PROTECT)
 
     def __str__(self): return str(self.author)+", "+str(self.book)
 
@@ -1801,7 +1801,7 @@ class RepositoryCacheBook(models.Model):
         ordering = [ "isbn" ]
 
 class RepositoryCacheAuthor(PositionAbstract):
-    book = models.ForeignKey(RepositoryCacheBook)
+    book = models.ForeignKey(RepositoryCacheBook,on_delete=models.PROTECT)
     name = models.CharField(max_length=4096)
     role = models.CharField(max_length=4096)
 
@@ -1830,7 +1830,7 @@ class BookSerieWithoutIsbn(models.Model):
     isbn_book_prefix = models.CharField(max_length=9,db_index=True)
     title = models.CharField(max_length=4096)
     title_prefix = models.CharField(max_length=4096,default='',blank=True)
-    publisher = models.ForeignKey(Publisher)
+    publisher = models.ForeignKey(Publisher,on_delete=models.PROTECT)
     
     def __str__(self): return str(self.title)
 

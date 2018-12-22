@@ -6,7 +6,8 @@ from django.views.generic.base import TemplateView,RedirectView
 from django.contrib import admin
 from django.views.decorators.cache import never_cache
 from django.utils.text import capfirst
-from django.core.urlresolvers import NoReverseMatch, reverse
+#from django.core.urlresolvers import NoReverseMatch, reverse
+from django.urls import NoReverseMatch, reverse
 from django.apps import apps
 from django.utils import six
 from django.template.response import TemplateResponse
@@ -171,7 +172,8 @@ admin.sites.site=admin.site
 
 urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    #url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
     #url(r'^$', RedirectView.as_view(url='/bibliography/catalog',permanent=False),name="home"),
     url(r'^$', RedirectView.as_view(url='/home/',permanent=False),name="home"),
 ]

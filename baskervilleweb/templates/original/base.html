@@ -9,14 +9,10 @@
 
 <link rel="icon" href='{% static "images/logo-baskerville-piccolo.png" %}' type="image/png"/>
 
-<!-- <link rel="stylesheet" type="text/css" href='{% static "css/creativecommons.css" %}'/>
-<link rel="stylesheet" type="text/css" href='{% static "css/font-libertine.css" %}'/>
-<link rel="stylesheet" type="text/css" href='{% static "css/font-sniglet.css" %}'/> -->
-<link rel="stylesheet" type="text/css" href='{% static "css/font-awesome.min-4.6.3.css" %}'/>
-<link rel="stylesheet" type="text/css" href='{% static "css/common.css" %}'/>
 <link rel="stylesheet" type="text/css" href='{% static "css/baskerville.css" %}'/>
 <link rel="stylesheet" type="text/css" href='{% static "css/jquery-ui-1.11.0.bookcolor.css" %}'/>
-<!-- <link rel="stylesheet" type="text/css" href='{% static "css/jquery-ui-santaclara-widgets.css" %}'/> -->
+
+<script defer src='{% static "js/fontawesome-all.min.js" %}'></script>
 
 </head>
 
@@ -29,63 +25,67 @@
 -->
 
   <header>
-    <div id="headerlogo">
-      <a href="/">
-      <img src="{% static "images/logo-baskerville.png" %}"/>
+      <a href="{% url 'home' %}">
+      <img src="{% static "images/logo-baskerville.png" %}" alt="home"/>
       </a>
-    </div>
-    <div id="headerbanner">
-      Baskerville
-    </div>
+      <h1>
+	Baskerville
+      </h1>
   </header>
 
   <nav>
 
-    <a href="{% url 'home' %}">{% trans "Home" %}</a>
-
     <div class="submenu">
-      <h1>{% trans "Library" %}</h1>
+      <h1><i class="fa fa-university"></i> {% trans "Library" %}</h1>
       <div class="items">
-	<a href="{% url 'bibliography:catalog' %}">{% trans "Catalog" %}</a><br/>
-	<a href="{% url 'bibliography:categories' %}">{% trans "Categories" %}</a><br/>
-	<a href="{% url 'bibliography:publisher-list' %}">{% trans "Publishers" %}</a><br/>
-	<a href="{% url 'bibliography:publication-list' %}">{% trans "Publications" %}</a><br/>
-	<a href="{% url 'bibliography:author-list' %}">{% trans "Authors" %}</a><br/>
-	<a href="{% url 'bibliography:nameformatcollection-list' %}">{% trans "Name Format Collections" %}</a><br/>
-	<a href="{% url 'bibliography:publisherisbn-list' %}">ISBN Case editrici</a><br/>
-	<a href="{% url 'bibliography:publisherisbn-alpha' %}">Case editrici con ISBN non numerico</a><br/>
-	<a href="{% url 'bibliography:book-list-alpha' %}">Libri con ISBN non numerico</a><br/>
-	<a href="{% url 'bibliography:book-serie-without-isbn' %}">Collane senza ISBN</a><br/>
-	<a href="{% url 'bibliography:publication-list-alpha' %}">{% trans "Publications without ISSN" %}</a><br/>
+	<a href="{% url 'bibliography:catalog' %}">{% trans "Catalog" %}</a>
+	<a href="{% url 'bibliography:categories' %}">{% trans "Categories" %}</a>
+	<hr/>
+	<a href="{% url 'bibliography:publisher-list' %}">{% trans "Publishers" %}</a>
+	<a href="{% url 'bibliography:publisherisbn-list' %}">ISBN Case editrici</a>
+	<a href="{% url 'bibliography:publisherisbn-alpha' %}">Case editrici con ISBN non numerico</a>
+	<hr/>
+	<a href="{% url 'bibliography:author-list' %}">{% trans "Authors" %}</a>
+	<a href="{% url 'bibliography:nameformatcollection-list' %}">{% trans "Name Format Collections" %}</a>
+	<hr/>
+	<a href="{% url 'bibliography:book-list-alpha' %}">Libri con ISBN non numerico</a>
+	<a href="{% url 'bibliography:book-serie-without-isbn' %}">Collane senza ISBN</a>
+	<hr/>
+	<a href="{% url 'bibliography:publication-list' %}">{% trans "Publications" %}</a>
+	<a href="{% url 'bibliography:publication-list-alpha' %}">{% trans "Publications without ISSN" %}</a>
       </div>
     </div>
 
-    <a href="{% url 'recipebook:recipecategory_list' %}">{% trans "Recipe Book" %}</a>
+    <a href="{% url 'recipebook:recipecategory_list' %}">
+      <i class="fa fa-book"></i> {% trans "Recipe Book" %}</a>
 
     <div class="submenu">
-      <h1>{% trans "Archive" %}</h1>
+      <h1><i class="fa fa-archive"></i> {% trans "Archive" %}</h1>
       <div class="items">
-	<a href="{% url 'archive:photo_list' %}">{% trans "Photos" %}</a>
+	<a href="{% url 'archive:photo_list' %}"><i class="fa fa-camera-retro"></i> {% trans "Photos" %}</a>
       </div>
     </div>
 
 
     <div class="submenu">
-      <h1>{% trans "Tools" %}</h1>
+      <h1><i class="fa fa-wrench"></i> {% trans "Tools" %}</h1>
       <div class="items">
-	<a href="{% url 'bibliography:insert' %}">{% trans "Insert book" %}</a><br/>
-	<a href="{% url 'bibliography:author-search' %}">{% trans "Search author" %}</a><br/>
-	<a href="{% url 'bibliography:author-insert' %}">{% trans "Insert author" %}</a><br/>
-	<a href="{% url 'bibliography:publisher-create' %}">{% trans "Create publisher" %}</a><br/>
-	<a href="{% url 'bibliography:author-create' %}">{% trans "Create author" %}</a><br/>
-	<a href="{% url 'bibliography:book-create' %}">{% trans "Create book" %}</a><br/>
+	<a href="{% url 'bibliography:insert' %}">{% trans "Insert book" %}</a>
+	<a href="{% url 'bibliography:book-create' %}">{% trans "Create book" %}</a>
+	<hr/>
+	<a href="{% url 'bibliography:author-search' %}">{% trans "Search author" %}</a>
+	<a href="{% url 'bibliography:author-insert' %}">{% trans "Insert author" %}</a>
+	<a href="{% url 'bibliography:author-create' %}">{% trans "Create author" %}</a>
+	<hr/>
+	<a href="{% url 'bibliography:publisher-create' %}">{% trans "Create publisher" %}</a>
+	<hr/>
 	<a href="{% url 'bibliography:categories-categorizer' %}">
-	  {% trans "Categorizer: category to category" %}</a><br/>
+	  {% trans "Categorizer: category to category" %}</a>
 	<a href="{% url 'bibliography:books-categorizer' %}">{% trans "Categorizer: book to category" %}</a>
       </div>
     </div>
 
-    <a href="{% url 'admin:index' %}">{% trans "Admin" %}</a>
+    <a href="{% url 'admin:index' %}"><i class="fa fa-key"></i> {% trans "Admin" %}</a>
 
   </nav>
 

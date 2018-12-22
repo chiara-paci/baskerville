@@ -46,7 +46,7 @@ class StepSequence(NameAbstract):
 
 class Step(models.Model):
     description = models.CharField(max_length=8192)
-    sequence = models.ForeignKey(StepSequence)
+    sequence = models.ForeignKey(StepSequence,on_delete=models.PROTECT)
     tools = models.ManyToManyField(Tool,blank=True)
 
     class Meta:
@@ -57,10 +57,10 @@ class Step(models.Model):
 class RecipeCategory(NameAbstract): pass
     
 class Recipe(NameAbstract):
-    category = models.ForeignKey(RecipeCategory)
+    category = models.ForeignKey(RecipeCategory,on_delete=models.PROTECT)
     serving = models.PositiveIntegerField(blank=True,default=4,
                                           validators=[validators.MinValueValidator(1)])
-    execution = models.ForeignKey(StepSequence)
+    execution = models.ForeignKey(StepSequence,on_delete=models.PROTECT)
 
     def ingredients(self):
         t=[str(x) for x in self.ingredient_set.all().filter(inlist=True)]
@@ -89,7 +89,7 @@ class MeasureUnit(NameAbstract):
         ordering = [ 'name' ]
 
 class Food(NameAbstract):
-    category = models.ForeignKey(FoodCategory)
+    category = models.ForeignKey(FoodCategory,on_delete=models.PROTECT)
     plural = models.CharField(max_length=4096,blank=True,null=True)
     gender = models.CharField(max_length=128,default='masculine',choices = ( 
         ( "masculine", "masculine" ),
@@ -145,13 +145,13 @@ class Food(NameAbstract):
         return "lo"
 
 class Ingredient(models.Model):
-    food = models.ForeignKey(Food)
-    recipe = models.ForeignKey(Recipe)
+    food = models.ForeignKey(Food,on_delete=models.PROTECT)
+    recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
     quantity = models.FloatField(validators=[validators.MinValueValidator(0.0)],
                                  blank=True,null=True)
     measure = models.ForeignKey(MeasureUnit,
-                                blank=True,null=True)
-    preparation = models.ForeignKey(StepSequence,blank=True,null=True)
+                                blank=True,null=True,on_delete=models.PROTECT)
+    preparation = models.ForeignKey(StepSequence,blank=True,null=True,on_delete=models.PROTECT)
     inlist=models.BooleanField(default=True,blank=True)
 
     def __str__(self): 

@@ -25,7 +25,7 @@ class Photo(models.Model):
     description = models.CharField(max_length=8192,blank=True)
     width = models.IntegerField()
     height = models.IntegerField()
-    format = models.ForeignKey(ImageFormat)
+    format = models.ForeignKey(ImageFormat,on_delete=models.PROTECT)
     mode = models.CharField(max_length=1024)
     mimetype = models.CharField(max_length=1024)
     datetime = models.DateTimeField(default=timezone.now)
@@ -66,8 +66,8 @@ class MetaLabel(models.Model):
     def __str__(self): return self.name
 
 class PhotoMetaDatum(models.Model):
-    photo = models.ForeignKey(Photo)
-    label = models.ForeignKey(MetaLabel)
+    photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
+    label = models.ForeignKey(MetaLabel,on_delete=models.PROTECT)
     value = models.CharField(max_length=8192)
 
     def __str__(self): return str(self.photo)+"/"+str(self.label)
@@ -82,7 +82,7 @@ class ExifType(models.Model):
 class ExifLabel(models.Model):
     category = models.CharField(max_length=128)
     name = models.CharField(max_length=1024,blank=True)
-    type = models.ForeignKey(ExifType)
+    type = models.ForeignKey(ExifType,on_delete=models.PROTECT)
     exif_id = models.IntegerField(blank=True,default=-1)
 
     def __str__(self):
@@ -90,8 +90,8 @@ class ExifLabel(models.Model):
         return self.type+" "+str(self.exif_id)
 
 class ExifDatum(models.Model):
-    photo = models.ForeignKey(Photo)
-    label = models.ForeignKey(ExifLabel)
+    photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
+    label = models.ForeignKey(ExifLabel,on_delete=models.PROTECT)
     value = models.CharField(max_length=8192)
 
     def __str__(self): return str(self.photo)+"/"+str(self.label)

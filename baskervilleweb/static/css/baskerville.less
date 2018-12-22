@@ -1,61 +1,26 @@
 @import "baskerville-colors.less";
 @import "baskerville-fonts.less";
+@import "baskerville-library.less";
 
-/*** functions ***/
-
-.outshadow(@x;@y;@blur;@spread;@color) {
-    box-shadow: @x @y @blur @spread @color;
-    -moz-box-shadow: @x @y @blur @spread  @color;
-    -webkit-box-shadow: @x @y @blur @spread  @color;
-}
-
-.inshadow(@x;@y;@blur;@spread;@color) {
-    box-shadow: inset @x @y @blur @spread @color, inset -@x -@y @blur @spread @color;
-    -moz-box-shadow: inset @x @y @blur @spread @color, inset -@x -@y @blur @spread @color;
-    -webkit-box-shadow: inset @x @y @blur @spread @color, inset -@x -@y @blur @spread @color;
-}
-
-.borderradius(@radius){
-    border-radius: @radius;
-    -moz-border-radius: @radius;
-    -webkit-border-radius: @radius;
-}
-
-.textshadow(@x;@y;@blur;@color) {
-    text-shadow: @x @y @blur @color;
-    -moz-text-shadow: @x @y @blur @color;
-    -webkit-text-shadow: @x @y @blur @color;
-}
-
-.columned(@num) {
-    -webkit-column-count: @num; /* Chrome, Safari, Opera */
-    -moz-column-count: @num; /* Firefox */
-    column-count: @num;
-}
-
-/*** commons ***/
-
-.shadow-prim {
-    .outshadow(1px;1px;3px;3px;@prim4)
-}
-
-.removed {
-    display: none;
-}
 
 /*** MAIN ***/
 
 * {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box
 }
 
-body {
-    font-family: 'OpenSans','Arial', sans-serif;
-    letter-spacing: -0.01em;
-    font-size: 12pt;
-    background: @textbackcolor;
-    color: @textforecolor;
+html {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -ms-font-size-adjust: 0.58;
+    -webkit-font-size-adjust: 0.58;
+    font-size-adjust: 0.58;
+    min-height: 100vh;
 }
 
 table {
@@ -63,9 +28,41 @@ table {
     font-size: .8em;
 }
 
+body {
+    font-family: 'OpenSans','Arial', sans-serif;
+    letter-spacing: -0.01em;
+    background: @textbackcolor;
+    color: @textforecolor;
+    font-size: 14px;
+    line-height: 150%;
+    text-align: center;
+    min-height: 100vh;
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    align-content: stretch;
+    justify-content: flex-start;
+}
+
 header {
     background: @seca0;
     color: @seca2;
+
+    text-align: left;
+    z-index: 100;
+    width: 100%;
+    vertical-align: center;
+    position: relative;
+    padding: .1em;
+
+    order: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+
 
     * {
 	display: inline-block;
@@ -80,8 +77,8 @@ header {
 	padding-left: 20px;
     }
 
-    div {
-	font: 4em Sniglet, 'Comic Sans MS', serif;
+    h1 {
+	font: 5em Sniglet, 'Comic Sans MS', serif;
 	line-height: 100px;
 	.textshadow(2px;2px;4px;@secahard4);
     }
@@ -90,22 +87,24 @@ header {
 
 
 nav {
+    order: 1;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+
     background-color: @secahard4;
     color: @seca2;
-    left: 0;
-    right: 0;
     margin-bottom: .5em;
     height: 2em;
     line-height: 2em;
-    padding: 1em;
-    padding-top: .5em;
-    padding-bottom: .5em;
     text-align: center;
-
-    * {
-	display: inline-block;
-	vertical-align: top;
-    }
     
     a {
 	color: @seca2;
@@ -120,26 +119,26 @@ nav {
 	color: @secahard4;
     }
     
-    .right {
-	float: right;
-    }
-    
-    .left {
-	float: left;
-    }
-
     .submenu {
 	background-color: @secahard4;
 	color: @seca2;
 	width: 10em;
+
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+	align-items: flex-start;
+	align-content: flex-start;
+
+	.borderradiusbottom(1em);
+
 	h1 {
 	    font-size: 1em;
 	    font-weight: normal;
-	    .borderradius(1em);
+	    .borderradiustop(1em);
 	    text-align: center;
 	    width: 100%;
-	    padding: 0;
-	    margin: 0;
 	}
 
 	h1:hover {
@@ -148,30 +147,47 @@ nav {
 	}
 
 	.items {
-	    padding: .3em;
-	    margin: 0;
-	    margin-top: .5em;
+	    .borderradiusbottom(1em);
+	    padding-bottom: 1em;
+	    padding-top: .2em;
 	    display: none;
 	    position: relative;
 	    background-color: @secahard4;
 	    font-size: .9em;
-	    line-height: .9em;
+	    line-height: 1em;
 	    text-align: left;
-	    * {
-		padding: 0;
+	    width: 100%;
+
+	    a,h2 {
+		width: 100%;
+		padding: .3em;
 		margin: 0;
 		margin-top: .2em;
 		margin-bottom: .2em;
-		display: block;
 		.borderradius(0);
 	    }
+
+	    hr {
+		height: .2em;
+		.borderradius(.2em);
+		width: 100%;
+		margin: auto;
+		background: linear-gradient(to right, @secahard4 , @seca2, @secahard4);
+		border: 0px;
+	    }
+
 	}
 
     }
 
     .submenu:hover {
 	.items {
-	    display: block;
+	    display: flex;
+	    flex-direction: column;
+	    flex-wrap: nowrap;
+	    justify-content: flex-start;
+	    align-items: flex-start;
+	    align-content: flex-start;
 	    z-index: 200;
 	}
 
@@ -187,6 +203,11 @@ nav {
 }
 
 main {
+
+    order: 2;
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: auto;
 
     padding: 1em;
     
@@ -340,7 +361,63 @@ main {
 
     }
 
+} /** end main **/
+
+
+/*** recipe book ***/
+
+div.recipebook {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    align-content: flex-start;
+    justify-content: space-around;
+
+    section {
+	width: 30%;
+	border: 1px solid fade(@primhard4,50%);
+	padding: .2em;
+
+	background: white;
+
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	align-content: flex-start;
+	justify-content: flex-start;
+
+	min-height: 10em;
+
+	h1 {
+	    background: @primhard4;
+	    color: @prim2;
+	    .borderradius(0);
+	    padding: .2em;
+	    width: 100%;
+	    border: 0px;
+	}
+
+	a {
+	    width: 100%;
+	    color: @primhard4;
+	    text-decoration: none;
+	    text-align: left;
+	}
+
+	a:hover {
+	    background: @primhard4;
+	    color: @prim2;
+	}
+
+    }
+
 }
+
+
+
+/*** da verificare ***/
 
 textarea.fixed {
     font-size: 14pt;
@@ -503,3 +580,7 @@ div.filter {
     
 
 }
+
+
+
+
