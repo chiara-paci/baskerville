@@ -5,13 +5,17 @@
 
 <h1>{{ recipe }}</h1>
 
+<div class="recipebook">
+
+<div>
 <h2>{% trans "Ingredients" %}</h2>
 
 <table>
 {% for ing in recipe.ingredient_set.all %}
 <tr>
-  <td>{{ ing.food }}{% if ing.quantity %}:{% endif %}</td>
-  <td>{% if ing.quantity %}{{ ing.quantity|floatformat:"-2" }} {% if ing.measure %}{{ ing.measure }}{% endif %}{% endif %}</td>
+  <td>{{ ing.food }}</td>
+  <td>{{ ing.format_quantity }}</td>
+  <td>{{ ing.format_conversion }}</td>
 </tr>
 {% endfor %}
 </table>
@@ -27,7 +31,6 @@
   {% endfor %}
 </table>
 
-
 <h2>{% trans "Ingredients preparation" %}</h2>
 
 <ol>
@@ -39,6 +42,11 @@
 {% endfor %}
 </ol>
 
+</div>
+
+
+<div>
+
 <h2>{% trans "Execution" %}</h2>
 
 <ol>
@@ -47,5 +55,10 @@
 
 {% endfor %}
 </ol>
+
+</div>
+
+
+</div>
 
 {% endblock content %}

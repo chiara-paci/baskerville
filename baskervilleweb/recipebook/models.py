@@ -2,6 +2,8 @@ from django.db import models
 from django.core import validators
 from django.utils.functional import cached_property
 
+import re
+
 # Create your models here.
 
 class NameAbstract(models.Model):
@@ -43,7 +45,6 @@ class StepSequence(NameAbstract):
                 steps.append(step)
         return steps
 
-
 class Step(models.Model):
     description = models.CharField(max_length=8192)
     sequence = models.ForeignKey(StepSequence,on_delete=models.PROTECT)
@@ -81,12 +82,19 @@ class Recipe(NameAbstract):
 
 
 class MeasureUnit(NameAbstract):
-    base = models.CharField(max_length=128,default='g',choices = ( ( "g", "g" ),
-                                                                   ( "ml", "ml" ) ))
+    base = models.CharField(max_length=128,default='g',choices = ( ( "g",  "g" ),
+                                                                   ( "ml", "ml" ),
+                                                                   ( "qb", "qb") ))
     factor = models.FloatField(validators=[validators.MinValueValidator(0.0)])
+    plural = models.CharField(max_length=4096,blank=True,null=True)
     
     class Meta:
         ordering = [ 'name' ]
+
+    @cached_property
+    def name_plural(self):
+        if self.plural: return self.plural
+        return self.name
 
 class Food(NameAbstract):
     category = models.ForeignKey(FoodCategory,on_delete=models.PROTECT)
@@ -181,4 +189,24 @@ class Ingredient(models.Model):
         ret=[]
         for step in self.preparation.step_set.all():
             ret.append(str(step) % params)
+            #ret.append(str(step)) # % params)
         return ret
+
+    @cached_property
+    def format_quantity(self):
+        # {% if ing.quantity %}{{ ing.quantity|floatformat:"-2" }} {% if ing.measure %}{{ ing.measure }}{% endif %}{% endif %}</td>
+        if self.measure.base=="qb": return "q.b."
+        if self.quantity<=0: return "q.b."
+        qta=re.sub( r'\.?0+$','', ("%.2f" % self.quantity) )
+        if self.quantity==1:
+            return "%s %s" % (qta,self.measure.name)
+        else:
+            return "%s %s" % (qta,self.measure.name_plural)
+            
+    @cached_property
+    def format_conversion(self):
+        if (self.measure.name==self.measure.base) and (self.measure.factor==1): return ""
+        q_conv=re.sub( r'\.?0+$','', ("%.2f" % (self.quantity*self.measure.factor) ) )
+        return "(%s %s)" % (q_conv,self.measure.base)
+        
+        
