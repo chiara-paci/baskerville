@@ -205,6 +205,7 @@ class Ingredient(models.Model):
             
     @cached_property
     def format_conversion(self):
+        if self.measure.base=="qb": return ""
         if (self.measure.name==self.measure.base) and (self.measure.factor==1): return ""
         q_conv=re.sub( r'\.?0+$','', ("%.2f" % (self.quantity*self.measure.factor) ) )
         return "(%s %s)" % (q_conv,self.measure.base)
