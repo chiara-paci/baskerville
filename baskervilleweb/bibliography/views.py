@@ -1158,3 +1158,12 @@ class PublicationIssuesAuthorAddView(View,SingleObjectMixin):
 
 #### category graph
 
+class CatalogView(ListView):
+    paginate_by=63
+    context_object_name="author_list"
+    template_name="bibliography/author_catalog.html"
+    #queryset=Author.objects.catalog()
+
+    def get_queryset(self, *args, **kwargs):
+        return Author.objects.catalog()
+    

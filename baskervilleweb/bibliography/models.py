@@ -1147,13 +1147,48 @@ class CategorizedObject(models.Model):
 
 ### authors
 
+class AuthorManager(PersonManager):
+
+    def catalog(self):
+
+        class CatAuthor(object):
+            def __init__(self,db_author):
+                self._db_author=db_author
+                self.id=db_author.id
+                self.list_name=db_author.list_name
+                self.long_name=db_author.long_name
+                self.publications=[]
+
+        issues=[ (rel.author,rel.author_role,rel.issue)
+                 for rel in IssueAuthorRelation.objects.all().select_related() ]
+        books=[ (rel.author,rel.author_role,rel.book)
+                for rel in BookAuthorRelation.objects.all().select_related() ]
+        articles=[ (rel.author,rel.author_role,rel.article)
+                   for rel in ArticleAuthorRelation.objects.all().select_related() ]
+        authors=[ CatAuthor(aut) for aut in self.all().select_related().prefetch_related("cache") ]
+        dict_aut={ aut.id: aut for aut in authors }
+
+        for aut,role,obj in issues:
+            dict_aut[aut.id].publications.append( (obj.year,role,obj) )
+        for aut,role,obj in books:
+            dict_aut[aut.id].publications.append( (obj.year,role,obj) )
+        for aut,role,obj in articles:
+            dict_aut[aut.id].publications.append( (obj.year,role,obj) )
+
+        return authors
+            
+        #return self.all().select_related().prefetch_related("cache","authorrelation_set")
+
 class Author(Person):
+
+    objects=AuthorManager()
+    
     class Meta:
         proxy = True
 
     def publications(self):
         L=[]
-        for rel in self.authorrelation_set.all():
+        for rel in self.authorrelation_set.all().select_related():
             L.append( (rel.year,rel.author_role,rel.actual()) )
         return L
 
@@ -1468,6 +1503,8 @@ class Issue(models.Model):
     title = models.CharField(max_length=4096,blank=True,default="")
     date = models.DateField()
     date_ipotetic = models.BooleanField(default=False)
+    html_cache = models.TextField(blank=True,null=True,default="",editable=False)
+
     authors = models.ManyToManyField(Author,through='IssueAuthorRelation',blank=True)
 
     objects=IssueManager()
@@ -1484,7 +1521,13 @@ class Issue(models.Model):
             return D+"?"
         return D
 
-    def html(self):
+    def save(self,*args,**kwargs):
+        self.html_cache=self._html()
+        return models.Model.save(self,*args,**kwargs)
+
+    def html(self): return self.html_cache
+
+    def _html(self):
         H=self.volume.html()
         if H:
             H+=", "
@@ -1536,6 +1579,7 @@ class Article(models.Model):
     page_begin = models.CharField(max_length=10,blank=True,default="x")
     page_end = models.CharField(max_length=10,blank=True,default="x")
     authors = models.ManyToManyField(Author,through='ArticleAuthorRelation',blank=True)
+    html_cache = models.TextField(blank=True,null=True,default="",editable=False)
 
     def get_authors(self):
         return ", ".join([str(x.author.long_name()) for x in self.articleauthorrelation_set.filter(author_role__cover_name=True).order_by("pos")])
@@ -1569,7 +1613,13 @@ class Article(models.Model):
 
     def year(self): return self.issue.year()
 
-    def html(self):
+    def save(self,*args,**kwargs):
+        self.html_cache=self._html()
+        return models.Model.save(self,*args,**kwargs)
+
+    def html(self): return self.html_cache
+
+    def _html(self):
         H=""
         H+=self.get_authors()
         if H:
@@ -1643,6 +1693,8 @@ class Book(CategorizedObject):
     publisher = models.ForeignKey(Publisher,on_delete=models.PROTECT)
     authors = models.ManyToManyField(Author,through='BookAuthorRelation',blank=True)
 
+    html_cache = models.TextField(blank=True,default="",editable=False)
+    
     objects=BookManager()
 
     class Meta:
@@ -1683,7 +1735,10 @@ class Book(CategorizedObject):
             return str(self.title)+" ("+str(self.year)+")"
         return str(self.title)+" ("+str(self.year)+"?)"
 
-    def html(self):
+    @cached_property
+    def html(self): return self.html_cache
+
+    def _html(self):
         H=""
         H+=self.get_authors()
         if H:
@@ -1711,6 +1766,7 @@ class Book(CategorizedObject):
         self.isbn_crc13 = self.crc13()
         self.isbn_cache10=self.isbn_ced+self.isbn_book+str(self.crc10())
         self.isbn_cache13='978'+self.isbn_ced+self.isbn_book+str(self.crc13())
+        self.html_cache=self._html()
         super(Book, self).save(*args, **kwargs)
 
     def update_crc(self):
