@@ -339,7 +339,6 @@ table {
   font-size: .8em;
 }
 body {
-  font-family: 'OpenSans', 'Arial', sans-serif;
   letter-spacing: -0.01em;
   background: #ffffff;
   color: #000000;
@@ -410,7 +409,6 @@ nav a {
   -moz-border-radius: 1em;
   -webkit-border-radius: 1em;
   text-decoration: none;
-  width: 10em;
   test-align: center;
 }
 nav a:hover {
@@ -570,15 +568,12 @@ main nav.paginator .disabled {
   display: none;
 }
 main nav.tabmenu {
-  -webkit-column-count: 3;
-  /* Chrome, Safari, Opera */
-  -moz-column-count: 3;
-  /* Firefox */
-  column-count: 3;
-  display: inline-block;
-  padding: 0;
-  height: auto;
-  line-height: auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: baseline;
+  align-content: stretch;
   background: none;
   color: #000000;
   font-size: .9em;
@@ -587,22 +582,15 @@ main nav.tabmenu * {
   display: auto;
 }
 main nav.tabmenu a {
+  font-size: 80%;
   color: #9b8a00;
   background-color: #fff8be;
   border: 1px solid #9b8a00;
   border-radius: 1em;
   -moz-border-radius: 1em;
   -webkit-border-radius: 1em;
-  padding-left: 1em;
-  padding-right: 1em;
-  padding-top: .2em;
-  padding-bottom: .2em;
-  margin-top: .1em;
-  margin-bottom: .1em;
   text-decoration: none;
   display: block;
-  height: 1em;
-  line-height: 1em;
 }
 main nav.tabmenu a:hover {
   background-color: #ffe8be;
