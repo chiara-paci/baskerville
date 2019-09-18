@@ -1,0 +1,21 @@
+{% if is_paginated %}
+<nav class="paginator">
+{% if page_obj.has_previous %}
+<a href="?page={{ page_obj.previous_page_number }}&{{ parameters }}"><i class="fa fa-angle-left"></i></a>
+{% else %}
+<span class="disabled"><i class="fa fa-angle-left"></i></span>
+{% endif %}
+{% for p,pnum in page_obj.paginator.page_range %}
+{% if pnum == page_obj.number %}
+<span class="current">{{ p }}</span>
+{% else %}
+<a href="?page={{ pnum }}&{{ parameters }}">{{ p }}</a>
+{% endif %}
+{% endfor %}
+{% if page_obj.has_next %}
+<a href="?page={{ page_obj.next_page_number }}&{{ parameters }}"><i class="fa fa-angle-right"></i></a>
+{% else %}
+<span class="disabled"><i class="fa fa-angle-right"></i></span>
+{% endif %}
+</nav>
+{% endif %}
