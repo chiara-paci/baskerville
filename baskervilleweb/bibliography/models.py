@@ -479,59 +479,40 @@ class NameFormatCollection(LabeledAbstract):
         short_name=str(self.short_format.pattern)
         list_name=str(self.list_format.pattern)
         ordering_name=str(self.ordering_format.pattern)
-        for key,val in list(names.items()):
-            val_f={}
-            t=RE_NAME_SEP.split(val)
-            #t=map(lambda x: x.capitalize(),RE_NAME_SEP.split(val))
-            vons_t=[]
-            norm_t=[]
-            for x in t:
-                if x.lower() in VONS:
-                    vons_t.append(x.lower())
-                else:
-                    if len(x)==1 and x.isalpha():
-                        vons_t.append(x.upper()+".")
-                    else:
-                        vons_t.append(x.capitalize())
-                if len(x)==1 and x.isalpha():
-                    norm_t.append(x+".")
-                else:
-                    norm_t.append(x)
-                    
-            cap_t=[x.capitalize() for x in norm_t]
-            val_norm="".join(norm_t)
-            val_f["L"]=val.lower()
-            val_f["U"]=val.upper()
-            val_f["N"]=val.lower().replace(" ","_")
-            val_f["I"]=". ".join([x[0].upper() for x in list(filter(bool,val.split(" ")))])+"."
-            val_f["C"]="".join(cap_t)
-            val_f["V"]="".join(vons_t)
+        list_upper=str(self.list_format.pattern)
+        list_lower=str(self.list_format.pattern)
 
-            if val.isdigit():
-                val_f["R"]=ROMANS[int(val)-1]
-                val_f["A"]="%3.3d" % int(val)
-            else:
-                val_f["R"]=""
-                val_f["A"]=""
-
-            long_name=long_name.replace("{{"+key+"}}",val_norm)
-            short_name=short_name.replace("{{"+key+"}}",val_norm)
-            list_name=list_name.replace("{{"+key+"}}",val_norm)
-            ordering_name=ordering_name.replace("{{"+key+"}}",val_norm)
+        for key,rel in list(names.items()):
+            val_f=rel.formatted()
+            
+            long_name=long_name.replace("{{"+key+"}}",val_f["norm"])
+            short_name=short_name.replace("{{"+key+"}}",val_f["norm"])
+            list_name=list_name.replace("{{"+key+"}}",val_f["norm"])
+            ordering_name=ordering_name.replace("{{"+key+"}}",val_f["norm"])
+            list_upper=list_upper.replace("{{"+key+"}}",val_f["norm_upper"])
+            list_lower=list_lower.replace("{{"+key+"}}",val_f["norm_lower"])
 
             for k in "VALURNIC":
                 long_name=long_name.replace("{{"+k+"|"+key+"}}",val_f[k])
                 short_name=short_name.replace("{{"+k+"|"+key+"}}",val_f[k])
                 list_name=list_name.replace("{{"+k+"|"+key+"}}",val_f[k])
                 ordering_name=ordering_name.replace("{{"+k+"|"+key+"}}",val_f[k])
+                if k in "AR":
+                    list_upper=list_upper.replace("{{"+k+"|"+key+"}}",val_f[k])
+                    list_lower=list_lower.replace("{{"+k+"|"+key+"}}",val_f[k])
+                else:
+                    list_upper=list_upper.replace("{{"+k+"|"+key+"}}",val_f["norm_upper"])
+                    list_lower=list_lower.replace("{{"+k+"|"+key+"}}",val_f["norm_lower"])
 
-        return long_name,short_name,list_name,ordering_name
+        return long_name,short_name,list_name,ordering_name,list_upper[0],list_lower[0]
 
 class PersonCache(models.Model):
     long_name = models.CharField(max_length=4096,default="-")
     short_name = models.CharField(max_length=4096,default="-")
     list_name = models.CharField(max_length=4096,default="-")
     ordering_name = models.CharField(max_length=4096,default="-")
+    upper_initial = models.CharField(max_length=4,default="-")
+    lower_initial = models.CharField(max_length=4,default="-")
 
     class Meta:
         ordering = ["ordering_name"]
@@ -621,6 +602,8 @@ class Person(models.Model):
     def short_name(self): return str(self.cache.short_name)
     def ordering_name(self): return str(self.cache.ordering_name)
     def list_name(self): return str(self.cache.list_name)
+    def upper_initial(self): return str(self.cache.upper_initial)
+    def lower_initial(self): return str(self.cache.lower_initial)
 
     def save(self, *args, **kwargs):
         if not self.cache:
@@ -631,18 +614,23 @@ class Person(models.Model):
     def update_cache(self):
         names={}
         for rel in self.personnamerelation_set.all():
-            names[str(rel.name_type.label)]=str(rel.value)
-        long_name,short_name,list_name,ordering_name=self.format_collection.apply_formats(names)
-        self.cache.long_name = long_name
-        self.cache.short_name = short_name
-        self.cache.list_name = list_name
+            names[str(rel.name_type.label)]=rel
+        long_name,short_name,list_name,ordering_name,upper_initial,lower_initial=self.format_collection.apply_formats(names)
+        self.cache.long_name     = long_name
+        self.cache.short_name    = short_name
+        self.cache.list_name     = list_name
         self.cache.ordering_name = ordering_name
+        self.cache.upper_initial = upper_initial
+        self.cache.lower_initial = lower_initial
         self.cache.save()
 
 class PersonNameRelation(models.Model):
     person = models.ForeignKey(Person,on_delete=models.PROTECT)
     name_type = models.ForeignKey(NameType,on_delete=models.PROTECT)
     value = models.CharField(max_length=4096,default="-",db_index=True)
+    case_rule = models.CharField(max_length=128,choices=[ ("latin","latin"),
+                                                          ("turkic","turkic") ],
+                                 default="latin")
 
     def __str__(self): return str(self.value)
 
@@ -650,6 +638,96 @@ class PersonNameRelation(models.Model):
         super(PersonNameRelation, self).save(*args, **kwargs)
         self.person.update_cache()
 
+    def _upper(self,x):
+        if self.case_rule=="latin":
+            return x.upper()
+        x=x.replace("ı","I")
+        x=x.replace("i","İ")
+        return x.upper()
+
+    def _lower(self,x):
+        if self.case_rule=="latin":
+            return x.lower()
+        x=x.replace("I","ı")
+        x=x.replace("İ","i")
+        return x.lower()
+
+    def _capitalize(self,x):
+        if self.case_rule=="latin":
+            return x.capitalize()
+        return self._upper(x[0])+self._lower(x[1:])
+
+    ### Sintassi dei formati
+    #   {{<name_type>}}: <name_type> 
+    #   {{C|<name_type>}}: <name_type> (capitalized)
+    #   {{V|<name_type>}}: <name_type> (capitalized except von, de, ecc.)
+    #   {{L|<name_type>}}: <name_type> (lowered)
+    #   {{U|<name_type>}}: <name_type> (uppered)
+    #   {{A|<name_type>}}: <name_type> as integer in arabic 
+    #   {{R|<name_type>}}: <name_type> as integer in roman upper
+    #   {{N|<name_type>}}: <name_type> (lowered and with space => _)
+    #   {{I|<name_type>}}: iniziali (Gian Uberto => G. U.)
+
+    def formatted(self):
+        val=str(self.value)
+        val_f={}
+        t=RE_NAME_SEP.split(val)
+        #t=map(lambda x: self._capitalize(x),RE_NAME_SEP.split(val))
+        vons_t=[]
+        norm_t=[]
+        for x in t:
+            if self._lower(x) in VONS:
+                vons_t.append(self._lower(x))
+            else:
+                if len(x)==1 and x.isalpha():
+                    vons_t.append(self._upper(x)+".")
+                else:
+                    vons_t.append(self._capitalize(x))
+            if len(x)==1 and x.isalpha():
+                norm_t.append(x+".")
+            else:
+                norm_t.append(x)
+
+        cap_t=[self._capitalize(x) for x in norm_t]
+        val_norm="".join(norm_t)
+        val_f["L"]=self._lower(val)
+        val_f["U"]=self._upper(val)
+        val_f["N"]=self._lower(val).replace(" ","_")
+        val_f["I"]=". ".join([x[0].upper() for x in list(filter(bool,val.split(" ")))])+"."
+        val_f["C"]="".join(cap_t)
+        val_f["V"]="".join(vons_t)
+
+        if val.isdigit():
+            val_f["R"]=ROMANS[int(val)-1]
+            val_f["A"]="%3.3d" % int(val)
+        else:
+            val_f["R"]=""
+            val_f["A"]=""
+
+        val_f["norm"]=val_norm
+        val_f["norm_upper"]=self._upper(val_norm)
+        val_f["norm_lower"]=self._lower(val_norm)
+        return val_f
+
+    #     long_name=long_name.replace("{{"+key+"}}",val_norm)
+    #     short_name=short_name.replace("{{"+key+"}}",val_norm)
+    #     list_name=list_name.replace("{{"+key+"}}",val_norm)
+    #     ordering_name=ordering_name.replace("{{"+key+"}}",val_norm)
+
+    #     for k in "VALURNIC":
+    #         long_name=long_name.replace("{{"+k+"|"+key+"}}",val_f[k])
+    #         short_name=short_name.replace("{{"+k+"|"+key+"}}",val_f[k])
+    #         list_name=list_name.replace("{{"+k+"|"+key+"}}",val_f[k])
+    #         ordering_name=ordering_name.replace("{{"+k+"|"+key+"}}",val_f[k])
+
+    # return long_name,short_name,list_name,ordering_name
+
+
+
+
+
+
+        
 ### category
 
 class CategoryTreeNodeManager(models.Manager):
@@ -1155,8 +1233,9 @@ class AuthorManager(PersonManager):
             def __init__(self,db_author):
                 self._db_author=db_author
                 self.id=db_author.id
-                self.list_name=db_author.list_name
-                self.long_name=db_author.long_name
+                self.list_name=db_author.list_name()
+                self.long_name=db_author.long_name()
+                self.ordering_name=db_author.ordering_name()
                 self.publications=[]
 
         issues=[ (rel.author,rel.author_role,rel.issue)

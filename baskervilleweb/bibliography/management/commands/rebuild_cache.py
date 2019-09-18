@@ -16,13 +16,20 @@ class Command(BaseCommand):
     args = 'types'
     help = 'Update cache\ntypes: author_names, issn_crc, preferred_publisher, publication_years,isbn'
 
-    def handle(self, *args, **options):
-        types=args
+    def add_arguments(self,parser):
+        parser.add_argument("types",nargs="*",default=[ "author_names","issn_crc",
+                                                        "preferred_publisher","publication_years",
+                                                        "isbn","nodes" ])
 
-        if len(args)==0:
-            types=[ "author_names","issn_crc","preferred_publisher","publication_years","isbn","nodes" ]
-        else:
-            types=args
+    def handle(self, *args, **options):
+        # types=args
+
+        # if len(args)==0:
+        #     types=[ "author_names","issn_crc","preferred_publisher","publication_years","isbn","nodes" ]
+        # else:
+        #     types=args
+
+        types=options["types"]
 
         if "author_names" in types:
             print("Author names")

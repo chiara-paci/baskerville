@@ -3,6 +3,7 @@
 from django.shortcuts import render,redirect
 from django.urls import reverse
 from django.http import HttpResponse
+from django.core import paginator
 
 
 from django.views.generic import TemplateView,ListView,View,CreateView,DetailView
@@ -1164,6 +1165,31 @@ class CatalogView(ListView):
     template_name="bibliography/author_catalog.html"
     #queryset=Author.objects.catalog()
 
+    class Paginator(paginator.Paginator):
+        def __init__(self,object_list, per_page, orphans=0, allow_empty_first_page=True):
+            paginator.Paginator.__init__(self,object_list, per_page, orphans=0, allow_empty_first_page=True)
+
+
+        def _page_label(self, number):
+            number = self.validate_number(number)
+            bottom = (number - 1) * self.per_page
+            top = bottom + self.per_page
+            if top + self.orphans >= self.count:
+                top = self.count
+            first=self.object_list[bottom].ordering_name[:3].lower()
+            last=self.object_list[top-1].ordering_name[:3].upper()
+            #return "%s-%s" % (first,last)
+            return first
+
+        @property
+        def page_range(self):
+            return [ (self._page_label(n),n) for n in range(1, self.num_pages + 1) ]
+
     def get_queryset(self, *args, **kwargs):
         return Author.objects.catalog()
     
+    def get_paginator(self,queryset, per_page, orphans=0, allow_empty_first_page=True):
+        object_list=queryset
+        p=self.Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True)
+        
+        return p #ListView.get_paginator(self,queryset, per_page, orphans=0, allow_empty_first_page=True)

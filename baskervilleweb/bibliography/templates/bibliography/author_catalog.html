@@ -2,25 +2,25 @@
 
 {% block content %}
 
-{% include "includes/pagination.html" %}
+{% include "includes/pagination_author.html" %}
 
-<div id="authors">
-  <div id="authors-left" class="shadow-prim tabcontainer">
-    <nav class="tabmenu">
-      {% for aut in author_list %}
-      <a href="" 
-	 data-target_id="#author_{{ aut.id }}" 
-	 data-label_id="#author_lab{{ aut.id }}" 
-	 class="tablabel">
-	<div class="tabitem{% if forloop.first %}selected{% endif %}" id="author_lab{{ aut.id }}">{{ aut.list_name }}</div></a>
-      {% endfor %}
-    </nav>
-  </div>
+<div id="authors" class="tabarea">
+
+  <nav id="authors-left" class="shadow-prim tabmenu">
+    {% for aut in author_list %}
+    <a href="" 
+       data-target_id="#author_{{ aut.id }}" 
+       data-label_id="#author_lab{{ aut.id }}" 
+       class="tabitem"
+       id="author_lab{{ aut.id }}">{{ aut.list_name }}</a>
+    {% endfor %}
+    <p>&nbsp;</p>
+  </nav>
   
-  <div id="authors-right" class="shadow-prim">
+  <div id="authors-right" class="shadow-prim tabcontainer">
 
     {% for aut in author_list %}
-    <div id="author_{{ aut.id }}" class="tabscheda removed">
+    <div id="author_{{ aut.id }}" class="tabscheda">
       <h1>{{ aut.long_name }}</h1>
 
       <table>
@@ -36,41 +36,37 @@
 	</tbody>
 	{% endfor %}
       </table>
-
+    <p>&nbsp;</p>
     </div>
+    
     {% endfor %}  
   </div>
 
 </div>
 
-{% include "includes/pagination.html" %}
+{% include "includes/pagination_author.html" %}
 
 {% endblock %}
 
 {% block script %}
 
-$("#authors").sc_hpanel({
-    right_name: "authors-right",
-    left_name: "authors-left",
-    big: "right",
-    start_width: 50,
-    min_height: 200
-});
-
 $(".tabscheda").hide();
-$("#author_{{ author_list.0.id }}").show().removeClass("removed");
+$("#author_{{ author_list.0.id }}").show();
+$("#author_lab{{ author_list.0.id }}").addClass("selected");
 
-$(".tablabel").click(function(event){
+$(".tabitem").click(function(event){
     event.preventDefault();
     var label_id=$(this).data("label_id");
     var target_id=$(this).data("target_id");
-    $(".tabitemselected").removeClass("tabitemselected").addClass("tabitem");
-    $(label_id).removeClass("tabitem").addClass("tabitemselected");
-    $(".tabscheda").hide().addClass("removed");
 
-    $(target_id).show().removeClass("removed");
+    console.log(target_id);
+
+    $(".tabitem").removeClass("selected");
+    $(this).addClass("selected");
+    $(".tabscheda").hide();
+
+    $(target_id).show();
     
-    $("#authors").sc_hpanel("reset_heights");
 });
 
 {% endblock %}

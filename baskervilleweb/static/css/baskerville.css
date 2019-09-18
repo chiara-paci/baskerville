@@ -394,22 +394,25 @@ nav {
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: center;
-  align-items: flex-start;
+  align-items: baseline;
   align-content: flex-start;
   background-color: #669100;
   color: #ddf0b2;
   margin-bottom: .5em;
-  height: 2em;
+  height: 2.4em;
   line-height: 2em;
   text-align: center;
 }
 nav a {
+  flex-grow: 0;
+  flex-shrink: 0;
   color: #ddf0b2;
   border-radius: 1em;
   -moz-border-radius: 1em;
   -webkit-border-radius: 1em;
   text-decoration: none;
-  test-align: center;
+  text-align: center;
+  padding: .2em;
 }
 nav a:hover {
   background-color: #ddf0b2;
@@ -540,8 +543,8 @@ main :first-child {
 main nav.paginator {
   background-color: #9b6400;
   color: #ffe8be;
-  height: 1em;
-  line-height: 1em;
+  height: 1.8em;
+  line-height: 1.4em;
 }
 main nav.paginator * {
   display: inline-block;
@@ -567,13 +570,42 @@ main nav.paginator .current {
 main nav.paginator .disabled {
   display: none;
 }
+main div.tabarea {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: stretch;
+  align-items: stretch;
+  align-content: stretch;
+  height: 100vh;
+}
+main div.tabcontainer {
+  order: 2;
+  flex-grow: 1;
+  flex-shrink: 0;
+  flex-basis: auto;
+  padding: 1em;
+  overflow: auto;
+  width: 80%;
+}
+main div.tabcontainer table {
+  width: 100%;
+}
 main nav.tabmenu {
+  width: 20%;
+  order: 1;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: auto;
+  padding: 1em;
+  height: auto;
+  overflow: auto;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  justify-content: stretch;
   align-items: baseline;
-  align-content: stretch;
+  align-content: space-between;
   background: none;
   color: #000000;
   font-size: .9em;
@@ -589,6 +621,9 @@ main nav.tabmenu a {
   border-radius: 1em;
   -moz-border-radius: 1em;
   -webkit-border-radius: 1em;
+  padding: .1em;
+  margin: .1em;
+  width: 100%;
   text-decoration: none;
   display: block;
 }
@@ -597,12 +632,17 @@ main nav.tabmenu a:hover {
   color: #9b6400;
   border: 1px solid #9b6400;
 }
+main nav.tabmenu a.selected {
+  background-color: #9b8a00;
+  color: #fff8be;
+}
 main th {
   padding: .5em;
   font-weight: 600;
 }
 main td {
   padding-left: .5em;
+  text-align: left;
 }
 main tbody:nth-of-type(even),
 main thead {
