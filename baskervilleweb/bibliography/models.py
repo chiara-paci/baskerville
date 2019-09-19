@@ -482,7 +482,13 @@ class NameFormatCollection(LabeledAbstract):
         list_upper=str(self.list_format.pattern)
         list_lower=str(self.list_format.pattern)
 
-        for key,rel in list(names.items()):
+        names_list=list(names.items())
+
+        if not names_list:
+            return long_name,short_name,list_name,ordering_name,"-","-"
+            
+
+        for key,rel in names_list:
             val_f=rel.formatted()
             
             long_name=long_name.replace("{{"+key+"}}",val_f["norm"])

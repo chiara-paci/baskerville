@@ -450,17 +450,14 @@ class PersonAlphabeticFilter(admin.SimpleListFilter):
         """
 
         qset = PersonCache.objects.all()
-        #qset = qset.values( "upper_initial","lower_initial" ).distinct()
-        #L=qset.extra(select={"initial": "upper(substr(list_name,1,1))"},order_by=["initial"]).values("initial").distinct()
-
         L=qset.extra(select={"upper_initial":"upper_initial",
-                           "lower_initial":"lower_initial"},
-                   order_by=["upper_initial"]).values("upper_initial","lower_initial").distinct()
+                             "lower_initial":"lower_initial"},
+                     order_by=["upper_initial"]).values("upper_initial","lower_initial").distinct()
         
-        t=[]
-
         t=[ (x["upper_initial"]+","+x["lower_initial"],
-             x["upper_initial"]+","+x["lower_initial"]) for x in L ]
+             x["upper_initial"]+","+x["lower_initial"]) for x in L if x["upper_initial"]!="-"]
+
+        t=[("-,-","immutable")]+t
         
         # for ch in [x["initial"] for x in L]:
         #     t.append( (ch.upper()+","+ch.lower(),ch.upper()+","+ch.lower()) )
@@ -475,9 +472,11 @@ class PersonAlphabeticFilter(admin.SimpleListFilter):
 
         if not self.value(): return queryset
 
-        upper,lower=self.value().split(",")
+        val=self.value()
+        
+        upper,lower=val.split(",")
 
-        return queryset.filter( models.Q(cache__upper_initial=upper) & models.Q(cache__lower_initial=lower) )
+        return queryset.filter( cache__upper_initial=upper,cache__lower_initial=lower ) 
 
 class PersonAdmin(admin.ModelAdmin):
     list_display= ['long_name','short_name','list_name','ordering_name','upper_initial','lower_initial']
