@@ -22,6 +22,7 @@ valid_changed = django.dispatch.Signal(providing_args=["instance"])
 #from santaclara_base.models import PositionAbstract
 
 import re
+import heapq
 
 def custom_model_list(model_list):
 
@@ -1231,10 +1232,81 @@ class CategorizedObject(models.Model):
 
 ### authors
 
+def print_result(label):
+    def g(func):
+        def f(*args):
+            res=func(*args)
+            print(label,res,*args)
+            return res
+        return f
+    return g
+
 class AuthorManager(PersonManager):
 
     def catalog(self):
 
+        class PubTuple(tuple):
+            def __new__ (cls, year,role,obj):
+                x=super(PubTuple, cls).__new__(cls, tuple( (year,role,obj) ))
+                return x
+
+            def __str__(self):
+                return "(%s,%s,%s)" % (str(self._year),str(self._role),str(self._obj))
+
+            def __init__(self,year,role,obj):
+                self._year=year
+                self._role=role
+                self._obj=obj
+
+                
+            #@print_result("EQ")
+            def __eq__(self,other):
+                if self._year!=other._year: return False
+                if type(self._obj) is not type(other._obj): return False
+                return self._obj.id == other._obj.id
+
+            #@print_result("LT")
+            def __lt__(self,other):
+                if self._year < other._year: return True
+                if self._year > other._year: return False
+
+                if type(self._obj) is type(other._obj):
+                    return self._obj.id < other._obj.id
+                if type(self._obj) is Book: return True
+                if type(other._obj) is Book: return False
+                return type(self._obj) is Issue
+                
+                # if isinstance(self._obj,Book):
+                #     if isinstance(other._obj,Book):
+                #         if self._obj.title == other._obj.title:
+                #             return self._obj.id < other._obj.id
+                #         return self._obj.title < other._obj.title
+                #     return True
+                # if isinstance(other._obj,Book): return False
+                # if isinstance(self._obj,Issue):
+                #     s_date=self._obj.date
+                # else:
+                #     s_date=self._obj.issue.date
+                # if isinstance(other._obj,Issue):
+                #     o_date=other._obj.date
+                # else:
+                #     o_date=other._obj.issue.date
+                # if s_date<o_date: return True
+                # if s_date>o_date: return False
+
+                # if type(self._obj) is not type(other._obj):
+                #     return type(self._obj) is Issue
+                # if self._obj.title == other._obj.title:
+                #     return self._obj.id < other._obj.id
+                # return self._obj.title < other._obj.title
+
+
+            def _gt__(self,other): return other.__lt__(self)
+            def _le__(self,other): return self.__eq__(other) or self.__lt__(other)
+            def _ge__(self,other): return self.__eq__(other) or self.__gt__(other)
+            def _ne__(self,other): return not self.__eq__(other)
+
+        
         class CatAuthor(object):
             def __init__(self,db_author):
                 self._db_author=db_author
@@ -1242,8 +1314,15 @@ class AuthorManager(PersonManager):
                 self.list_name=db_author.list_name()
                 self.long_name=db_author.long_name()
                 self.ordering_name=db_author.ordering_name()
-                self.publications=[]
+                self._publications=[]
 
+            def add(self,pub):
+                heapq.heappush(self._publications, pub)
+
+            @property
+            def publications(self):
+                return heapq.nsmallest(len(self._publications), self._publications)
+                
         issues=[ (rel.author,rel.author_role,rel.issue)
                  for rel in IssueAuthorRelation.objects.all().select_related() ]
         books=[ (rel.author,rel.author_role,rel.book)
@@ -1254,11 +1333,11 @@ class AuthorManager(PersonManager):
         dict_aut={ aut.id: aut for aut in authors }
 
         for aut,role,obj in issues:
-            dict_aut[aut.id].publications.append( (obj.year,role,obj) )
+            dict_aut[aut.id].add( PubTuple(obj.year(),role,obj) )
         for aut,role,obj in books:
-            dict_aut[aut.id].publications.append( (obj.year,role,obj) )
+            dict_aut[aut.id].add( PubTuple(obj.year,role,obj) )
         for aut,role,obj in articles:
-            dict_aut[aut.id].publications.append( (obj.year,role,obj) )
+            dict_aut[aut.id].add( PubTuple(obj.year(),role,obj) )
 
         return authors
             
@@ -1792,7 +1871,6 @@ class Book(CategorizedObject):
 
     def get_absolute_url(self):
         U="/bibliography/book/%d" % self.pk
-        print(U)
         return U
 
     def get_secondary_authors(self):

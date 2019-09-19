@@ -1160,7 +1160,7 @@ class PublicationIssuesAuthorAddView(View,SingleObjectMixin):
 #### category graph
 
 class CatalogView(ListView):
-    paginate_by=63
+    paginate_by=50
     context_object_name="author_list"
     template_name="bibliography/author_catalog.html"
     #queryset=Author.objects.catalog()
