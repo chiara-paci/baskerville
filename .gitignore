@@ -4,6 +4,7 @@ __pycache__
 *.pyc
 *.bak
 *.log
+preauth.sql
 *~
 web/
 **/web/

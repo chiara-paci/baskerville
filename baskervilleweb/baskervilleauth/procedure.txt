@@ -1,0 +1,79 @@
+https://code.djangoproject.com/ticket/25313
+
+1. Aggiornare e NON aggiungere nuove applicazioni in settings.py.
+   Applicare migrazioni e aggiornare cache:
+
+   ./manage.py migrate
+   ./manage.py rebuild_cache author_names
+   ./manage.py save_pub
+
+2. Database backup:
+
+   pg_dump -U baskerville baskerville > preauth.sql
+
+3. Installare con models.py di base:
+
+   cd baskervilleauth/
+   cp models.py models.py.final
+   cp models.py.firstsetup models.py
+
+4. In settings.py (NON aggiungere altre applicazioni):
+
+INSTALLED_APPS = (
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.humanize',
+    'debug_toolbar',
+    "home.apps.HomeConfig",
+    "bibliography.apps.BibliographyConfig",
+    "archive.apps.ArchiveConfig",
+    "recipebook.apps.RecipebookConfig",
+    "baskervilleauth.apps.BaskervilleauthConfig",
+)
+
+AUTH_USER_MODEL="baskervilleauth.User"
+
+5. Cancellare tutti i file di migrazione:
+
+   find . -path '*/migrations/*' -not -name __init__.py -delete
+
+6. Troncare la tabella django_migrations:
+
+   truncate django_migrations
+
+7. Ricreare le migrazioni:
+
+   ./manage.py makemigrations
+
+8. Ritroncare la tabella django_migrations:
+
+   truncate django_migrations
+
+9. Applicare le migrazioni:
+
+   ./manage.py migrate --fake contenttypes
+   ./manage.py migrate --fake-initial
+
+10. Riavviare
+
+11. Rinominare la tabella utenti:
+
+   cd baskervilleauth/
+   cp models.py.phase2 models.py
+   cd ..
+   ./manage.py makemigrations
+   ./manage.py migrate
+
+12. Installare il models.py finale:
+
+   cp models.py.final models.py
+   cd baskervilleauth/
+   cd ..
+   ./manage.py makemigrations
+   ./manage.py migrate
+   
+13. Installare le altre applicazioni, migrare ecc.
