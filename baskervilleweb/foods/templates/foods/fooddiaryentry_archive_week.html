@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ p }} {{ userobj }}: {{ first_day|date:"j M" }} - {{ last_day|date:"j M" }}</h1>
+
+<table style="background:white">
+  <tr><th></th><th>%</th><th>min</th><th>max</th></tr>
+  <tr><th class="row">fat </th>         
+    <td class="number" 
+	{% if calories_percentual.fat >= calories_reference.fat.min and calories_percentual.fat <= calories_reference.fat.max %}style="background:#a0ffa0"{% else %}style="background:#ff9020"{% endif %}>
+	{{ calories_percentual.fat|floatformat:2 }}</td>
+    <td class="number">{{ calories_reference.fat.min }}</td>
+    <td class="number">{{ calories_reference.fat.max }}</td>
+  </tr>
+  <tr><th class="row">saturated fat </th>         
+    <td class="number"
+	{% if calories_percentual.saturated_fat >= calories_reference.saturated_fat.min and calories_percentual.saturated_fat <= calories_reference.saturated_fat.max %}style="background:#a0ffa0"{% else %}style="background:#ff9020"{% endif %}>
+	{{ calories_percentual.saturated_fat|floatformat:2 }}</td>
+    <td class="number">{{ calories_reference.saturated_fat.min }}</td>
+    <td class="number">{{ calories_reference.saturated_fat.max }}</td>
+  </tr>
+  <tr><th class="row">protein </th>     
+    <td class="number"
+	{% if calories_percentual.protein >= calories_reference.protein.min and calories_percentual.protein <= calories_reference.protein.max %}style="background:#a0ffa0"{% else %}style="background:#ff9020"{% endif %}>
+	{{ calories_percentual.protein|floatformat:2 }}</td>
+    <td class="number">{{ calories_reference.protein.min }}</td>
+    <td class="number">{{ calories_reference.protein.max }}</td>
+  </tr>
+  <tr><th class="row">carbohydrate </th>
+    <td class="number"
+	{% if calories_percentual.carbohydrate >= calories_reference.carbohydrate.min and calories_percentual.carbohydrate <= calories_reference.carbohydrate.max %}style="background:#a0ffa0"{% else %}style="background:#ff9020"{% endif %}>
+	{{ calories_percentual.carbohydrate|floatformat:2 }}</td>
+    <td class="number">{{ calories_reference.carbohydrate.min }}</td>
+    <td class="number">{{ calories_reference.carbohydrate.max }}</td>
+  </tr>
+  <tr><th class="row">sugar </th>         
+    <td class="number"
+	{% if calories_percentual.sugar >= calories_reference.sugar.min and calories_percentual.sugar <= calories_reference.sugar.max %}style="background:#a0ffa0"{% else %}style="background:#ff9020"{% endif %}>
+	{{ calories_percentual.sugar|floatformat:2 }}</td>
+    <td class="number">{{ calories_reference.sugar.min }}</td>
+    <td class="number">{{ calories_reference.sugar.max|floatformat:0 }}</td>
+  </tr>
+  <tr><th class="row">added sugar </th>         
+    <td class="number">{{ calories_percentual.added_sugar|floatformat:2 }}</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr><th class="row">alcohol </th>         
+    <td class="number">{{ calories_percentual.alcohol|floatformat:2 }}</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr><th class="row">added sugar, saturated fat and alcool </th>         
+    <td class="number"
+	{% if calories_percentual.sofas >= calories_reference.sofas.min and calories_percentual.sofas <= calories_reference.sofas.max %}style="background:#a0ffa0"{% else %}style="background:#ff9020"{% endif %}>
+	{{ calories_percentual.sofas|floatformat:2 }}</td>
+    <td class="number">{{ calories_reference.sofas.min }}</td>
+    <td class="number">{{ calories_reference.sofas.max }}</td>
+  </tr>
+
+</table>
+
+<br/>
+
+<table>
+  <tr><th colspan="3" rowspan="3">&nbsp;</th>
+    <th rowspan="3">kcal<br/>min: {{ ref_weight.base|floatformat:0 }}<br/>max: {{ ref_weight.need|floatformat:0 }}</th>
+    <th colspan="2">fat</th>
+    <th colspan="3">carbohydrate</th>
+    <th rowspan="2">protein</th>
+    <th rowspan="2">alcohol</th>
+    <th rowspan="2">sodium<br/>{{ salt_reference.sodium.diseq|safe }} {{ salt_reference.sodium.g|floatformat:1 }} g</th>
+    <th rowspan="2">potassium<br/>{{ salt_reference.potassium.diseq|safe }} {{ salt_reference.potassium.g|floatformat:1 }} g</th>
+    <th rowspan="2">fiber<br/>{{ salt_reference.fiber.diseq|safe }} {{ salt_reference.fiber.g|floatformat:1 }} g</th>
+    <th rowspan="2">water</th>
+  </tr>
+  <tr>
+    <th>total</th><th>sat.</th>
+    <th>total</th><th>sugar</th><th>added sugar</th>
+  </tr>
+  <tr>
+    <th>g</th><th>g</th><th>g</th><th>g</th><th>g</th><th>g</th><th>g</th>
+    <th>g</th><th>g</th><th>g</th><th>ml</th>
+  </tr>
+  <tr><th class="row" colspan="3">totals</th>
+    <td class="number"
+	{% if aggregates.kcal__sum >= ref_weight.base and aggregates.kcal__sum <= ref_weight.need %}style="background:#a0ffa0"{% else %}style="background:#ff9020"{% endif %}>
+	{{ aggregates.kcal__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.fat__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.saturated_fat__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.carbohydrate__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.sugar__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.added_sugar__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.protein__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.alcohol__sum|floatformat:1 }}</td>
+    <td class="number"
+	{% if aggregates.sodium__sum <= salt_reference.sodium.g %}style="background:#a0ffa0"{% else %}style="background:#ff9020"{% endif %}>
+	{{ aggregates.sodium__sum|floatformat:3 }}</td>
+    <td class="number"
+	{% if aggregates.potassium__sum >= salt_reference.potassium.g %}style="background:#a0ffa0"{% else %}style="background:#ff9020"{% endif %}>
+	{{ aggregates.potassium__sum|floatformat:3 }}</td>
+    <td class="number"
+	{% if aggregates.fiber__sum >= salt_reference.fiber.g %}style="background:#a0ffa0"{% else %}style="background:#ff9020"{% endif %}>
+	{{ aggregates.fiber__sum|floatformat:3 }}</td>
+    <td class="number">{{ aggregates.water__sum|floatformat:0 }}</td>
+  </tr>
+  {% for obj in aggregate_products %}
+  <tr>
+    <td>{{ obj.product }}</td>
+    <td class="number">{{ obj.quantity|floatformat:1 }}</td>
+    <td> {% if obj.product.value_for == "100 g" %}g&nbsp;{% else %}ml{% endif %}</td>
+    
+    <td class="number">{{ obj.kcal|floatformat:1 }}</td>
+    <td class="number">{{ obj.fat|floatformat:1 }}</td>
+    <td class="number">{{ obj.saturated_fat|floatformat:1 }}</td>
+    <td class="number">{{ obj.carbohydrate|floatformat:1 }}</td>
+    <td class="number">{{ obj.sugar|floatformat:1 }}</td>
+    <td class="number">{{ obj.added_sugar|floatformat:1 }}</td>
+    <td class="number">{{ obj.protein|floatformat:1 }}</td>
+    <td class="number">{{ obj.alcohol|floatformat:1 }}</td>
+
+    <td class="number">{{ obj.sodium|floatformat:3 }}</td>
+    <td class="number">{{ obj.potassium|floatformat:3 }}</td>
+    <td class="number">{{ obj.fiber|floatformat:3 }}</td>
+    <td class="number">{{ obj.water|floatformat:0 }}</td>
+
+
+  </tr>
+  {% endfor %}
+</table>
+
+<br/>
+
+<table>
+  <tr><th colspan="7" rowspan="3">&nbsp;</th>
+    <th rowspan="3">kcal<br/>min: {{ ref_weight.base|floatformat:0 }}<br/>max: {{ ref_weight.need|floatformat:0 }}</th>
+    <th colspan="2">fat</th>
+    <th colspan="3">carbohydrate</th>
+    <th rowspan="2">protein</th>
+    <th rowspan="2">alcohol</th>
+    <th rowspan="2">sodium<br/>{{ salt_reference.sodium.diseq|safe }} {{ salt_reference.sodium.g|floatformat:1 }} g</th>
+    <th rowspan="2">potassium<br/>{{ salt_reference.potassium.diseq|safe }} {{ salt_reference.potassium.g|floatformat:1 }} g</th>
+    <th rowspan="2">fiber<br/>{{ salt_reference.fiber.diseq|safe }} {{ salt_reference.fiber.g|floatformat:1 }} g</th>
+    <th rowspan="2">water</th>
+  </tr>
+  <tr>
+    <th>total</th><th>sat.</th>
+    <th>total</th><th>sugar</th><th>added sugar</th>
+  </tr>
+  <tr>
+    <th>g</th><th>g</th><th>g</th><th>g</th><th>g</th><th>g</th><th>g</th>
+    <th>g</th><th>g</th><th>g</th><th>ml</th>
+  </tr>
+  {% for obj in object_list %}
+  <tr{% if obj.future %} style="font-style:italic"{% endif %}>
+    <td>{{ obj.time|date:"j M" }}</td>
+    <td>{{ obj.time|time:"H:i" }}</td>
+    <td>{{ obj }}</td>
+    <td class="number">{{ obj.quantity|floatformat:1 }}</td>
+    <td>{{ obj.measure_unit }}</td>
+    <td class="number">{{ obj.quantity_real|floatformat:1 }}</td><td> {% if obj.product.value_for == "100 g" %}g&nbsp;{% else %}ml{% endif %}</td>
+    
+    <td class="number">{{ obj.kcal|floatformat:1 }}</td>
+    <td class="number">{{ obj.fat|floatformat:1 }}</td>
+    <td class="number">{{ obj.saturated_fat|floatformat:1 }}</td>
+    <td class="number">{{ obj.carbohydrate|floatformat:1 }}</td>
+    <td class="number">{{ obj.sugar|floatformat:1 }}</td>
+    <td class="number">{{ obj.added_sugar|floatformat:1 }}</td>
+    <td class="number">{{ obj.protein|floatformat:1 }}</td>
+    <td class="number">{{ obj.alcohol|floatformat:1 }}</td>
+
+    <td class="number">{{ obj.sodium|floatformat:3 }}</td>
+    <td class="number">{{ obj.potassium|floatformat:3 }}</td>
+    <td class="number">{{ obj.fiber|floatformat:3 }}</td>
+    <td class="number">{{ obj.water|floatformat:0 }}</td>
+
+
+  </tr>
+  {% endfor %}
+  <tr><th class="row" colspan="7">totals</th>
+    <td class="number">{{ aggregates.kcal__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.fat__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.saturated_fat__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.carbohydrate__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.sugar__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.added_sugar__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.protein__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.alcohol__sum|floatformat:1 }}</td>
+    <td class="number">{{ aggregates.sodium__sum|floatformat:3 }}</td>
+    <td class="number">{{ aggregates.potassium__sum|floatformat:3 }}</td>
+    <td class="number">{{ aggregates.fiber__sum|floatformat:3 }}</td>
+    <td class="number">{{ aggregates.water__sum|floatformat:0 }}</td>
+  </tr>
+</table>
+
+
+{% endblock %}
+

@@ -1,8 +1,8 @@
 from django.db import models
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.conf import settings
 from django.utils import timezone
+from django.conf import settings
 
 User=settings.AUTH_USER_MODEL
 
