@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ userobj }} - {{ year.year }}</h1>
+
+{% for d in date_list%}
+
+    <p>{{ d }} {{ d|date:"z" }}</p>
+    {% endfor %}
+
+{% endblock content %}
+
+{% block script %}
+
+var MILLIS_PER_DAY = 1000 * 60 * 60 * 24;
+var start = new Date("{{ year.year }}-01-01T00:00:00");
+var end = new Date("{{ year.year }}-12-31T23:59:59");
+
+var date_list = [ {% for d in date_list%}{{ d|date:"z" }}{% if not forloop.last %},{% endif %}{% endfor %} ];
+
+console.log(date_list);
+
+var ts = start.getTime();
+var ts_end = end.getTime();
+
+var day;
+var calendar = new Array();
+while (ts<ts_end) {
+    day=new Date(ts);
+    calendar.push({
+	"day": day,
+	"value": 0
+    });
+    ts+=MILLIS_PER_DAY;
+};
+
+var num_days = calendar.length;
+
+date_list.forEach(function(ind){
+    calendar[ind-1]["value"]=1;
+});
+
+
+
+console.log(num_days);
+console.log(calendar);
+
+
+{% endblock script %}

@@ -3,7 +3,7 @@ from django.db.models import Sum
 # Create your views here.
 
 from django.views.generic import View,TemplateView,FormView,UpdateView,DetailView
-from django.views.generic.dates import DayArchiveView,TodayArchiveView,WeekArchiveView
+from django.views.generic.dates import DayArchiveView,TodayArchiveView,WeekArchiveView,ArchiveIndexView,YearArchiveView
 #from django.contrib.auth.models import User
 from django.utils.timezone import make_aware
 from django.contrib.auth import get_user_model
@@ -174,6 +174,7 @@ class DiaryDayArchiveView(DayArchiveView):
     model = models.FoodDiaryEntry
     date_field = "time"
     allow_empty = True
+    month_format = '%m'
 
     def get_queryset(self):
         uid=self.kwargs["uid"]
@@ -217,6 +218,38 @@ class DiaryTodayArchiveView(TodayArchiveView):
 #         uid=self.kwargs["uid"]
 #         date_list, object_list, extra_context=super(self.__class__,self).get_dated_items(*args,**kwargs)
 #         return diary_dated_pie(uid,date_list,object_list,extra_context)
+
+class CalendarUserView(YearArchiveView):
+    template_name="foods/calendar.html"
+    model = models.FoodDiaryEntry
+    date_field = "time"
+    week_format = "%W"
+    allow_future = True
+    allow_empty = True
+    date_list_period = 'day'
+
+    def get_queryset(self):
+        uid=self.kwargs["uid"]
+        q=super(self.__class__,self).get_queryset()
+        return q.filter(user__username=uid)
+
+    def dispatch(self,*args,**kwargs):
+        print(args,kwargs)
+
+        if "year" in kwargs:
+            return YearArchiveView.dispatch(self,*args,**kwargs)
+        year=datetime.datetime.today().year
+        kwargs["year"]=str(year)
+        self.kwargs["year"]=year
+        self.year=year
+        print(args,kwargs)
+        return YearArchiveView.dispatch(self,*args,**kwargs)
+
+    def get_context_data(self,*args,**kwargs):
+        context=YearArchiveView.get_context_data(self,*args,**kwargs)
+        context["userobj"]=User.objects.get(username=self.kwargs["uid"])
+        print(context)
+        return context
     
 class DiaryWeekArchiveView(WeekArchiveView):
     model = models.FoodDiaryEntry
