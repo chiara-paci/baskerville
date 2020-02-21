@@ -5,4 +5,4 @@ from django.apps import AppConfig
 class BibliographyConfig(AppConfig):
     name = 'bibliography'
     verbose_name = "bibliography"
-    pippio = "pippo"
+    #pippio = "pippo"

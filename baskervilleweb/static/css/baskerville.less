@@ -29,7 +29,6 @@ table {
 }
 
 body {
-    font-family: 'OpenSans','Arial', sans-serif;
     letter-spacing: -0.01em;
     background: @textbackcolor;
     color: @textforecolor;
@@ -96,22 +95,25 @@ nav {
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: center;
-    align-items: flex-start;
+    align-items: baseline;
     align-content: flex-start;
 
     background-color: @secahard4;
     color: @seca2;
     margin-bottom: .5em;
-    height: 2em;
+    height: 2.4em;
     line-height: 2em;
     text-align: center;
     
     a {
+	flex-grow: 0;
+	flex-shrink: 0;
 	color: @seca2;
 	.borderradius(1em);
 	text-decoration: none;
-	width: 10em;
-	test-align: center;
+	//width: 10em;
+	text-align: center;
+	padding: .2em;
     }
     
     a:hover {
@@ -243,8 +245,8 @@ main {
     nav.paginator {
 	background-color: @secbhard4;
 	color: @secb2;
-	height: 1em;
-	line-height: 1em;
+	height: 1.8em;
+	line-height: 1.4em;
 
 	* {
 	    display: inline-block;
@@ -273,12 +275,50 @@ main {
 
     }
 
+    
+    div.tabarea {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: stretch;
+	align-items: stretch;
+	align-content: stretch;
+	height: 100vh;
+    }
+
+    div.tabcontainer {
+	order: 2;
+	flex-grow: 1;
+	flex-shrink: 0;
+	flex-basis: auto;
+	padding: 1em;
+	overflow: auto;
+	width: 80%;
+
+	table {
+	width: 100%;
+	}
+    }
+    
     nav.tabmenu {
-	.columned(3);
-	display: inline-block;
-	padding: 0;
+	width: 20%;
+	order: 1;
+	flex-grow: 0;
+	flex-shrink: 0;
+	flex-basis: auto;
+	padding: 1em;
+
 	height: auto;
-	line-height: auto;
+	overflow: auto;
+
+	
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: stretch;
+	align-items: baseline;
+	align-content: space-between;
+
 	background: none;
 	color: @textforecolor;
 	font-size: .9em;
@@ -288,26 +328,27 @@ main {
 	}
 
 	a {
+	    font-size: 80%;
 	    color: @primhard4;
 	    background-color: @prim2;
 	    border: 1px solid @primhard4;
 	    .borderradius(1em);
-	    padding-left: 1em;
-	    padding-right: 1em;
-	    padding-top: .2em;
-	    padding-bottom: .2em;
-	    margin-top: .1em;
-	    margin-bottom: .1em;
+	    padding: .1em;
+	    margin: .1em;
+	    width: 100%;
 	    text-decoration: none;
 	    display: block;
-	    height: 1em;
-	    line-height: 1em;
 	}
 	
 	a:hover {
 	    background-color: @secb2;
 	    color: @secbhard4;
 	    border: 1px solid @secbhard4;
+	}
+
+	a.selected {
+	    background-color: @primhard4;
+	    color: @prim2;
 	}
 	
     }
@@ -319,6 +360,7 @@ main {
 
     td {
 	padding-left: .5em;
+	text-align: left;
     }
 
 

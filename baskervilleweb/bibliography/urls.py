@@ -9,11 +9,7 @@ app_name="bibliography"
 
 urlpatterns = [
     url( r'^$',TemplateView.as_view(template_name="bibliography/index.html"),name="index" ),
-    url( r'^catalog/?$',
-         ListView.as_view(model=models.Author,
-                          paginate_by=63,
-                          context_object_name="author_list"),
-         name="catalog"),
+    url( r'^catalog/?$',views.CatalogView.as_view(),name="catalog"),
     url( r'^categories/?$',
          ListView.as_view(model=models.CategoryTreeNode,
                           queryset=models.CategoryTreeNode.objects.filter(level=0),

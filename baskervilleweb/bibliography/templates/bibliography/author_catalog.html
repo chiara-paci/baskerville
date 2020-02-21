@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include "includes/pagination_author.html" %}
+
+<div id="authors" class="tabarea">
+
+  <nav id="authors-left" class="shadow-prim tabmenu">
+    {% for aut in author_list %}
+    <a href="" 
+       data-target_id="#author_{{ aut.id }}" 
+       data-label_id="#author_lab{{ aut.id }}" 
+       class="tabitem"
+       id="author_lab{{ aut.id }}">{{ aut.list_name }}</a>
+    {% endfor %}
+    <p>&nbsp;</p>
+  </nav>
+  
+  <div id="authors-right" class="shadow-prim tabcontainer">
+
+    {% for aut in author_list %}
+    <div id="author_{{ aut.id }}" class="tabscheda">
+      <h1>{{ aut.long_name }}</h1>
+
+      <table>
+	{% for year,role,pub in aut.publications %}
+	<tbody>
+	  <tr>
+	    <th class="top"><a href='{{ pub.get_absolute_url }}'>{{ year }}</a></th>
+	    <td rowspan="2">{{ pub.html_cache|safe }}</td>
+	  </tr>
+	  <tr>
+	    <th class="top"><a href='{{ pub.get_absolute_url }}'>({{ role }})</a></th>
+	  </tr>
+	</tbody>
+	{% endfor %}
+      </table>
+    <p>&nbsp;</p>
+    </div>
+    
+    {% endfor %}  
+  </div>
+
+</div>
+
+{% include "includes/pagination_author.html" %}
+
+{% endblock %}
+
+{% block script %}
+
+$(".tabscheda").hide();
+$("#author_{{ author_list.0.id }}").show();
+$("#author_lab{{ author_list.0.id }}").addClass("selected");
+
+$(".tabitem").click(function(event){
+    event.preventDefault();
+    var label_id=$(this).data("label_id");
+    var target_id=$(this).data("target_id");
+
+    console.log(target_id);
+
+    $(".tabitem").removeClass("selected");
+    $(this).addClass("selected");
+    $(".tabscheda").hide();
+
+    $(target_id).show();
+    
+});
+
+{% endblock %}

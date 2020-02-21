@@ -236,7 +236,8 @@ class AlphabeticFilter(admin.SimpleListFilter):
         """
 
         qset = model_admin.get_queryset(request)
-        L=qset.extra(select={"initial": "lower(substr(name,1,1))"},order_by=["initial"]).values("initial").distinct()
+        L=qset.extra(select={"initial": "lower(substr(name,1,1))"},
+                     order_by=["initial"]).values("initial").distinct()
         t=[]
         for ch in [x["initial"] for x in L]:
             t.append( (ch,ch) )
@@ -449,10 +450,17 @@ class PersonAlphabeticFilter(admin.SimpleListFilter):
         """
 
         qset = PersonCache.objects.all()
-        L=qset.extra(select={"initial": "upper(substr(list_name,1,1))"},order_by=["initial"]).values("initial").distinct()
-        t=[]
-        for ch in [x["initial"] for x in L]:
-            t.append( (ch.upper()+","+ch.lower(),ch.upper()+","+ch.lower()) )
+        L=qset.extra(select={"upper_initial":"upper_initial",
+                             "lower_initial":"lower_initial"},
+                     order_by=["upper_initial"]).values("upper_initial","lower_initial").distinct()
+        
+        t=[ (x["upper_initial"]+","+x["lower_initial"],
+             x["upper_initial"]+","+x["lower_initial"]) for x in L if x["upper_initial"]!="-"]
+
+        t=[("-,-","immutable")]+t
+        
+        # for ch in [x["initial"] for x in L]:
+        #     t.append( (ch.upper()+","+ch.lower(),ch.upper()+","+ch.lower()) )
         return tuple(t)
 
     def queryset(self, request, queryset):
@@ -464,17 +472,23 @@ class PersonAlphabeticFilter(admin.SimpleListFilter):
 
         if not self.value(): return queryset
 
-        upper,lower=self.value().split(",")
+        val=self.value()
+        
+        upper,lower=val.split(",")
 
-        return queryset.filter( models.Q(cache__list_name__startswith=upper) | models.Q(cache__list_name__startswith=lower) )
+        return queryset.filter( cache__upper_initial=upper,cache__lower_initial=lower ) 
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display= ['long_name','short_name','list_name','ordering_name']
+    list_display= ['long_name','short_name','list_name','ordering_name','upper_initial','lower_initial']
     list_filter=[ PersonAlphabeticFilter ]
     inlines=(AuthorNameInline,)
 
 admin.site.register(Person,PersonAdmin)
-admin.site.register(PersonCache)
+
+class PersonCacheAdmin(admin.ModelAdmin):
+    list_display= ['long_name','short_name','list_name','ordering_name','upper_initial','lower_initial']
+
+admin.site.register(PersonCache,PersonCacheAdmin)
 
 class AuthorAdmin(admin.ModelAdmin):
     inlines=(AuthorNameInline,MigrAuthorInline,BookAuthorRelationInline,ArticleAuthorRelationInline)

@@ -183,6 +183,7 @@ urlpatterns += staticfiles_urlpatterns()
 urlpatterns += [
     url(r'^home/',include('home.urls')),
     url(r'^recipebook/',include('recipebook.urls')),
+    url(r'^foods/',include('foods.urls')),
     url(r'^bibliography/',include('bibliography.urls')),
     url(r'^archive/',include('archive.urls')),
 ]

@@ -339,7 +339,6 @@ table {
   font-size: .8em;
 }
 body {
-  font-family: 'OpenSans', 'Arial', sans-serif;
   letter-spacing: -0.01em;
   background: #ffffff;
   color: #000000;
@@ -395,23 +394,25 @@ nav {
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: center;
-  align-items: flex-start;
+  align-items: baseline;
   align-content: flex-start;
   background-color: #669100;
   color: #ddf0b2;
   margin-bottom: .5em;
-  height: 2em;
+  height: 2.4em;
   line-height: 2em;
   text-align: center;
 }
 nav a {
+  flex-grow: 0;
+  flex-shrink: 0;
   color: #ddf0b2;
   border-radius: 1em;
   -moz-border-radius: 1em;
   -webkit-border-radius: 1em;
   text-decoration: none;
-  width: 10em;
-  test-align: center;
+  text-align: center;
+  padding: .2em;
 }
 nav a:hover {
   background-color: #ddf0b2;
@@ -542,8 +543,8 @@ main :first-child {
 main nav.paginator {
   background-color: #9b6400;
   color: #ffe8be;
-  height: 1em;
-  line-height: 1em;
+  height: 1.8em;
+  line-height: 1.4em;
 }
 main nav.paginator * {
   display: inline-block;
@@ -569,16 +570,42 @@ main nav.paginator .current {
 main nav.paginator .disabled {
   display: none;
 }
+main div.tabarea {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: stretch;
+  align-items: stretch;
+  align-content: stretch;
+  height: 100vh;
+}
+main div.tabcontainer {
+  order: 2;
+  flex-grow: 1;
+  flex-shrink: 0;
+  flex-basis: auto;
+  padding: 1em;
+  overflow: auto;
+  width: 80%;
+}
+main div.tabcontainer table {
+  width: 100%;
+}
 main nav.tabmenu {
-  -webkit-column-count: 3;
-  /* Chrome, Safari, Opera */
-  -moz-column-count: 3;
-  /* Firefox */
-  column-count: 3;
-  display: inline-block;
-  padding: 0;
+  width: 20%;
+  order: 1;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: auto;
+  padding: 1em;
   height: auto;
-  line-height: auto;
+  overflow: auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: stretch;
+  align-items: baseline;
+  align-content: space-between;
   background: none;
   color: #000000;
   font-size: .9em;
@@ -587,27 +614,27 @@ main nav.tabmenu * {
   display: auto;
 }
 main nav.tabmenu a {
+  font-size: 80%;
   color: #9b8a00;
   background-color: #fff8be;
   border: 1px solid #9b8a00;
   border-radius: 1em;
   -moz-border-radius: 1em;
   -webkit-border-radius: 1em;
-  padding-left: 1em;
-  padding-right: 1em;
-  padding-top: .2em;
-  padding-bottom: .2em;
-  margin-top: .1em;
-  margin-bottom: .1em;
+  padding: .1em;
+  margin: .1em;
+  width: 100%;
   text-decoration: none;
   display: block;
-  height: 1em;
-  line-height: 1em;
 }
 main nav.tabmenu a:hover {
   background-color: #ffe8be;
   color: #9b6400;
   border: 1px solid #9b6400;
+}
+main nav.tabmenu a.selected {
+  background-color: #9b8a00;
+  color: #fff8be;
 }
 main th {
   padding: .5em;
@@ -615,6 +642,7 @@ main th {
 }
 main td {
   padding-left: .5em;
+  text-align: left;
 }
 main tbody:nth-of-type(even),
 main thead {

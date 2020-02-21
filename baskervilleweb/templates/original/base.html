@@ -9,10 +9,12 @@
 
 <link rel="icon" href='{% static "images/logo-baskerville-piccolo.png" %}' type="image/png"/>
 
-<link rel="stylesheet" type="text/css" href='{% static "css/baskerville.css" %}'/>
-<link rel="stylesheet" type="text/css" href='{% static "css/jquery-ui-1.11.0.bookcolor.css" %}'/>
+<link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet"/> 
+<script src="https://kit.fontawesome.com/398c6b2bdc.js"></script>
 
-<script defer src='{% static "js/fontawesome-all.min.js" %}'></script>
+<link rel="stylesheet" type="text/css" href='https://code.jquery.com/ui/1.12.1/themes/sunny/jquery-ui.css'/>
+<link rel="stylesheet" type="text/css" href='{% static "css/baskerville.css" %}'/>
+
 
 </head>
 
@@ -93,20 +95,21 @@
     {% block content %}{% endblock %}
   </main>
 
-
-
 <!-- 
      ----------------------------
      javascript 
      ----------------------------
 -->
   
-<script type="text/javascript" src='{% static "js/jquery-3.1.1.min.js" %}'></script>
-<script type="text/javascript" src='{% static "js/jquery-ui-1.11.0.custom.js" %}'></script>
+<script type="text/javascript" src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+<script type="text/javascript" src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/luxon@1.18.0/build/global/luxon.min.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+
 <!-- 
      <script type="text/javascript" src='{% static "js/jcanvas-14.08.16.min.js" %}'></script>
-     <script type="text/javascript" src='{% static "js/jquery-ui-santaclara-widgets.js" %}'></script>
 -->
+     <script type="text/javascript" src='{% static "js/jquery-ui-santaclara-widgets.js" %}'></script>
 
 <script>//<![CDATA[    
 $(document).ready(function() {
