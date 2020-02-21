@@ -28,7 +28,7 @@
 <tr>
   <td rowspan="4" class="center">
     <a href="{{ photo.get_absolute_url }}">
-      <img {% if photo.rotated != "no" %}class='{% if photo.rotated == "180" %}rotate180{% elif photo.rotated == "90 cw" %}rotate270{% else %}rotate90{% endif %}'{% endif %}
+      <img {% if photo.rotated != "no" %}class='{% if photo.rotated == "180" %}rotate180{% elif photo.rotated == "90 cw" %}rotate90{% else %}rotate270{% endif %}'{% endif %}
 	   src="{{ photo.thumb_url }}"/>
     </a>
   </td>
