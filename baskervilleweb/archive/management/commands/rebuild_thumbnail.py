@@ -22,6 +22,7 @@ import shutil
 
 from .utility import store_exif_data,store_photo
 
+
 class Command(BaseCommand):
     help = 'Reset thumbnail of all photos.'
     requires_migrations_checks = True
