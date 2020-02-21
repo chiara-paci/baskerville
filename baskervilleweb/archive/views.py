@@ -6,6 +6,7 @@ from django.http import HttpResponse
 
 from . import models
 from PIL import Image
+import os.path
 
 class ImageMixin(object):
     def adjust_photo(self,img,photo):
@@ -22,8 +23,8 @@ class PhotoImageView(DetailView):
     def get(self,request,*args,**kwargs):
         photo=self.get_object()
         response = HttpResponse()
-        response["Content-Disposition"] = "attachment; filename={0}".format(photo.image_url())
-        response['X-Accel-Redirect'] = photo.full_path
+        response["Content-Disposition"] = "attachment; filename={0}".format(os.path.basename(photo.image_url()))
+        response['X-Accel-Redirect'] = photo.image_url()
         return response
 
 class PhotoThumbView(DetailView):
@@ -32,8 +33,8 @@ class PhotoThumbView(DetailView):
     def get(self,request,*args,**kwargs):
         photo=self.get_object()
         response = HttpResponse()
-        response["Content-Disposition"] = "attachment; filename={0}".format(photo.thumb_url())
-        response['X-Accel-Redirect'] = photo.thumb_path
+        response["Content-Disposition"] = "attachment; filename={0}".format(os.path.basename(photo.thumb_url()))
+        response['X-Accel-Redirect'] = photo.thumb_url()
         return response
 
 # class PhotoImageView(DetailView,ImageMixin):
