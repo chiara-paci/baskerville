@@ -486,7 +486,7 @@ class PersonAdmin(admin.ModelAdmin):
 admin.site.register(Person,PersonAdmin)
 
 class PersonCacheAdmin(admin.ModelAdmin):
-    list_display= ['long_name','short_name','list_name','ordering_name'] #Q,'upper_initial','lower_initial']
+    list_display= ['long_name','short_name','list_name','ordering_name','upper_initial','lower_initial']
 
 admin.site.register(PersonCache,PersonCacheAdmin)
 

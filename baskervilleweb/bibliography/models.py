@@ -518,8 +518,8 @@ class PersonCache(models.Model):
     short_name = models.CharField(max_length=4096,default="-")
     list_name = models.CharField(max_length=4096,default="-")
     ordering_name = models.CharField(max_length=4096,default="-")
-    #Q upper_initial = models.CharField(max_length=4,default="-")
-    #Q lower_initial = models.CharField(max_length=4,default="-")
+    upper_initial = models.CharField(max_length=4,default="-")
+    lower_initial = models.CharField(max_length=4,default="-")
 
     class Meta:
         ordering = ["ordering_name"]
@@ -635,9 +635,9 @@ class PersonNameRelation(models.Model):
     person = models.ForeignKey(Person,on_delete=models.PROTECT)
     name_type = models.ForeignKey(NameType,on_delete=models.PROTECT)
     value = models.CharField(max_length=4096,default="-",db_index=True)
-    # case_rule = models.CharField(max_length=128,choices=[ ("latin","latin"),
-    #                                                       ("turkic","turkic") ],
-    #                              default="latin")
+    case_rule = models.CharField(max_length=128,choices=[ ("latin","latin"),
+                                                          ("turkic","turkic") ],
+                                 default="latin")
 
     def __str__(self): return str(self.value)
 
@@ -1372,8 +1372,8 @@ class AuthorRelation(models.Model):
     author_role = models.ForeignKey(AuthorRole,on_delete=models.PROTECT)
     content_type = models.ForeignKey(ContentType,editable=False,null=True,on_delete=models.PROTECT)
     year = models.IntegerField(editable=False,db_index=True)
-    year_label = models.CharField(max_length=10,editable=False) #Q
-    title = models.CharField(max_length=4096) #Q
+    #year_label = models.CharField(max_length=10,editable=False)
+    #title = models.CharField(max_length=4096)
 
     class Meta:
         ordering = [ "year" ]
@@ -1409,8 +1409,8 @@ class AuthorRelation(models.Model):
 
 
 class MigrAuthor(models.Model):
-    cod = models.CharField(max_length=1,default="-") #Q ,db_index=True)
-    ind = models.IntegerField() #Q db_index=True)
+    cod = models.CharField(max_length=1,default="-",db_index=True)
+    ind = models.IntegerField(db_index=True)
     author = models.ForeignKey(Author,on_delete=models.PROTECT)
 
     def __str__(self): return str(self.cod)+str(self.ind)+" "+str(self.author)
@@ -1637,7 +1637,7 @@ class Publication(models.Model):
         return Issue.objects.filter(volume__publication__id=self.id).order_by("date")
 
 class Volume(models.Model):
-    label = models.CharField(max_length=256) #Q ,db_index=True)
+    label = models.CharField(max_length=256,db_index=True)
     publication = models.ForeignKey(Publication,on_delete=models.PROTECT)
 
     def __str__(self): return str(self.publication)+" - "+str(self.label)
@@ -1668,7 +1668,7 @@ class Issue(models.Model):
     title = models.CharField(max_length=4096,blank=True,default="")
     date = models.DateField()
     date_ipotetic = models.BooleanField(default=False)
-    #Q html_cache = models.TextField(blank=True,null=True,default="",editable=False)
+    html_cache = models.TextField(blank=True,null=True,default="",editable=False)
 
     authors = models.ManyToManyField(Author,through='IssueAuthorRelation',blank=True)
 
@@ -1744,7 +1744,7 @@ class Article(models.Model):
     page_begin = models.CharField(max_length=10,blank=True,default="x")
     page_end = models.CharField(max_length=10,blank=True,default="x")
     authors = models.ManyToManyField(Author,through='ArticleAuthorRelation',blank=True)
-    #Q html_cache = models.TextField(blank=True,null=True,default="",editable=False)
+    html_cache = models.TextField(blank=True,null=True,default="",editable=False)
 
     def get_authors(self):
         return ", ".join([str(x.author.long_name()) for x in self.articleauthorrelation_set.filter(author_role__cover_name=True).order_by("pos")])
@@ -1846,8 +1846,8 @@ class BookManager(models.Manager):
         
 
 class Book(CategorizedObject):
-    isbn_ced = models.CharField(max_length=9) #Q ,db_index=True)
-    isbn_book = models.CharField(max_length=9) #Q ,db_index=True)
+    isbn_ced = models.CharField(max_length=9,db_index=True)
+    isbn_book = models.CharField(max_length=9,db_index=True)
     isbn_crc10 = models.CharField(max_length=1,editable=False,default="Y")
     isbn_crc13 = models.CharField(max_length=1,editable=False,default="Y")
     isbn_cache10 = models.CharField(max_length=20,editable=False,default="")
@@ -1858,7 +1858,7 @@ class Book(CategorizedObject):
     publisher = models.ForeignKey(Publisher,on_delete=models.PROTECT)
     authors = models.ManyToManyField(Author,through='BookAuthorRelation',blank=True)
 
-    #Q html_cache = models.TextField(blank=True,default="",editable=False)
+    html_cache = models.TextField(blank=True,default="",editable=False)
     
     objects=BookManager()
 
