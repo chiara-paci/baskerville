@@ -9,7 +9,8 @@ from django.utils.text import capfirst
 #from django.core.urlresolvers import NoReverseMatch, reverse
 from django.urls import NoReverseMatch, reverse
 from django.apps import apps
-from django.utils import six
+#from django.utils import six
+import six
 from django.template.response import TemplateResponse
 from django.utils.translation import ugettext as _, ugettext_lazy
 

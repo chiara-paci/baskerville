@@ -85,7 +85,7 @@ class Recipe(NameAbstract):
 
     def tools(self):
         tools={}
-        for tool 
+        #for tool 
 
         for step in self.execution.step_set.all():
             rel_list=[]
