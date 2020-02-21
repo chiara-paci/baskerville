@@ -48,6 +48,14 @@ class Photo(models.Model):
     def image_url(self):
         t=self.mimetype.split("/")
         return "/archive/photo/%d.%s" % (self.id,t[1])
+
+    def image_redirect(self):
+        url=self.full_path.replace(PHOTO_ARCHIVE_FULL,PHOTO_REDIRECT_FULL)
+        return url
+
+    def thumb_redirect(self):
+        url=self.full_path.replace(PHOTO_ARCHIVE_THUMB,PHOTO_REDIRECT_THUMB)
+        return url
         
     def get_absolute_url(self):
         return "/archive/photo/%d/" % (self.id,)
