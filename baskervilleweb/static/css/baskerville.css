@@ -338,6 +338,9 @@ table {
   border-collapse: collapse;
   font-size: .8em;
 }
+img.photo {
+  image-orientation: from-image;
+}
 body {
   letter-spacing: -0.01em;
   background: #ffffff;
