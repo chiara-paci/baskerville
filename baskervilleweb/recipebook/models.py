@@ -20,7 +20,7 @@ class FoodCategory(NameAbstract): pass
 class RecipeCategory(NameAbstract): pass
 
 class StepSequence(NameAbstract):
-    parent = models.ForeignKey('self',on_delete=models.SET_NULL,blank=True,null=True)
+    #parent = models.ForeignKey('self',on_delete=models.SET_NULL,blank=True,null=True)
 
     class Meta:
         order_with_respect_to = 'name'
@@ -62,8 +62,8 @@ class Recipe(NameAbstract):
                                           validators=[validators.MinValueValidator(1)])
     execution = models.ForeignKey(StepSequence,on_delete=models.PROTECT)
 
-    #Q execution_tools = models.ManyToManyField(Tool,blank=True,through="ExecutionToolRelation",related_name="recipe_execution_set")
-    #Q ingredient_tools = models.ManyToManyField(Tool,blank=True,through="IngredientToolRelation",related_name="recipe_ingredient_set")
+    execution_tools = models.ManyToManyField(Tool,blank=True,through="ExecutionToolRelation",related_name="recipe_execution_set")
+    ingredient_tools = models.ManyToManyField(Tool,blank=True,through="IngredientToolRelation",related_name="recipe_ingredient_set")
 
     def ingredients(self):
         t=[str(x) for x in self.ingredient_set.all().filter(inlist=True)]
@@ -117,15 +117,15 @@ class Recipe(NameAbstract):
                     rel_list.append(rel.pk)
                 IngredientToolRelation.objects.filter(recipe=self).exclude(pk__in=rel_list).delete()
 
-#Q
-# class ExecutionToolRelation(models.Model):
-#     recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
-#     tool = models.ForeignKey(Tool,on_delete=models.PROTECT)
-#     step = models.ForeignKey(Step,on_delete=models.PROTECT)
-#     use_new = models.BooleanField(default=False)
 
-#     def __str__(self):
-#         return "%s: %s/%s" % (self.recipe,self.tool,self.step)
+class ExecutionToolRelation(models.Model):
+    recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
+    tool = models.ForeignKey(Tool,on_delete=models.PROTECT)
+    step = models.ForeignKey(Step,on_delete=models.PROTECT)
+    use_new = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "%s: %s/%s" % (self.recipe,self.tool,self.step)
 
 class MeasureUnit(NameAbstract):
     base = models.CharField(max_length=128,default='g',choices = ( ( "g",  "g" ),
@@ -256,14 +256,14 @@ class Ingredient(models.Model):
         q_conv=re.sub( r'\.?0+$','', ("%.2f" % (self.quantity*self.measure.factor) ) )
         return "(%s %s)" % (q_conv,self.measure.base)
 
-#Q        
-# class IngredientToolRelation(models.Model):
-#     recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
-#     tool = models.ForeignKey(Tool,on_delete=models.PROTECT)
-#     step = models.ForeignKey(Step,on_delete=models.PROTECT)
-#     ingredient = models.ForeignKey(Ingredient,on_delete=models.PROTECT)
-#     use_new = models.BooleanField(default=False)
+       
+class IngredientToolRelation(models.Model):
+    recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
+    tool = models.ForeignKey(Tool,on_delete=models.PROTECT)
+    step = models.ForeignKey(Step,on_delete=models.PROTECT)
+    ingredient = models.ForeignKey(Ingredient,on_delete=models.PROTECT)
+    use_new = models.BooleanField(default=False)
 
-#     def __str__(self):
-#         return "%s/%s: %s/%s" % (self.recipe,self.ingredient,self.tool,self.step)
+    def __str__(self):
+        return "%s/%s: %s/%s" % (self.recipe,self.ingredient,self.tool,self.step)
         
