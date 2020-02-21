@@ -56,7 +56,7 @@ class Photo(models.Model):
         return url
 
     def thumb_redirect(self):
-        url=self.full_path.replace(PHOTO_ARCHIVE_THUMB,PHOTO_REDIRECT_THUMB)
+        url=self.thumb_path.replace(PHOTO_ARCHIVE_THUMB,PHOTO_REDIRECT_THUMB)
         return url
         
     def get_absolute_url(self):
