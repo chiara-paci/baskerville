@@ -6,7 +6,8 @@
 <tr>
   <td rowspan=7>
     <a href="{{ photo.image_url }}">
-      <img class="photo" src="{{ photo.image_url }}" width="600"/>
+      <img {% if photo.rotated != "no" %}class='{% if photo.rotated == "180" %}rotate180{% elif photo.rotated == "90 cw" %}rotate90{% else %}rotate270{% endif %}'{% endif %}
+	   src="{{ photo.image_url }}" width="600"/>
     </a>
   </td>
   <td colspan=2>{{ photo.datetime }}</td>
