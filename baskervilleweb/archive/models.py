@@ -4,8 +4,10 @@ from django.conf import settings
 
 # Create your models here.
 
-PHOTO_ARCHIVE_FULL = settings.PHOTO_ARCHIVE_FULL
-PHOTO_ARCHIVE_THUMB = settings.PHOTO_ARCHIVE_THUMB
+PHOTO_ARCHIVE_FULL   = settings.PHOTO_ARCHIVE_FULL
+PHOTO_ARCHIVE_THUMB  = settings.PHOTO_ARCHIVE_THUMB
+PHOTO_REDIRECT_FULL  = settings.PHOTO_REDIRECT_FULL
+PHOTO_REDIRECT_THUMB = settings.PHOTO_REDIRECT_THUMB
 
 class ImageFormat(models.Model):
     name = models.CharField(max_length=1024,unique=True)
