@@ -11,8 +11,8 @@ admin.site.register(models.Step)
 admin.site.register(models.MeasureUnit)
 admin.site.register(models.Food)
 admin.site.register(models.Ingredient)
-admin.site.register(models.ExecutionToolRelation)
-admin.site.register(models.IngredientToolRelation)
+#Q admin.site.register(models.ExecutionToolRelation)
+#Q admin.site.register(models.IngredientToolRelation)
 
 class IngredientInline(admin.TabularInline):
     model = models.Ingredient
@@ -22,24 +22,26 @@ class StepInline(admin.TabularInline):
     model = models.Step
     extra = 0
 
-class ExecutionToolInline(admin.TabularInline):
-    model = models.ExecutionToolRelation
-    readonly_fields = [ "tool", "recipe", "step" ]
-    can_delete = False
-    extra = 0
+#Q
+# class ExecutionToolInline(admin.TabularInline):
+#     model = models.ExecutionToolRelation
+#     readonly_fields = [ "tool", "recipe", "step" ]
+#     can_delete = False
+#     extra = 0
 
-    def has_add_permission(self,request, obj): return False
+#     def has_add_permission(self,request, obj): return False
 
-class IngredientToolInline(admin.TabularInline):
-    model = models.IngredientToolRelation
-    readonly_fields = [ "tool", "recipe", "ingredient", "step" ]
-    can_delete = False
-    extra = 0
+#Q
+# class IngredientToolInline(admin.TabularInline):
+#     model = models.IngredientToolRelation
+#     readonly_fields = [ "tool", "recipe", "ingredient", "step" ]
+#     can_delete = False
+#     extra = 0
 
-    def has_add_permission(self,request, obj): return False
+#     def has_add_permission(self,request, obj): return False
 
 class RecipeAdmin(admin.ModelAdmin):
-    inlines=[IngredientInline,ExecutionToolInline,IngredientToolInline]
+    #Q inlines=[IngredientInline,ExecutionToolInline,IngredientToolInline]
     list_display=["name","ingredients"]
 
 admin.site.register(models.Recipe,RecipeAdmin)
