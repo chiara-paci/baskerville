@@ -31,19 +31,19 @@ class StepSequence(NameAbstract):
             for tool in step.tools.all():
                 if not tool.name in tools: tools[tool.name]=0
                 tools[tool.name]+=1
-        for seq in self.stepsequence_set.all():
-            for tool_name,num in seq.tools():
-                if not tool_name in tools: tools[tool_name]=0
-                tools[tool_name]+=num
+        # for seq in self.stepsequence_set.all():
+        #     for tool_name,num in seq.tools():
+        #         if not tool_name in tools: tools[tool_name]=0
+        #         tools[tool_name]+=num
         return tools.items()
 
     def steps(self):
         steps=[]
         for step in self.step_set.all():
             steps.append(step)
-        for seq in self.stepsequence_set.all():
-            for step in seq.steps():
-                steps.append(step)
+        # for seq in self.stepsequence_set.all():
+        #     for step in seq.steps():
+        #         steps.append(step)
         return steps
 
 class Step(models.Model):
