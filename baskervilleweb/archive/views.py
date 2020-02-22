@@ -25,7 +25,7 @@ class PhotoImageView(DetailView):
         response = HttpResponse()
         #response["Content-Disposition"] = "attachment; filename={0}".format(os.path.basename(photo.image_url()))
         response["Content-Type"]=""
-        response['X-Accel-Redirect'] = photo.image_redirect()
+        response['X-Accel-Redirect'] = photo.image_redirect_url()
         return response
 
 class PhotoThumbView(DetailView):
@@ -36,7 +36,7 @@ class PhotoThumbView(DetailView):
         response = HttpResponse()
         #response["Content-Disposition"] = "attachment; filename={0}".format(os.path.basename(photo.thumb_url()))
         response["Content-Type"]=""
-        response['X-Accel-Redirect'] = photo.thumb_redirect()
+        response['X-Accel-Redirect'] = photo.thumb_redirect_url()
         return response
 
 # class PhotoImageView(DetailView,ImageMixin):

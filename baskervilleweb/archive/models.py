@@ -9,6 +9,9 @@ PHOTO_ARCHIVE_THUMB  = settings.PHOTO_ARCHIVE_THUMB
 PHOTO_REDIRECT_FULL  = settings.PHOTO_REDIRECT_FULL
 PHOTO_REDIRECT_THUMB = settings.PHOTO_REDIRECT_THUMB
 
+ARCHIVE_PATH = settings.ARCHIVE_PATH
+ARCHIVE_REDIRECT_URL = settings.ARCHIVE_REDIRECT_URL
+
 class ImageFormat(models.Model):
     name = models.CharField(max_length=1024,unique=True)
     description = models.CharField(max_length=8192)
@@ -22,8 +25,10 @@ class PhotoManager(models.Manager):
         return list(map(lambda x: x.year,self.all().dates("datetime","year")))
 
 class Photo(models.Model):
-    full_path =  models.FilePathField(path=PHOTO_ARCHIVE_FULL,recursive=True,max_length=1024)
-    thumb_path = models.FilePathField(path=PHOTO_ARCHIVE_THUMB,recursive=True,max_length=1024)
+    #full_path =  models.FilePathField(path=PHOTO_ARCHIVE_FULL,recursive=True,max_length=1024)
+    #thumb_path = models.FilePathField(path=PHOTO_ARCHIVE_THUMB,recursive=True,max_length=1024)
+    full_path =  models.FilePathField(path=ARCHIVE_PATH["photo"]["full"],recursive=True,max_length=1024)
+    thumb_path = models.FilePathField(path=ARCHIVE_PATH["photo"]["thumb"],recursive=True,max_length=1024)
     description = models.CharField(max_length=8192,blank=True)
     width = models.IntegerField()
     height = models.IntegerField()
@@ -51,12 +56,12 @@ class Photo(models.Model):
         t=self.mimetype.split("/")
         return "/archive/photo/%d.%s" % (self.id,t[1])
 
-    def image_redirect(self):
-        url=self.full_path.replace(PHOTO_ARCHIVE_FULL,PHOTO_REDIRECT_FULL)
+    def image_redirect_url(self):
+        url=self.full_path.replace(ARCHIVE_PATH["photo"]["full"],ARCHIVE_REDIRECT_URL["photo"]["full"])
         return url
 
-    def thumb_redirect(self):
-        url=self.thumb_path.replace(PHOTO_ARCHIVE_THUMB,PHOTO_REDIRECT_THUMB)
+    def thumb_redirect_url(self):
+        url=self.thumb_path.replace(ARCHIVE_PATH["photo"]["thumb"],ARCHIVE_REDIRECT_URL["photo"]["thumb"])
         return url
         
     def get_absolute_url(self):
@@ -66,7 +71,6 @@ class Photo(models.Model):
         L=list(map(lambda x: x["name"], self.album_set.all().values("name")))
         return ",".join(L)
         
-
     class Meta:
         ordering = [ "datetime" ]
 
