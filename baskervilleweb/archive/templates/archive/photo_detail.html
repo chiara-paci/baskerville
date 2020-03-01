@@ -2,27 +2,31 @@
 
 {% block content %}
 
-<table>
-<tr>
-  <td rowspan=7>
-    <a href="{{ photo.image_url }}">
-      <img {% if photo.rotated != "no" %}class='{% if photo.rotated == "180" %}rotate180{% elif photo.rotated == "90 cw" %}rotate90{% else %}rotate270{% endif %}'{% endif %}
-	   src="{{ photo.image_url }}" width="600"/>
-    </a>
-  </td>
-  <td colspan=2>{{ photo.datetime }}</td>
-</tr>
-<tr><td colspan=2>{{ photo.width }}x{{ photo.height }}</td></tr>
-<tr><td>rotated:</td><td>{{ photo.rotated }}</td></tr>
-<tr><td> mirrored:</td><td>{{ photo.mirrored }}</td></tr>
-<tr><td colspan=2>{{ photo.mimetype }} {{ photo.format }} </td></tr>
-<tr><td colspan=2> {{ photo.description }} </td></tr>
-<tr><td colspan=2></td></tr>
-</table>
+<article class="archivephoto">
 
-<br/>
-<br/>
+<section class="detail">
 
+  <figure>
+    <div>
+      <img 
+	{% if photo.rotated != "no" %}class='{% if photo.rotated == "180" %}rotate180{% elif photo.rotated == "90 cw" %}rotate90{% else %}rotate270{% endif %}'{% endif %}
+	src="{{ photo.image_url }}"
+	/>
+    </div>
+    <figcaption>{{ photo.description }}</figcaption>
+  </figure>
+
+    <table>
+    <tr><td colspan=2>{{ photo.datetime }}</td></tr>
+    <tr><td colspan=2>{{ photo.width }}x{{ photo.height }}</td></tr>
+    <tr><td>rotated:</td><td>{{ photo.rotated }}</td></tr>
+    <tr><td>mirrored:</td><td>{{ photo.mirrored }}</td></tr>
+    <tr><td colspan=2>{{ photo.mimetype }} {{ photo.format }} </td></tr>
+    </table>
+
+</section>
+
+<section class="metadata">
 <h2>Metadata</h2>
 
 <table>
@@ -43,6 +47,34 @@
 </tbody>
 {% endfor %}
 </table>
+</section>
+
+</article>
 
 {% endblock %}
 
+
+{% block script %}
+
+var reshape_parent =function(){
+    var parent=$(this).parent();
+    var w=$(this).width();
+    var h=$(this).height();
+
+    
+    parent.width(h);
+    parent.height(w);
+
+    $(this).offset(parent.offset());
+
+    var section=$(this).parents("section.detail");
+    section.css("flex-direction", "row");
+
+    console.log(section);
+
+};
+
+$("img.rotate90").each(reshape_parent);
+$("img.rotate270").each(reshape_parent);
+
+{% endblock script %}

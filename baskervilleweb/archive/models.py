@@ -2,12 +2,6 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 
-# Create your models here.
-
-PHOTO_ARCHIVE_FULL   = settings.PHOTO_ARCHIVE_FULL
-PHOTO_ARCHIVE_THUMB  = settings.PHOTO_ARCHIVE_THUMB
-PHOTO_REDIRECT_FULL  = settings.PHOTO_REDIRECT_FULL
-PHOTO_REDIRECT_THUMB = settings.PHOTO_REDIRECT_THUMB
 
 ARCHIVE_PATH = settings.ARCHIVE_PATH
 ARCHIVE_REDIRECT_URL = settings.ARCHIVE_REDIRECT_URL
@@ -25,8 +19,6 @@ class PhotoManager(models.Manager):
         return list(map(lambda x: x.year,self.all().dates("datetime","year")))
 
 class Photo(models.Model):
-    #full_path =  models.FilePathField(path=PHOTO_ARCHIVE_FULL,recursive=True,max_length=1024)
-    #thumb_path = models.FilePathField(path=PHOTO_ARCHIVE_THUMB,recursive=True,max_length=1024)
     full_path =  models.FilePathField(path=ARCHIVE_PATH["photo"]["full"],recursive=True,max_length=1024)
     thumb_path = models.FilePathField(path=ARCHIVE_PATH["photo"]["thumb"],recursive=True,max_length=1024)
     description = models.CharField(max_length=8192,blank=True)
