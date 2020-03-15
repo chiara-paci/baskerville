@@ -76,7 +76,8 @@ class RecipeAdmin(admin.ModelAdmin):
 admin.site.register(models.Recipe,RecipeAdmin)
 
 class MeasureUnitAdmin(admin.ModelAdmin):
-    list_display=["name","abbreviation","apply_to","base","factor"]
+    list_display=["name","abbreviation","apply_to","base","factor","product_count"]
+    inline=[ProductInline]
 
 admin.site.register(models.MeasureUnit,MeasureUnitAdmin)
 

@@ -138,6 +138,9 @@ class MeasureUnit(NameAbstract):
         if self.plural: return self.plural
         return self.name
 
+    def product_count(self):
+        return self.product_set.count()
+
 
 class Food(NameAbstract):
     category = models.ForeignKey(FoodCategory,on_delete=models.PROTECT)
