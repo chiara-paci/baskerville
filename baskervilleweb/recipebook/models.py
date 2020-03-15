@@ -222,7 +222,7 @@ class Ingredient(models.Model):
 
     def __str__(self): 
         S="%s %f %s" % (str(self.food),self.quantity,self.measure.abbreviation)
-        if preparation:
+        if self.preparation:
             S+=" "+self.preparation.name
         return S
 
