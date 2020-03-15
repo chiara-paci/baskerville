@@ -119,7 +119,7 @@ class Recipe(NameAbstract):
 
 
 class ExecutionToolRelation(models.Model):
-    recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
+    #recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
     tool = models.ForeignKey(Tool,on_delete=models.PROTECT)
     step = models.ForeignKey(Step,on_delete=models.PROTECT)
     use_new = models.BooleanField(default=False)
@@ -258,7 +258,7 @@ class Ingredient(models.Model):
 
        
 class IngredientToolRelation(models.Model):
-    recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
+    #recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
     tool = models.ForeignKey(Tool,on_delete=models.PROTECT)
     step = models.ForeignKey(Step,on_delete=models.PROTECT)
     ingredient = models.ForeignKey(Ingredient,on_delete=models.PROTECT)
