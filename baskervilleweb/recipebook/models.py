@@ -128,6 +128,10 @@ class MeasureUnit(NameAbstract):
     class Meta:
         ordering = [ 'name' ]
 
+    def __str__(self):
+        if not self.apply_to: return self.name
+        return "%s (%s)" % (self.name,self.apply_to)
+
     @cached_property
     def name_plural(self):
         if self.plural: return self.plural
