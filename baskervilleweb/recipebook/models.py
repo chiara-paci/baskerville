@@ -221,7 +221,9 @@ class Ingredient(models.Model):
     inlist=models.BooleanField(default=True,blank=True)
 
     def __str__(self): 
-        S="%s %f %s" % (str(self.food),self.quantity,self.measure.abbreviation)
+        qta=("%2.2f" % self.quantity).strip("0").rstrip(".")
+
+        S="%s %s %s" % (str(self.food),qta,self.measure.abbreviation)
         if self.preparation:
             S+=" "+self.preparation.name
         return S
