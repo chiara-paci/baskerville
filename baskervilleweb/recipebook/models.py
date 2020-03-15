@@ -62,8 +62,8 @@ class Recipe(NameAbstract):
                                           validators=[validators.MinValueValidator(1)])
     execution = models.ForeignKey(StepSequence,on_delete=models.PROTECT)
 
-    execution_tools = models.ManyToManyField(Tool,blank=True,through="ExecutionToolRelation",related_name="recipe_execution_set")
-    ingredient_tools = models.ManyToManyField(Tool,blank=True,through="IngredientToolRelation",related_name="recipe_ingredient_set")
+    #execution_tools = models.ManyToManyField(Tool,blank=True,through="ExecutionToolRelation",related_name="recipe_execution_set")
+    #ingredient_tools = models.ManyToManyField(Tool,blank=True,through="IngredientToolRelation",related_name="recipe_ingredient_set")
 
     def ingredients(self):
         t=[str(x) for x in self.ingredient_set.all().filter(inlist=True)]
