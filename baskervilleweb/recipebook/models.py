@@ -123,6 +123,7 @@ class MeasureUnit(NameAbstract):
                                                                    ( "qb", "qb") ))
     factor = models.FloatField(validators=[validators.MinValueValidator(0.0)])
     plural = models.CharField(max_length=4096,blank=True,null=True)
+    apply_to = models.CharField(max_length=4096,blank=True,null=True)
     
     class Meta:
         ordering = [ 'name' ]
