@@ -125,7 +125,7 @@ class ExecutionToolRelation(models.Model):
     use_new = models.BooleanField(default=False)
 
     def __str__(self):
-        return "%s: %s/%s" % (self.recipe,self.tool,self.step)
+        return "%s/%s" % (self.tool,self.step)
 
 class MeasureUnit(NameAbstract):
     base = models.CharField(max_length=128,default='g',choices = ( ( "g",  "g" ),
@@ -265,5 +265,5 @@ class IngredientToolRelation(models.Model):
     use_new = models.BooleanField(default=False)
 
     def __str__(self):
-        return "%s/%s: %s/%s" % (self.recipe,self.ingredient,self.tool,self.step)
+        return "%s: %s/%s" % (self.ingredient,self.tool,self.step)
         
