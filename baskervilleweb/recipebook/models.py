@@ -121,6 +121,7 @@ class MeasureUnit(NameAbstract):
     base = models.CharField(max_length=128,default='g',choices = ( ( "g",  "g" ),
                                                                    ( "ml", "ml" ),
                                                                    ( "qb", "qb") ))
+    abbreviation = models.CharField(max_length=1024)
     factor = models.FloatField(validators=[validators.MinValueValidator(0.0)])
     plural = models.CharField(max_length=4096,blank=True,null=True)
     apply_to = models.CharField(max_length=4096,blank=True,null=True)
@@ -215,11 +216,15 @@ class Ingredient(models.Model):
                                  blank=True,null=True)
     measure = models.ForeignKey(MeasureUnit,
                                 blank=True,null=True,on_delete=models.PROTECT)
-    preparation = models.ForeignKey(StepSequence,blank=True,null=True,on_delete=models.PROTECT)
+    preparation = models.ForeignKey(StepSequence,blank=True,null=True,
+                                    on_delete=models.PROTECT)
     inlist=models.BooleanField(default=True,blank=True)
 
     def __str__(self): 
-        return str(self.food)
+        S="%s %f %s" % (str(self.food),self.quantity,self.measure.abbreviation)
+        if preparation:
+            S+=" "+self.preparation.name
+        return S
 
     @cached_property
     def il(self):

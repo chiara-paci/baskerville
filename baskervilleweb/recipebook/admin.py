@@ -97,7 +97,7 @@ class ProductAdmin(admin.ModelAdmin):
 admin.site.register(models.Product,ProductAdmin)
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display=["food","quantity","measure"]
+    list_display=["__str__","food","quantity","measure","preparation"]
 
 admin.site.register(models.Ingredient,IngredientAdmin)
 
