@@ -138,8 +138,8 @@ class MeasureUnit(NameAbstract):
         if self.plural: return self.plural
         return self.name
 
-    def product_count(self):
-        return self.product_set.count()
+    def ingredient_count(self):
+        return self.ingredient_set.all().count()
 
 
 class Food(NameAbstract):
