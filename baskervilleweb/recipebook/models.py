@@ -11,6 +11,7 @@ class NameAbstract(models.Model):
 
     class Meta:
         abstract = True
+        ordering = [ 'name' ]
 
     def __str__(self): 
         return self.name
@@ -22,39 +23,49 @@ class RecipeCategory(NameAbstract): pass
 class StepSequence(NameAbstract):
     #parent = models.ForeignKey('self',on_delete=models.SET_NULL,blank=True,null=True)
 
-    class Meta:
-        order_with_respect_to = 'name'
+    #class Meta:
+    #    ordering = [ 'name' ]
 
     def tools(self):
         tools={}
         for step in self.step_set.all():
-            for tool in step.tools.all():
-                if not tool.name in tools: tools[tool.name]=0
-                tools[tool.name]+=1
-        # for seq in self.stepsequence_set.all():
-        #     for tool_name,num in seq.tools():
-        #         if not tool_name in tools: tools[tool_name]=0
-        #         tools[tool_name]+=num
+            for rel in step.steptoolrelation_set.all():
+                if not rel.tool.name in tools: tools[rel.tool.name]=0
+                if tools[rel.tool.name]==0: 
+                    tools[rel.tool.name]=1
+                    continue
+                if rel.use_new:
+                    tools[rel.tool.name]+=1
         return tools.items()
 
     def steps(self):
         steps=[]
         for step in self.step_set.all():
             steps.append(step)
-        # for seq in self.stepsequence_set.all():
-        #     for step in seq.steps():
-        #         steps.append(step)
         return steps
 
 class Step(models.Model):
     description = models.CharField(max_length=8192)
     sequence = models.ForeignKey(StepSequence,on_delete=models.PROTECT)
-    tools = models.ManyToManyField(Tool,blank=True)
+    pos = models.PositiveIntegerField()
+    #tools = models.ManyToManyField(Tool,blank=True,through='StepToolRelation')
 
     class Meta:
-        order_with_respect_to = 'sequence'
+        ordering = [ "sequence","pos" ]
+        unique_together = [ "sequence","pos" ]
 
     def __str__(self): return self.description
+
+class StepToolRelation(models.Model):
+    tool = models.ForeignKey(Tool,on_delete=models.PROTECT)
+    step = models.ForeignKey(Step,on_delete=models.PROTECT)
+    use_new = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "%s/%s" % (self.tool,self.step)
+
+###
+
 
 class Recipe(NameAbstract):
     category = models.ForeignKey(RecipeCategory,on_delete=models.PROTECT)
@@ -62,70 +73,49 @@ class Recipe(NameAbstract):
                                           validators=[validators.MinValueValidator(1)])
     execution = models.ForeignKey(StepSequence,on_delete=models.PROTECT)
 
-    #execution_tools = models.ManyToManyField(Tool,blank=True,through="ExecutionToolRelation",related_name="recipe_execution_set")
+    #execution_tools = models.ManyToManyField(Tool,blank=True,through="StepToolRelation",related_name="recipe_execution_set")
     #ingredient_tools = models.ManyToManyField(Tool,blank=True,through="IngredientToolRelation",related_name="recipe_ingredient_set")
 
-    def ingredients(self):
-        t=[str(x) for x in self.ingredient_set.all().filter(inlist=True)]
-        return ", ".join(t)
+    # def ingredients(self):
+    #     t=[str(x) for x in self.ingredient_set.all().filter(inlist=True)]
+    #     return ", ".join(t)
 
     # def tools(self):
     #     tools={}
-    #     for tool_name,num in self.execution.tools():
-    #         if not tool_name in tools: tools[tool_name]=0
-    #         tools[tool_name]+=num
+    #     #for tool 
 
+    #     for step in self.execution.step_set.all():
+    #         rel_list=[]
+    #         for tool in step.tools.all():
+    #             rel,created=StepToolRelation.objects.get_or_create(recipe=self,tool=tool,step=step)
+    #             rel_list.append(rel.pk)
+    #         StepToolRelation.objects.filter(recipe=self).exclude(pk__in=rel_list).delete()
     #     for ing in self.ingredient_set.all():
-    #         if not ing.preparation: continue
-    #         for tool_name,num in ing.preparation.tools():
-    #             if not tool_name in tools: tools[tool_name]=0
-    #             tools[tool_name]+=num
-    #     return tools.items()
-
-    def tools(self):
-        tools={}
-        #for tool 
-
-        for step in self.execution.step_set.all():
-            rel_list=[]
-            for tool in step.tools.all():
-                rel,created=ExecutionToolRelation.objects.get_or_create(recipe=self,tool=tool,step=step)
-                rel_list.append(rel.pk)
-            ExecutionToolRelation.objects.filter(recipe=self).exclude(pk__in=rel_list).delete()
-        for ing in self.ingredient_set.all():
-            for step in ing.preparation.step_set.all():
-                rel_list=[]
-                for tool in step.tools.all():
-                    rel,created=IngredientToolRelation.objects.get_or_create(recipe=self,ingredient=ing,tool=tool,step=step)
-                    rel_list.append(rel.pk)
-                IngredientToolRelation.objects.filter(recipe=self).exclude(pk__in=rel_list).delete()
+    #         for step in ing.preparation.step_set.all():
+    #             rel_list=[]
+    #             for tool in step.tools.all():
+    #                 rel,created=IngredientToolRelation.objects.get_or_create(recipe=self,ingredient=ing,tool=tool,step=step)
+    #                 rel_list.append(rel.pk)
+    #             IngredientToolRelation.objects.filter(recipe=self).exclude(pk__in=rel_list).delete()
 
 
-    def save(self,*args,**kwargs):
-        NameAbstract.save(self,*args,**kwargs)
-        for step in self.execution.step_set.all():
-            rel_list=[]
-            for tool in step.tools.all():
-                rel,created=ExecutionToolRelation.objects.get_or_create(recipe=self,tool=tool,step=step)
-                rel_list.append(rel.pk)
-            ExecutionToolRelation.objects.filter(recipe=self).exclude(pk__in=rel_list).delete()
-        for ing in self.ingredient_set.all():
-            for step in ing.preparation.step_set.all():
-                rel_list=[]
-                for tool in step.tools.all():
-                    rel,created=IngredientToolRelation.objects.get_or_create(recipe=self,ingredient=ing,tool=tool,step=step)
-                    rel_list.append(rel.pk)
-                IngredientToolRelation.objects.filter(recipe=self).exclude(pk__in=rel_list).delete()
+    # def save(self,*args,**kwargs):
+    #     NameAbstract.save(self,*args,**kwargs)
+    #     for step in self.execution.step_set.all():
+    #         rel_list=[]
+    #         for tool in step.tools.all():
+    #             rel,created=StepToolRelation.objects.get_or_create(recipe=self,tool=tool,step=step)
+    #             rel_list.append(rel.pk)
+    #         StepToolRelation.objects.filter(recipe=self).exclude(pk__in=rel_list).delete()
+    #     for ing in self.ingredient_set.all():
+    #         for step in ing.preparation.step_set.all():
+    #             rel_list=[]
+    #             for tool in step.tools.all():
+    #                 rel,created=IngredientToolRelation.objects.get_or_create(recipe=self,ingredient=ing,tool=tool,step=step)
+    #                 rel_list.append(rel.pk)
+    #             IngredientToolRelation.objects.filter(recipe=self).exclude(pk__in=rel_list).delete()
 
 
-class ExecutionToolRelation(models.Model):
-    #recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
-    tool = models.ForeignKey(Tool,on_delete=models.PROTECT)
-    step = models.ForeignKey(Step,on_delete=models.PROTECT)
-    use_new = models.BooleanField(default=False)
-
-    def __str__(self):
-        return "%s/%s" % (self.tool,self.step)
 
 class MeasureUnit(NameAbstract):
     base = models.CharField(max_length=128,default='g',choices = ( ( "g",  "g" ),
@@ -141,6 +131,7 @@ class MeasureUnit(NameAbstract):
     def name_plural(self):
         if self.plural: return self.plural
         return self.name
+
 
 class Food(NameAbstract):
     category = models.ForeignKey(FoodCategory,on_delete=models.PROTECT)
@@ -198,9 +189,23 @@ class Food(NameAbstract):
             return "la"
         return "lo"
 
+class Retailer(NameAbstract): pass
+
+class Vendor(NameAbstract):
+    name = models.CharField(max_length=4096,unique=True)
+
+def get_bulk_product_vendor():
+    vendor,create=Vendor.objects.get_or_create(name="bulk product")
+    return vendor.id
+
+class Product(NameAbstract):
+    food = models.ForeignKey(Food,on_delete=models.PROTECT)
+    vendor = models.ForeignKey(Vendor,on_delete=models.PROTECT,default=get_bulk_product_vendor)
+    retailers = models.ManyToManyField(Retailer,blank=True)
+
 class Ingredient(models.Model):
     food = models.ForeignKey(Food,on_delete=models.PROTECT)
-    recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
+    # recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
     quantity = models.FloatField(validators=[validators.MinValueValidator(0.0)],
                                  blank=True,null=True)
     measure = models.ForeignKey(MeasureUnit,
@@ -256,14 +261,44 @@ class Ingredient(models.Model):
         q_conv=re.sub( r'\.?0+$','', ("%.2f" % (self.quantity*self.measure.factor) ) )
         return "(%s %s)" % (q_conv,self.measure.base)
 
-       
-class IngredientToolRelation(models.Model):
-    #recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
-    tool = models.ForeignKey(Tool,on_delete=models.PROTECT)
-    step = models.ForeignKey(Step,on_delete=models.PROTECT)
-    ingredient = models.ForeignKey(Ingredient,on_delete=models.PROTECT)
-    use_new = models.BooleanField(default=False)
+class IngredientGroup(NameAbstract): 
+    ingredients = models.ManyToManyField(Ingredient,blank=True)
 
-    def __str__(self):
-        return "%s: %s/%s" % (self.ingredient,self.tool,self.step)
+class IngredientAlternative(NameAbstract): pass
+    
+class RecipeIngredientGroupRelation(models.Model):
+    recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
+    group = models.ForeignKey(IngredientGroup,on_delete=models.PROTECT)
+    factor = models.FloatField(validators=[validators.MinValueValidator(0.0)],default=1.0)
+
+class RecipeIngredientAlternativeRelation(models.Model):
+    recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
+    alternative = models.ForeignKey(IngredientAlternative,on_delete=models.PROTECT)
+    factor = models.FloatField(validators=[validators.MinValueValidator(0.0)],default=1.0)
+
+class IngredientAlternativeGroupRelation(models.Model):
+    alternative = models.ForeignKey(IngredientAlternative,on_delete=models.PROTECT)
+    group = models.ForeignKey(IngredientGroup,on_delete=models.PROTECT)
+    factor = models.FloatField(validators=[validators.MinValueValidator(0.0)],default=1.0)
+
+class RecipeSet(NameAbstract): pass
+class RecipeLabel(NameAbstract): pass
+
+class RecipeRecipeSetRelation(models.Model):
+    recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
+    set = models.ForeignKey(RecipeSet,on_delete=models.PROTECT)
+    label = models.ForeignKey(RecipeLabel,on_delete=models.PROTECT)
+    serving = models.PositiveIntegerField(blank=True,default=2,
+                                          validators=[validators.MinValueValidator(1)])
+
+
+# class IngredientToolRelation(models.Model):
+#     #recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
+#     tool = models.ForeignKey(Tool,on_delete=models.PROTECT)
+#     step = models.ForeignKey(Step,on_delete=models.PROTECT)
+#     ingredient = models.ForeignKey(Ingredient,on_delete=models.PROTECT)
+#     use_new = models.BooleanField(default=False)
+
+#     def __str__(self):
+#         return "%s: %s/%s" % (self.ingredient,self.tool,self.step)
         
