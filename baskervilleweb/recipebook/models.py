@@ -132,6 +132,7 @@ class Recipe(NameAbstract):
 
 
 class MeasureUnit(NameAbstract):
+    name = models.CharField(max_length=4096)
     base = models.CharField(max_length=128,default='g',choices = ( ( "g",  "g" ),
                                                                    ( "ml", "ml" ),
                                                                    ( "qb", "qb") ))
