@@ -87,6 +87,15 @@ class Recipe(NameAbstract):
                                           validators=[validators.MinValueValidator(1)])
     execution = models.ForeignKey(StepSequence,on_delete=models.PROTECT)
 
+    def __serialize__(self):
+        return {
+            "name": self.name,
+            "category": self.category.name,
+            "execution": self.execution.name,
+            "serving": self.serving
+        }
+        
+
     #execution_tools = models.ManyToManyField(Tool,blank=True,through="StepToolRelation",related_name="recipe_execution_set")
     #ingredient_tools = models.ManyToManyField(Tool,blank=True,through="IngredientToolRelation",related_name="recipe_ingredient_set")
 
@@ -130,7 +139,6 @@ class Recipe(NameAbstract):
     #             IngredientToolRelation.objects.filter(recipe=self).exclude(pk__in=rel_list).delete()
 
 
-
 class MeasureUnit(NameAbstract):
     name = models.CharField(max_length=4096)
     base = models.CharField(max_length=128,default='g',choices = ( ( "g",  "g" ),
@@ -140,9 +148,21 @@ class MeasureUnit(NameAbstract):
     factor = models.FloatField(validators=[validators.MinValueValidator(0.0)])
     plural = models.CharField(max_length=4096,blank=True,null=True)
     apply_to = models.CharField(max_length=4096,blank=True,null=True)
+
+    def __serialize__(self):
+        return {
+            "name": self.name,
+            "base": self.base,
+            "abbreviation": self.abbreviation,
+            "factor": self.factor,
+            "plural": self.plural,
+            "apply_to": self.apply_to,
+        }
+
     
     class Meta:
         ordering = [ 'name' ]
+        unique_together = [ ("name","apply_to") ]
 
     def __str__(self):
         if not self.apply_to: return self.name
