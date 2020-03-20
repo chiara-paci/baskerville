@@ -13,6 +13,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for grp in models.IngredientGroup.objects.all():
             print(grp)
-            for i in grp.ingredients:
+            for i in grp.ingredients.all():
                 print("    ",i)
                 rel,created=models.IngredientIngredientGroupRelation.objects.get_or_create(ingredient=i,group=grp)
