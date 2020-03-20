@@ -39,7 +39,7 @@ class RecipeIngredientGroupRelationInline(admin.TabularInline):
     extra = 0
 
 class IngredientIngredientGroupRelationInline(admin.TabularInline):
-    model = models.RecipeIngredientGroupRelation
+    model = models.IngredientIngredientGroupRelation
     extra = 0
 
 class RecipeIngredientAlternativeRelationInline(admin.TabularInline):
@@ -107,8 +107,9 @@ class IngredientAdmin(admin.ModelAdmin):
 admin.site.register(models.Ingredient,IngredientAdmin)
 
 class IngredientGroupAdmin(admin.ModelAdmin):
-    inlines=[RecipeIngredientGroupRelationInline,
-             IngredientAlternativeGroupRelationInline]
+    inlines=[IngredientIngredientGroupRelationInline,
+             IngredientAlternativeGroupRelationInline,
+             RecipeIngredientGroupRelationInline]
 
 admin.site.register(models.IngredientGroup,IngredientGroupAdmin)
 
