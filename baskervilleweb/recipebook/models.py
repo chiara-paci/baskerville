@@ -16,6 +16,8 @@ class NameAbstract(models.Model):
     def __str__(self): 
         return self.name
 
+    def __serialize__(self): return self.name
+
 class Tool(NameAbstract): pass
 class FoodCategory(NameAbstract): pass
 class RecipeCategory(NameAbstract): pass
@@ -92,7 +94,14 @@ class Recipe(NameAbstract):
             "name": self.name,
             "category": self.category.name,
             "execution": self.execution.name,
-            "serving": self.serving
+            "serving": self.serving,
+            "ingredient_groups": [ 
+                (rel.group.name,
+                 rel.factor) for rel in self.recipeingredientgrouprelation_set.all() ],
+            "ingredient_alternatives": [ 
+                (rel.alternative.name,
+                 rel.factor) for rel in self.recipeingredientalternativerelation_set.all() ],
+            
         }
         
 
@@ -185,6 +194,15 @@ class Food(NameAbstract):
         ( "neuter", "neuter" ),
         ( "feminine", "feminine" ) ))
 
+    def __serialize__(self):
+        return {
+            "name": self.name,
+            "category": self.category.name,
+            "plural": self.plural,
+            "gender": self.gender,
+        }
+
+
     def __str__(self):
         if self.plural: return self.plural
         return self.name
@@ -234,9 +252,7 @@ class Food(NameAbstract):
         return "lo"
 
 class Retailer(NameAbstract): pass
-
-class Vendor(NameAbstract):
-    name = models.CharField(max_length=4096,unique=True)
+class Vendor(NameAbstract): pass
 
 def get_bulk_product_vendor():
     vendor,create=Vendor.objects.get_or_create(name="bulk product")
@@ -246,6 +262,14 @@ class Product(NameAbstract):
     food = models.ForeignKey(Food,on_delete=models.PROTECT)
     vendor = models.ForeignKey(Vendor,on_delete=models.PROTECT,default=get_bulk_product_vendor)
     retailers = models.ManyToManyField(Retailer,blank=True)
+
+    def __serialize__(self):
+        return {
+            "name": self.name,
+            "food": self.food.name,
+            "vendor": self.vendor.name,
+            "retailers": [ o.name for o in self.retailers.all() ]
+        }
 
 class Ingredient(models.Model):
     food = models.ForeignKey(Food,on_delete=models.PROTECT)
@@ -257,6 +281,15 @@ class Ingredient(models.Model):
     preparation = models.ForeignKey(StepSequence,blank=True,null=True,
                                     on_delete=models.PROTECT)
     inlist=models.BooleanField(default=True,blank=True)
+
+    def __serialize__(self):
+        return {
+            "food": self.food.name,
+            "preparation": self.preparation.name,
+            "measure": ( self.measure.name,self.measure.apply_to ),
+            "quantity": self.quantity,
+            "inlist": self.inlist,
+        }
 
     class Meta:
         ordering = [ "food", "quantity", "measure", 'preparation' ]
@@ -319,12 +352,30 @@ class IngredientGroup(NameAbstract):
     preparation = models.ForeignKey(StepSequence,blank=True,null=True,
                                     on_delete=models.PROTECT)
 
+    def __serialize__(self):
+        return {
+            "name": self.name,
+            "preparation": self.preparation.name,
+            "ingredients": [ 
+                (rel.ingredient.name,
+                 rel.factor) for rel in self.ingredientingredientgrouprelation_set.all() ]
+        }
+
+
 class IngredientIngredientGroupRelation(models.Model):
     ingredient = models.ForeignKey(Ingredient,on_delete=models.PROTECT)
     group = models.ForeignKey(IngredientGroup,on_delete=models.PROTECT)
     factor = models.FloatField(validators=[validators.MinValueValidator(0.0)],default=1.0)
 
-class IngredientAlternative(NameAbstract): pass
+class IngredientAlternative(NameAbstract): 
+    def __serialize__(self):
+        return {
+            "name": self.name,
+            "groups": [ 
+                (rel.group.name,
+                 rel.factor) for rel in self.ingredientalternativegrouprelation_set.all() ]
+        }
+
     
 class RecipeIngredientGroupRelation(models.Model):
     recipe = models.ForeignKey(Recipe,on_delete=models.PROTECT)
@@ -341,7 +392,16 @@ class IngredientAlternativeGroupRelation(models.Model):
     group = models.ForeignKey(IngredientGroup,on_delete=models.PROTECT)
     factor = models.FloatField(validators=[validators.MinValueValidator(0.0)],default=1.0)
 
-class RecipeSet(NameAbstract): pass
+class RecipeSet(NameAbstract):
+    def __serialize__(self):
+        return {
+            "name": self.name,
+            "recipes": [ 
+                (rel.recipe.name,
+                 rel.label.name,
+                 rel.serving) for rel in self.reciperecipesetrelation_set.all() ]
+        }
+
 class RecipeLabel(NameAbstract): pass
 
 class RecipeRecipeSetRelation(models.Model):
