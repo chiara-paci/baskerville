@@ -361,9 +361,11 @@ class IngredientGroup(NameAbstract):
         ret={
             "name": self.name,
             "ingredients": [ 
-                (rel.ingredient.name,
-                 rel.factor) for rel in self.ingredientingredientgrouprelation_set.all() ]
+                (rel.ingredient.__serialize__(),
+                 rel.factor) for rel in self.ingredientingredientgrouprelation_set.all() 
+            ]
         }
+
         if self.preparation is not None:
             ret["preparation"]= self.preparation.name
         else:
