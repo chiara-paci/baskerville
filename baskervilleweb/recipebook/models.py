@@ -286,7 +286,6 @@ class IngredientIngredientGroupRelation(models.Model):
     group = models.ForeignKey(IngredientGroup,on_delete=models.PROTECT)
     factor = models.FloatField(validators=[validators.MinValueValidator(0.0)],default=1.0)
 
-
 class IngredientAlternative(NameAbstract): pass
     
 class RecipeIngredientGroupRelation(models.Model):
