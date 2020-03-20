@@ -280,7 +280,7 @@ class Ingredient(models.Model):
         return "(%s %s)" % (q_conv,self.measure.base)
 
 class IngredientGroup(NameAbstract): 
-    ingredients = models.ManyToManyField(Ingredient,blank=True)
+    #ingredients = models.ManyToManyField(Ingredient,blank=True)
     preparation = models.ForeignKey(StepSequence,blank=True,null=True,
                                     on_delete=models.PROTECT)
 
