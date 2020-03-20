@@ -7,7 +7,7 @@ import re
 # Create your models here.
 
 class NameAbstract(models.Model):
-    name = models.CharField(max_length=4096)
+    name = models.CharField(max_length=4096,unique=True)
 
     class Meta:
         abstract = True
@@ -44,6 +44,12 @@ class StepSequence(NameAbstract):
             steps.append(step)
         return steps
 
+    def __serialize__(self):
+        return {
+            "name": self.name,
+            "steps": [ s.__serialize__() for s in self.step_set.all() ]
+        }
+
 class Step(models.Model):
     description = models.CharField(max_length=8192)
     sequence = models.ForeignKey(StepSequence,on_delete=models.PROTECT)
@@ -55,6 +61,14 @@ class Step(models.Model):
         unique_together = [ "sequence","pos" ]
 
     def __str__(self): return self.description
+
+    def __serialize__(self):
+        return {
+            "description": self.description,
+            "pos": self.pos,
+            "tools":[ (rel.tool.name,
+                       rel.use_new) for rel in self.steptoolrelation_set.all() ]
+        }
 
 class StepToolRelation(models.Model):
     tool = models.ForeignKey(Tool,on_delete=models.PROTECT)
