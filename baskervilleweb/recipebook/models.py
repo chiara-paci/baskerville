@@ -283,13 +283,18 @@ class Ingredient(models.Model):
     inlist=models.BooleanField(default=True,blank=True)
 
     def __serialize__(self):
-        return {
+        ret={
             "food": self.food.name,
-            "preparation": self.preparation.name,
             "measure": ( self.measure.name,self.measure.apply_to ),
             "quantity": self.quantity,
             "inlist": self.inlist,
         }
+        if self.preparation is not None:
+            ret["preparation"]= self.preparation.name
+        else:
+            ret["preparation"]=None
+        return ret
+
 
     class Meta:
         ordering = [ "food", "quantity", "measure", 'preparation' ]
@@ -353,13 +358,18 @@ class IngredientGroup(NameAbstract):
                                     on_delete=models.PROTECT)
 
     def __serialize__(self):
-        return {
+        ret={
             "name": self.name,
-            "preparation": self.preparation.name,
             "ingredients": [ 
                 (rel.ingredient.name,
                  rel.factor) for rel in self.ingredientingredientgrouprelation_set.all() ]
         }
+        if self.preparation is not None:
+            ret["preparation"]= self.preparation.name
+        else:
+            ret["preparation"]=None
+        return ret
+
 
 
 class IngredientIngredientGroupRelation(models.Model):
