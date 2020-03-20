@@ -38,6 +38,10 @@ class RecipeIngredientGroupRelationInline(admin.TabularInline):
     model = models.RecipeIngredientGroupRelation
     extra = 0
 
+class IngredientIngredientGroupRelationInline(admin.TabularInline):
+    model = models.RecipeIngredientGroupRelation
+    extra = 0
+
 class RecipeIngredientAlternativeRelationInline(admin.TabularInline):
     model = models.RecipeIngredientAlternativeRelation
     extra = 0
@@ -124,6 +128,7 @@ class RecipeLabelAdmin(admin.ModelAdmin):
 
 admin.site.register(models.RecipeLabel,RecipeLabelAdmin)
 
+admin.site.register(models.IngredientIngredientGroupRelation)
 admin.site.register(models.RecipeIngredientGroupRelation)
 admin.site.register(models.RecipeIngredientAlternativeRelation)
 admin.site.register(models.IngredientAlternativeGroupRelation)

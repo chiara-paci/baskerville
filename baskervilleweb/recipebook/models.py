@@ -223,6 +223,9 @@ class Ingredient(models.Model):
                                     on_delete=models.PROTECT)
     inlist=models.BooleanField(default=True,blank=True)
 
+    class Meta:
+        ordering = [ "food", "quantity", "measure", 'preparation' ]
+
     def __str__(self): 
         qta=("%2.2f" % self.quantity).strip("0").rstrip(".")
 
