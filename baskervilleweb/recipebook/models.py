@@ -278,6 +278,14 @@ class Ingredient(models.Model):
 
 class IngredientGroup(NameAbstract): 
     ingredients = models.ManyToManyField(Ingredient,blank=True)
+    preparation = models.ForeignKey(StepSequence,blank=True,null=True,
+                                    on_delete=models.PROTECT)
+
+class IngredientIngredientGroupRelation(models.Model):
+    ingredient = models.ForeignKey(Ingredient,on_delete=models.PROTECT)
+    group = models.ForeignKey(IngredientGroup,on_delete=models.PROTECT)
+    factor = models.FloatField(validators=[validators.MinValueValidator(0.0)],default=1.0)
+
 
 class IngredientAlternative(NameAbstract): pass
     
