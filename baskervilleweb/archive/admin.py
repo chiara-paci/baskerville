@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.template import Template, Context , RequestContext
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
 
 # Register your models here.
 
@@ -54,9 +55,9 @@ class AlbumAlbumPhotoInline(admin.TabularInline):
     readonly_fields = ("thumbnail",)
 
     def thumbnail(self,obj):
-        return u'<img src="%s" />' % obj.photo.thumb_url()
+        return mark_safe('<img src="%s" />' % obj.photo.thumb_url())
     thumbnail.short_description = 'Thumbnail'
-    thumbnail.allow_tags = True
+    #thumbnail.allow_tags = True
 
 class AlbumAdmin(admin.ModelAdmin):
     inlines=(AlbumAlbumPhotoInline,)
@@ -148,9 +149,9 @@ class PhotoAdmin(admin.ModelAdmin):
     list_filter=[YearListFilter,AlbumListFilter,"mimetype","mode","width","height"]
 
     def thumbnail(self,obj):
-        return u'<img src="%s" />' % obj.thumb_url()
+        return mark_safe('<img src="%s" />' % obj.thumb_url())
     thumbnail.short_description = 'Thumbnail'
-    thumbnail.allow_tags = True
+    #thumbnail.allow_tags = True
 
     def add_to_album(self,request,queryset):
         class MyForm(forms.Form):
