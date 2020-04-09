@@ -35,9 +35,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         fname = options["fname"]
 
-        archive=tarfile.open(name=fname,mode="w:bz2")
+        archive=tarfile.open(name=fname,mode="r:bz2")
 
-        D={}
+        m_base=archive.getmember("./base.json")
+        fd=archive.extractfile(m_base)
+        D=json.loads(fd.read().decode())
         for name,model in [ 
                 ("tools",models.Tool),
                 ("food_categories",models.FoodCategory),
@@ -46,9 +48,17 @@ class Command(BaseCommand):
                 ("vendors", models.Vendor),
                 ("recipe_labels",models.RecipeLabel),
         ]:
-            D[name]=[ obj.__serialize__() for obj in model.objects.all() ]
-        info,bdata=build_tarinfo("./base.json",json.dumps(D))
-        archive.addfile(info, bdata)
+            for obj in D[name]: model.objects.deserialize(obj)
+
+        for name,model in [ 
+                ("step_sequences",models.StepSequence),
+        ]:
+            for tarinfo in archive.getmembers():
+                if not tarinfo.name.startswith('./%s/' % name): continue
+                fd=archive.extractfile(tarinfo)
+                data=json.loads(fd.read().decode())
+                model.objects.deserialize(data)
+
 
         for name,model in [ 
                 ("measure_units",models.MeasureUnit),
@@ -58,21 +68,22 @@ class Command(BaseCommand):
                 ("ingredient_groups",models.IngredientGroup),
                 ("ingredient_alternatives",models.IngredientAlternative),
         ]:
-            D=[ obj.__serialize__() for obj in model.objects.all() ]
-            info,bdata=build_tarinfo("./%s.json" % name,json.dumps(D))
-            archive.addfile(info, bdata)
+
+            m_name=archive.getmember("./%s.json" % name)
+            fd=archive.extractfile(m_name)
+            D=json.loads(fd.read().decode())
+            for obj in D:
+                model.objects.deserialize(obj)
         
         for name,model in [ 
-                ("step_sequences",models.StepSequence),
                 ("recipes",models.Recipe),
                 ("recipe_sets",models.RecipeSet),
         ]:
-            for obj in model.objects.all():
-                label="%d-%s" % (obj.id,slugify(obj.name).replace("-","_"))
-                D=obj.__serialize__()
-                info,bdata=build_tarinfo("./%s/%s.json" % (name,label),
-                                         json.dumps(D))
-                archive.addfile(info, bdata)
+            for tarinfo in archive.getmembers():
+                if not tarinfo.name.startswith('./%s/' % name): continue
+                fd=archive.extractfile(tarinfo)
+                data=json.loads(fd.read().decode())
+                model.objects.deserialize(data)
             
 
 

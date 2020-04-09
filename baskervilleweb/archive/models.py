@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 
-
 ARCHIVE_PATH = settings.ARCHIVE_PATH
 ARCHIVE_REDIRECT_URL = settings.ARCHIVE_REDIRECT_URL
 

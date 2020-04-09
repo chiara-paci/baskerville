@@ -5,60 +5,127 @@
 
 <h1>{{ recipe }}</h1>
 
-<div class="recipebook">
+<article class="recipebook">
 
-<div>
-<h2>{% trans "Ingredients" %}</h2>
+  <aside>
 
-<table>
-{% for ing in recipe.ingredient_set.all %}
-<tr>
-  <td>{{ ing.food }}</td>
-  <td>{{ ing.format_quantity }}</td>
-  <td>{{ ing.format_conversion }}</td>
-</tr>
-{% endfor %}
-</table>
+    <section>
+    <h2>{% trans "Ingredients" %}</h2>
 
-<h2>{% trans "Tools" %}<h2>
+    <table class="ingredients">
 
-<table>
-  {% for tool,num in recipe.tools %}
-  <tr>
-    <td>{{ tool }}:</td>
-    <td>{{ num }}</td>
-  </tr>
-  {% endfor %}
-</table>
+      {% for gname,ilist in recipe.ingredient_groups %}
+      {% with groupid="group-"|add:forloop.counter %}
+      <tbody id="{{ groupid }}">
+      <tr><th colspan="8" class="title">{{ gname }}</th></tr>
+      {% for ingr in ilist %}
+      {% include "recipebook/includes/ingredient.html" with ingrid=groupid|add:"-ingr-"|add:forloop.counter ingredient=ingr only %}
+      {% endfor %}
+      </tbody>
+      {% endwith %}
+      {% endfor %}
 
-<h2>{% trans "Ingredients preparation" %}</h2>
+      {% for aname,glist in recipe.ingredient_alternatives %}
+      {% with alternativeid="alt-"|add:forloop.counter %}
+      <tbody id="{{ alternativeid }}"><tr><th colspan="8" class="title">{{ aname }} <span class="selectedgroup"></span></th></tr></tbody>
+      {% for gname,ilist in glist %}
+      {% with groupid=alternativeid|add:"-group-"|add:forloop.counter %}
+      <tbody id="{{ groupid }}" data-alternative="#{{ alternativeid }}">
+	<tr class="grouprow">
+	  <td class="empty">&nbsp;</td>
+	  <th colspan="7" class="sub">
+	    <input type="checkbox" class="selectalternative" data-group="#{{ groupid }}" data-alternative="#{{ alternativeid }}">
+	    alt. {{ forloop.counter }}: <span class="groupname">{{ gname }}</span>
+	  </th>
+	</tr>
+	{% for ingr in ilist %}
+	<tr class="ingredientrow" id="ingredient{{ ingr.id }}">
+	  <td class="empty" colspan="2">&nbsp;</td>
+	  {% if ingr.measure.base == "qb" %}
+	  <td class="empty"></td>
+	  <td class="datafirst">q. b.</td>
+	  <td class="data">{% if ingr.preparation %}<i class="fas fa-caret-right"></i>{% endif %} {{ ingr.food.name }}</td>
+	  <td class="data">{% if ingr.preparation %}{{ ingr.preparation }}{% endif %}</td>
+	  <td class="data right light"></td>
+	  <td class="data"></td>
+	  {% else %}
+	  <td class="datafirst right">{{ ingr.quantity_str }}</td>
+	  <td class="data">{{ ingr.measure.abbreviation }}</td>
+	  <td class="data">{% if ingr.preparation %}<i class="fas fa-caret-right"></i>{% endif %} {{ ingr.food.name }}</td>
+	  <td class="data">{% if ingr.preparation %}{{ ingr.preparation }}{% endif %}</td>
+	  <td class="data right light">{{ ingr.quantity_base_str }}</td>
+	  <td class="data light">{{ ingr.measure.base }}</td>
+	  {% endif %}
+	</tr>
+	{% if ingr.preparation %}
+	<tr>
+	  <td class="empty" colspan="4">&nbsp;</td>
+	  <td colspan="4">
+	    <ol>
+	      {% for step in ingr.preparation.steps %}
+	      <li>{{ step }}</li>
+	      {% endfor %}
+	    </ol>
+	  </td>
+	</tr>
+	{% endif %}
+	{% endfor %}
+      </tbody>
 
-<ol>
-{% for ing in recipe.ingredient_set.all %}
-{% for step in ing.format_preparation %}
-<li>{{ step }}</li>
 
-{% endfor %}
-{% endfor %}
-</ol>
+      {% endwith %}
+      {% endfor %}
+      {% endwith %}
+      {% endfor %}
 
-</div>
+    </table>
+
+    </section>
+
+    <section>
+      <h2>{% trans "Tools" %}</h2>
+
+      <table>
+	{% for tool,num in recipe.tools %}
+	<tr>
+	  <td>{{ tool }}:</td>
+	  <td>{{ num }}</td>
+	</tr>
+	{% endfor %}
+      </table>
+    </section>
+
+  </aside>
+
+  <section>
+
+    <section>
+      <h1>{% trans "Ingredients preparation" %}</h1>
+      
+      <ol>
+	{% for ing in recipe.ingredient_set.all %}
+	{% for step in ing.format_preparation %}
+	<li>{{ step }}</li>
+	
+	{% endfor %}
+	{% endfor %}
+      </ol>
+    </section>
+    
+    <section>
+      <h1>{% trans "Execution" %}</h1>
+      
+      <ol>
+	{% for step in recipe.execution.steps %}
+	<li>{{ step }}</li>
+	
+	{% endfor %}
+      </ol>
+      
+    </section>
+  </section>
 
 
-<div>
-
-<h2>{% trans "Execution" %}</h2>
-
-<ol>
-{% for step in recipe.execution.steps %}
-<li>{{ step }}</li>
-
-{% endfor %}
-</ol>
-
-</div>
-
-
-</div>
+</article>
 
 {% endblock content %}

@@ -34,8 +34,8 @@ class Command(BaseCommand):
         src_dir=options["src_dir"]
         reldir=options["dest_rel_dir"]
 
-        dirphoto=os.path.join(models.PHOTO_ARCHIVE_FULL,reldir)
-        dirthumb=os.path.join(models.PHOTO_ARCHIVE_THUMB,reldir)
+        dirphoto=os.path.join(settings.ARCHIVE_PATH["photo"]["full"],reldir)
+        dirthumb=os.path.join(settings.ARCHIVE_PATH["photo"]["thumb"],reldir)
 
         os.makedirs(dirphoto,exist_ok=True)
         os.makedirs(dirthumb,exist_ok=True)

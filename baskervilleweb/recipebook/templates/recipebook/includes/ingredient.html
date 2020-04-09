@@ -1,0 +1,31 @@
+<tr id="{{ ingredient_id }}">
+  <td class="empty">&nbsp;</td>
+  {% if ingredient.measure.base == "qb" %}
+  <td class="empty" colspan="2"></td>
+  <td class="datafirst">q. b.</td>
+  <td class="data">{% if ingredient.preparation %}<a href="" class="viewpreparation" 
+						     data-target="#prep-{{ ingredient_id }}"><i class="fas fa-caret-right"></i></a>{% endif %} {{ ingredient.food.name }}</td>
+  <td class="data">{% if ingredient.preparation %}{{ ingredient.preparation }}{% endif %}</td>
+  <td class="data right light"></td>
+  <td class="data"></td>
+  {% else %}
+  <td class="data right" colspan="2">{{ ingredient.quantity_str }}</td>
+  <td class="data">{{ ingredient.measure.abbreviation }}</td>
+  <td class="data">{% if ingredient.preparation %}<i class="fas fa-caret-right"></i>{% endif %} {{ ingredient.food.name }}</td>
+  <td class="data">{% if ingredient.preparation %}{{ ingredient.preparation }}{% endif %}</td>
+  <td class="data right light">{{ ingredient.quantity_base_str }}</td>
+  <td class="data">{{ ingredient.measure.base }}</td>
+  {% endif %}
+</tr>
+{% if ingredient.preparation %}
+<tr id="prep-{{ ingredient_id }}" class="preparation">
+  <td class="empty" colspan="4">&nbsp;</td>
+  <td colspan="4">
+    <ol>
+      {% for step in ingredient.preparation.steps %}
+      <li>{{ step }}</li>
+      {% endfor %}
+    </ol>
+  </td>
+</tr>
+{% endif %}

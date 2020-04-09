@@ -13,6 +13,10 @@
     box-sizing: border-box
 }
 
+ol, ul {
+    margin-left: 2em;
+}
+
 html {
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
@@ -479,28 +483,63 @@ article.archivephoto {
 
 /*** recipe book ***/
 
-div.recipebook {
+article.recipebook {
+
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: stretch;
     align-content: flex-start;
     justify-content: space-around;
 
-    section {
-	width: 30%;
-	border: 1px solid fade(@primhard4,50%);
-	padding: .2em;
+    text-align: justify;
 
-	background: white;
-
+    aside {
 	display: flex;
 	flex-direction: column;
 	flex-wrap: wrap;
-	align-items: flex-start;
+	align-items: stretch;
 	align-content: flex-start;
-	justify-content: flex-start;
+	justify-content: space-around;
 
+	section {
+	    border: 1px solid fade(@primhard4,50%);
+	    padding: .2em;
+	}
+
+	table {
+
+	    tr {
+		background: white;
+	    }
+
+	    td,th {
+		background: white;
+	    }
+
+	    th {
+		text-align: left;
+		color: @primhard4;
+	    }
+
+	    th.sub {
+		font-weight: normal;
+		font-style: italic;
+	    }
+
+	    td.empty {
+		width: 2em;
+	    }
+
+	    td.light {
+		color: #909090;
+	    }
+
+	}
+
+    }
+
+    section {
 	min-height: 10em;
 
 	h1 {
