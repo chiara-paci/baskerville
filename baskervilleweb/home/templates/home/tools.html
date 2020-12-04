@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+
+<section class="index boxed">
+  <h1 class="hidden">{% trans "Tools" %}</h1>
+
+  <div class="boxes">
+    <div class="box">
+      <a href="{% url 'bibliography:insert' %}"><i class="fas fa-wrench"></i></a>
+      <a href="{% url 'bibliography:insert' %}">{% trans "Insert book" %}</a>
+    </div>
+    <div class="box">
+      <a href="{% url 'bibliography:book-create' %}"><i class="fas fa-wrench"></i></a>
+      <a href="{% url 'bibliography:book-create' %}">{% trans "Create book" %}</a>
+    </div>
+    <div class="box">
+      <a href="{% url 'bibliography:author-search' %}"><i class="fas fa-wrench"></i></a>
+      <a href="{% url 'bibliography:author-search' %}">{% trans "Search author" %}</a>
+    </div>
+    <div class="box">
+      <a href="{% url 'bibliography:author-insert' %}"><i class="fas fa-wrench"></i></a>
+      <a href="{% url 'bibliography:author-insert' %}">{% trans "Insert author" %}</a>
+    </div>
+    <div class="box">
+      <a href="{% url 'bibliography:author-create' %}"><i class="fas fa-wrench"></i></a>
+      <a href="{% url 'bibliography:author-create' %}">{% trans "Create author" %}</a>
+    </div>
+    <div class="box">
+      <a href="{% url 'bibliography:publisher-create' %}"><i class="fas fa-wrench"></i></a>
+      <a href="{% url 'bibliography:publisher-create' %}">{% trans "Create publisher" %}</a>
+    </div>
+    <div class="box">
+      <a href="{% url 'bibliography:categories-categorizer' %}"><i class="fas fa-wrench"></i></a>
+      <a href="{% url 'bibliography:categories-categorizer' %}">{% trans "Categorizer: category to category" %}</a>
+    </div>
+    <div class="box">
+      <a href="{% url 'bibliography:books-categorizer' %}"><i class="fas fa-wrench"></i></a>
+      <a href="{% url 'bibliography:books-categorizer' %}">{% trans "Categorizer: book to category" %}</a>
+    </div>
+  </div>
+
+</section>
+
+{% endblock content %}

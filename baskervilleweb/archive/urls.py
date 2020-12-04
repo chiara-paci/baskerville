@@ -7,6 +7,7 @@ from . import models,views
 app_name="archive"
 
 urlpatterns = [
+    url( r'^$',views.PhotoListView.as_view(),name="index" ),
     url( r'^photo/?$',views.PhotoListView.as_view(),name="photo_list" ),
     url( r'^photo/(?P<pk>\d+)/?$',DetailView.as_view(model=models.Photo),name="photo_detail" ),
     url( r'^photo/(?P<pk>\d+)\.thumb\.jpeg/?$',views.PhotoThumbView.as_view(),name="photo_thumb" ),

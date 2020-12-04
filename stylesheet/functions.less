@@ -1,0 +1,69 @@
+.menu-reduced(@bgcolor,@border) {
+    align-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+    
+    z-index: 20;
+
+    button.menu-opener {
+	display: block;
+	heigth: 30px;
+	margin-top: 5px;
+    }
+    
+    a {
+	background: @bgcolor;
+	border-bottom: @border;
+	visibility: hidden;
+	line-height: 2em;
+	text-align: left;
+	width: 100%;
+	padding: .2em;
+	transition: opacity .5s, visibility: .5s;
+
+    }
+
+}
+
+.menu-responsive(@threshold,@bgcolor,@border){
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    align-content: center;
+    
+    a {
+	background: @bgcolor;
+	display: inline-block;
+	flex-grow: 0;
+	flex-shrink: 0;
+	flex-basis: 2px;
+	padding: 0;
+	margin-left: .5em;
+	margin-right: .5em;
+
+	&:hover,
+	&:focus {
+	    text-decoration: underline;
+	}
+
+    }
+
+    button.menu-opener {
+	margin: 0px;
+	font-size: 12px;
+	display: none;
+    }
+    
+    @media screen and (max-device-width: @threshold) {
+	.menu-reduced(@bgcolor,@border);
+    }
+    
+    @media screen and (max-width: @threshold) {
+	.menu-reduced(@bgcolor,@border);
+    }
+
+}

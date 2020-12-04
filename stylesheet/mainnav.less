@@ -1,0 +1,118 @@
+nav {
+    order: 1;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: baseline;
+    align-content: flex-start;
+
+    background-color: @secahard4;
+    color: @seca2;
+    margin-bottom: .5em;
+    height: 2.4em;
+    line-height: 2em;
+    text-align: center;
+    
+    a {
+	flex-grow: 0;
+	flex-shrink: 0;
+	color: @seca2;
+	.borderradius(1em);
+	text-decoration: none;
+	//width: 10em;
+	text-align: center;
+	padding: .2em;
+    }
+    
+    a:hover {
+	background-color: @seca2;
+	color: @secahard4;
+    }
+    
+    .submenu {
+	background-color: @secahard4;
+	color: @seca2;
+	width: 10em;
+
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+	align-items: flex-start;
+	align-content: flex-start;
+
+	.borderradiusbottom(1em);
+
+	h1 {
+	    font-size: 1em;
+	    font-weight: normal;
+	    .borderradiustop(1em);
+	    text-align: center;
+	    width: 100%;
+	}
+
+	h1:hover {
+	    background-color: @seca2;
+	    color: @secahard4;
+	}
+
+	.items {
+	    .borderradiusbottom(1em);
+	    padding-bottom: 1em;
+	    padding-top: .2em;
+	    display: none;
+	    position: relative;
+	    background-color: @secahard4;
+	    font-size: .9em;
+	    line-height: 1em;
+	    text-align: left;
+	    width: 100%;
+
+	    a,h2 {
+		width: 100%;
+		padding: .3em;
+		margin: 0;
+		margin-top: .2em;
+		margin-bottom: .2em;
+		.borderradius(0);
+	    }
+
+	    hr {
+		height: .2em;
+		.borderradius(.2em);
+		width: 100%;
+		margin: auto;
+		background: linear-gradient(to right, @secahard4 , @seca2, @secahard4);
+		border: 0px;
+	    }
+
+	}
+
+    }
+
+    .submenu:hover {
+	.items {
+	    display: flex;
+	    flex-direction: column;
+	    flex-wrap: nowrap;
+	    justify-content: flex-start;
+	    align-items: flex-start;
+	    align-content: flex-start;
+	    z-index: 200;
+	}
+
+	h1 {
+	    background-color: @seca2;
+	    color: @secahard4;
+	}
+
+	z-index: 200;
+	
+    }
+
+}

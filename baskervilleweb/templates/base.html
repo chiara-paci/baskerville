@@ -2,19 +2,28 @@
 {% load static %}
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ LANGUAGE_CODE }}" xml:lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      lang="{{ LANGUAGE_CODE }}" xml:lang="{{ LANGUAGE_CODE }}" 
+      {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Baskerville{% block title %}{% endblock %}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<link rel="icon" href='{% static "images/logo-baskerville-piccolo.png" %}' type="image/png"/>
+<link rel="icon" href='{% static "images/logo-baskerville-piccolo.png" %}' 
+      type="image/png"/>
 
-<link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet"/> 
+<link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" 
+      rel="stylesheet"/> 
 <script src="https://kit.fontawesome.com/398c6b2bdc.js"></script>
 
-<link rel="stylesheet" type="text/css" href='https://code.jquery.com/ui/1.12.1/themes/sunny/jquery-ui.css'/>
-<link rel="stylesheet" type="text/css" href='{% static "css/baskerville.css" %}'/>
+<link rel="stylesheet" type="text/css" 
+      href='https://code.jquery.com/ui/1.12.1/themes/sunny/jquery-ui.css'/>
 
+<link rel="stylesheet" type="text/css" 
+      href='{% static "css/baskerville.css" %}'/>
 
 </head>
 
@@ -27,15 +36,34 @@
 -->
 
   <header>
+    <div id="title">
       <a href="{% url 'home' %}">
-      <img src="{% static "images/logo-baskerville.png" %}" alt="home"/>
+	<img src="{% static "images/logo-baskerville.png" %}" alt="home"/>
       </a>
-      <h1>
-	Baskerville
-      </h1>
-  </header>
+      <h1>Baskerville</h1>
+    </div>
 
   <nav>
+    <section id="viewmenu">
+      <button id="sitemenu-open" data-target="#sitemenu" 
+	      class="menu-opener" aria-label="site menu">
+	<i class="fas fa-bars"></i>
+      </button>
+      <h2 class="hidden">{% trans "View menu" %}</h2>
+      <a href="/">{% trans "Home" %}</a>
+      <a href="{% url "bibliography:index" %}">{% trans "Library" %}</a>
+      <a href="{% url "archive:index" %}">{% trans "Archive" %}</a>
+      <a href="{% url "recipebook:index" %}">{% trans "Recipe Book" %}</a>
+    </section>
+    
+    <section id="usermenu">
+      <button id="usermenu-open" data-target="#usermenu" class="menu-opener"  aria-label="site menu">
+	<i class="fas fa-user"></i>
+      </button>
+      <h2 class="hidden">{% trans "User navigation" %}</h2>
+      {% include "baskervilleauth/includes/user_links.html" %}
+    </section>
+
 
     <div class="submenu">
       <h1><i class="fa fa-university"></i> {% trans "Library" %}</h1>
@@ -90,6 +118,8 @@
     <a href="{% url 'admin:index' %}"><i class="fa fa-key"></i> {% trans "Admin" %}</a>
 
   </nav>
+
+  </header>
 
   <main>
     {% block content %}{% endblock %}

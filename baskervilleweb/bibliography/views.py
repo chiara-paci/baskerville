@@ -423,13 +423,18 @@ class PublisherCreateView(CreateView):
                                                                          "url": url,
                                                                          "note": note,
                                                                          "alias": alias })
+        print(publisher_obj)
         isbn_obj,created=PublisherIsbn.objects.get_or_create(isbn=isbn,defaults={"preferred":publisher_obj})
+        print(isbn_obj)
+        print(isbn_obj.preferred,created)
 
         if not created: 
             publisher_obj.alias=(isbn_obj.preferred!=publisher_obj)
             publisher_obj.save()
 
         publisher_obj.isbns.add(isbn_obj)
+
+        print("OK")
 
         address_obj_list=[]
         pos=-1

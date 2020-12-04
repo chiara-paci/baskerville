@@ -1478,6 +1478,7 @@ class PublisherIsbn(models.Model):
         if self._state.adding:
             return Publisher.objects.get(pk=0)
         pubs=list(self.publisher_set.all())
+        if len(pubs)==0: return Publisher.objects.get(pk=0)
         if len(pubs)!=1:
             for p in pubs:
                 if not p.alias:
