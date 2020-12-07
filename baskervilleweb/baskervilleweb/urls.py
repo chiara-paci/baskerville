@@ -14,12 +14,12 @@ from django.utils.translation import ugettext as _, ugettext_lazy
 
 from . import admin as myadmin
 
-#admin.site=myadmin.MyAdminSite(admin.site)
-#admin.sites.site=admin.site
+admin.site=myadmin.MyAdminSite(admin.site)
+admin.sites.site=admin.site
 
 urlpatterns = [
-#    path(r'admin/doc/', include('django.contrib.admindocs.urls')),
-#    path(r'admin/', admin.site.urls),
+    path(r'admin/doc/', include('django.contrib.admindocs.urls')),
+    path(r'admin/', admin.site.urls),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
