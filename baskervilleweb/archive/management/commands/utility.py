@@ -82,7 +82,7 @@ def store_exif_data(photo):
             d.value=val
             d.save()
 
-        if label.name == "DateTime":
+        if label.name in [ "DateTime", "DateTimeDigitized" ]:
             dt=dateutil.parser.parse(val.replace(":","-",2)+" CET")
             photo.datetime=dt
             photo.save()
