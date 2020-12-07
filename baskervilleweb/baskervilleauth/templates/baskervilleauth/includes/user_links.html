@@ -3,11 +3,10 @@
 
 {% if user.is_anonymous %}
 <a href="{% url "baskervilleauth:login" %}">{% trans "login" %}</a>
-<a href="{% url "baskervilleauth:register" %}">{% trans "register" %}</a>
 {% else %}
 {% if user.is_staff %}
 <a href="{% url "tools" %}">{% trans "tools" %}</a>
-<a href="{% url "admin:index" %}">{% trans "admin" %}</a>
+{% comment %}<a href="{% url "admin:index" %}">{% trans "admin" %}</a>{% endcomment %}
 {% endif %}
 <a href="{% url "baskervilleauth:logout" %}">{% trans "logout" %}</a>
 {% endif %}
