@@ -15,15 +15,21 @@
 <link rel="icon" href='{% static "images/logo-baskerville-piccolo.png" %}' 
       type="image/png"/>
 
+<!--
 <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" 
       rel="stylesheet"/> 
-<script src="https://kit.fontawesome.com/398c6b2bdc.js"></script>
+-->
 
-<link rel="stylesheet" type="text/css" 
-      href='https://code.jquery.com/ui/1.12.1/themes/sunny/jquery-ui.css'/>
+<!-- <script src="https://kit.fontawesome.com/398c6b2bdc.js"></script>-->
 
-<link rel="stylesheet" type="text/css" 
-      href='{% static "css/baskerville.css" %}'/>
+
+<!-- <link rel="stylesheet" type="text/css" 
+      href='https://code.jquery.com/ui/1.12.1/themes/sunny/jquery-ui.css'/> -->
+
+<link rel="stylesheet" type="text/css" href='{% static "others/jquery-ui.css" %}'/>
+<link rel="stylesheet" type="text/css" href='{% static "others/fontawesome-free-5.15.1-web/css/all.css" %}'/>
+
+<link rel="stylesheet" type="text/css" href='{% static "css/baskerville.css" %}'/>
 
 </head>
 
@@ -131,10 +137,18 @@
      ----------------------------
 -->
   
-<script type="text/javascript" src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-<script type="text/javascript" src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/luxon@1.18.0/build/global/luxon.min.js"></script>
-<script src="https://d3js.org/d3.v5.min.js"></script>
+
+
+<!-- <script type="text/javascript" src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+     <script type="text/javascript" src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/luxon@1.18.0/build/global/luxon.min.js"></script>
+     <script src="https://d3js.org/d3.v5.min.js"></script>
+-->
+
+<script type="text/javascript" src='{% static "others/jquery-3.5.1.min.js" %}'></script> 
+<script type="text/javascript" src='{% static "others/jquery-ui.min.js" %}'></script>
+<script type="text/javascript" src='{% static "others/luxon.min.js" %}'></script>
+<script type="text/javascript" src='{% static "others/d3.v5.min.js" %}'></script>
 
 <!-- 
      <script type="text/javascript" src='{% static "js/jcanvas-14.08.16.min.js" %}'></script>
