@@ -174,3 +174,29 @@ class PhotoAdmin(admin.ModelAdmin):
 
 admin.site.register(models.Photo,PhotoAdmin)
 
+
+
+admin.site.register(models.Document)
+
+class DocumentAssetAdmin(admin.ModelAdmin):
+    list_display=["full_path","document","thumbnail","mimetype","datetime"]
+
+    def thumbnail(self,obj):
+        return mark_safe('<img src="%s" />' % obj.thumb_url())
+    thumbnail.short_description = 'Thumbnail'
+
+admin.site.register(models.DocumentAsset,DocumentAssetAdmin)
+
+
+admin.site.register(models.DocumentCollection)
+
+class DocumentMetaDatumAdmin(admin.ModelAdmin):
+    list_display = [ "document","label","value" ]
+
+admin.site.register(models.DocumentMetaDatum,DocumentMetaDatumAdmin)
+
+
+class DocumentAssetMetaDatumAdmin(admin.ModelAdmin):
+    list_display = [ "document_asset","label","value" ]
+
+admin.site.register(models.DocumentAssetMetaDatum,DocumentAssetMetaDatumAdmin)

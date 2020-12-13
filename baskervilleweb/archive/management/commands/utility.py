@@ -1,9 +1,76 @@
 import exifread
 import dateutil.parser
 import os,datetime,magic,pytz
-from PIL import Image
+from PIL import Image,ImageDraw,ImageFont
+
+from django.contrib.staticfiles import finders
+
 
 from archive import models
+
+def store_asset(doc,asset_path,thumb_path):
+    fname,ext=os.path.splitext(asset_path)
+    ext=ext.lower()
+    try:
+        im = Image.open(asset_path)
+        im.thumbnail( (128,128) )
+        im.save(thumb_path, "JPEG")
+        im.close()
+    except IOError:
+
+        font_path= finders.find('fonts/OpenSans-Bold-webfont.ttf')
+        #searched_locations = finders.searched_locations
+        im = Image.new('RGB', (128, 128), color = '#ffffff')
+        draw = ImageDraw.Draw(im)
+
+        X=4
+        Y=19
+
+        poly1=[(0,0),(0,90),(120,90),(120,45),(75,0)]
+        poly1=[ (x+X,y+Y) for x,y in poly1 ]
+        poly2=[(120,45),(75,45),(75,0)]
+        poly2=[ (x+X,y+Y) for x,y in poly2 ]
+
+        draw.polygon(
+            poly1,
+            fill='#e9f4ce',
+            outline="#87a73b",
+        )
+
+        draw.polygon(poly2,fill='#87a73b')
+
+        for x in range(15,75,10):
+            draw.line( [ (x+X,10+Y),(x+X,45+Y) ], fill="#87a73b")
+
+        fnt = ImageFont.truetype(font_path, 20)
+        draw.text( (X+5,90-30+Y), ext, font=fnt,fill="#87a73b" )
+
+
+        #draw.line((0, 0) + im.size, fill=128)
+        #draw.line((0, im.size[1], im.size[0], 0), fill=128)
+        
+        # write to stdout
+
+        im=im.rotate(90)
+        im.save(thumb_path, "JPEG")
+
+        #print("cannot create thumbnail for", asset_path)
+        #return None
+    
+    stat=os.stat(asset_path)
+    dt=datetime.datetime.utcfromtimestamp(stat.st_mtime).replace(tzinfo=pytz.utc)
+    mimetype=magic.from_file(asset_path, mime=True)
+
+    asset,created=models.DocumentAsset.objects.update_or_create(document=doc,
+                                                                full_path=asset_path,
+                                                                defaults={
+                                                                    "thumb_path": thumb_path,
+                                                                    "mimetype": mimetype,
+                                                                    "datetime": dt
+                                                                })
+    return asset
+    
+
 
 def store_photo(photo_path,thumb_path):
 

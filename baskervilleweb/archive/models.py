@@ -101,7 +101,6 @@ class ExifDatum(models.Model):
 
     def __str__(self): return str(self.photo)+"/"+str(self.label)
 
-
 class Album(models.Model):
     name = models.CharField(max_length=1024)
     photos = models.ManyToManyField(Photo,blank=True)
@@ -114,3 +113,63 @@ class Album(models.Model):
     def photos_count(self):
         return self.photos.count()
 
+class Document(models.Model):
+    name = models.CharField(max_length=1024)
+    
+    def __str__(self): return self.name
+
+class DocumentAsset(models.Model):
+    document = models.ForeignKey(Document,on_delete=models.CASCADE)
+    full_path =  models.FilePathField(path=ARCHIVE_PATH["document_asset"]["full"],recursive=True,max_length=1024)
+    thumb_path = models.FilePathField(path=ARCHIVE_PATH["document_asset"]["thumb"],recursive=True,max_length=1024)
+    mimetype = models.CharField(max_length=1024)
+    datetime = models.DateTimeField(default=timezone.now)
+
+    def __str__(self): return self.full_path
+
+    def thumb_url(self):
+        return "/archive/document_asset/%d.thumb.jpeg" % self.id
+
+    def image_url(self):
+        t=self.mimetype.split("/")
+        return "/archive/document_asset/%d.%s" % (self.id,t[1])
+
+    def image_redirect_url(self):
+        url=self.full_path.replace(ARCHIVE_PATH["document_asset"]["full"],ARCHIVE_REDIRECT_URL["document_asset"]["full"])
+        return url
+
+    def thumb_redirect_url(self):
+        url=self.thumb_path.replace(ARCHIVE_PATH["document_asset"]["thumb"],ARCHIVE_REDIRECT_URL["document_asset"]["thumb"])
+        return url
+        
+    def get_absolute_url(self):
+        return "/archive/document_asset/%d/" % (self.id,)
+
+    class Meta:
+        ordering = [ "full_path" ]
+
+class DocumentCollection(models.Model):
+    name = models.CharField(max_length=1024)
+    documents = models.ManyToManyField(Document,blank=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self): return self.name
+
+    def documents_count(self):
+        return self.documents.count()
+
+class DocumentMetaDatum(models.Model):
+    document = models.ForeignKey(Document,on_delete=models.PROTECT)
+    label = models.ForeignKey(MetaLabel,on_delete=models.PROTECT)
+    value = models.CharField(max_length=8192)
+
+    def __str__(self): return str(self.document)+"/"+str(self.label)
+
+class DocumentAssetMetaDatum(models.Model):
+    document_asset = models.ForeignKey(DocumentAsset,on_delete=models.PROTECT)
+    label = models.ForeignKey(MetaLabel,on_delete=models.PROTECT)
+    value = models.CharField(max_length=8192)
+
+    def __str__(self): return str(self.document_asset)+"/"+str(self.label)
