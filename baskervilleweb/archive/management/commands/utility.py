@@ -18,7 +18,6 @@ def store_asset(doc,asset_path,thumb_path):
         im.save(thumb_path, "JPEG")
         im.close()
     except IOError:
-
         font_path= finders.find('fonts/OpenSans-Bold-webfont.ttf')
         #searched_locations = finders.searched_locations
         im = Image.new('RGB', (128, 128), color = '#ffffff')

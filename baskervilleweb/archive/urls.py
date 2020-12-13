@@ -16,4 +16,5 @@ urlpatterns = [
          views.PhotoImageView.as_view(model=models.Photo),name="photo_image" ),
     url( r'^document_asset/(?P<pk>\d+)\.thumb\.jpeg/?$',
          views.DocumentAssetThumbView.as_view(),name="document_asset_thumb" ),
+
 ]

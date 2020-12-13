@@ -55,7 +55,11 @@ class Command(BaseCommand):
         name=options["name"]
         collection=options["collection"]
 
-        src_base=os.path.commonpath(src_list)
+        if len(src_list)==1:
+            src_base=os.path.dirname(src_list[0])
+        else:
+            src_base=os.path.commonpath(src_list)
+
         src_list=[ os.path.relpath(p,start=src_base) for p in src_list ]
 
         dirasset=os.path.join(settings.ARCHIVE_PATH["document_asset"]["full"],
