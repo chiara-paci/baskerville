@@ -23,6 +23,7 @@ import shutil
 from .utility import store_asset
 
 def add_src(doc,src_base,src,dirasset,dirthumb):
+    if os.path.basename(src)=="cache": return
     src_path=os.path.join(src_base,src)
     if not os.path.isfile(src_path):
         os.makedirs(os.path.join(dirasset,src),exist_ok=True)
