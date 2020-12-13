@@ -139,7 +139,10 @@ class DocumentAsset(models.Model):
         return url
 
     def thumb_redirect_url(self):
-        url=self.thumb_path.replace(ARCHIVE_PATH["document_asset"]["thumb"],ARCHIVE_REDIRECT_URL["document_asset"]["thumb"])
+        url=self.thumb_path.replace(
+            ARCHIVE_PATH["document_asset"]["thumb"],
+            ARCHIVE_REDIRECT_URL["document_asset"]["thumb"]
+        )
         return url
         
     def get_absolute_url(self):

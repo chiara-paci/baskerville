@@ -95,6 +95,29 @@ class PhotoThumbView(DetailView):
         img.close()
         return response
 
+class DocumentAssetThumbView(DetailView):
+    model = models.DocumentAsset
+
+    def get_image_format(self):
+        mimetype="image/jpeg"
+        savetype="JPEG"
+        return mimetype,savetype
+
+    def get(self,request,*args,**kwargs):
+        asset=self.get_object()
+        if not settings.ARCHIVE_TEST:
+            response = HttpResponse()
+            #response["Content-Disposition"] = "attachment; filename={0}".format(os.path.basename(asset.thumb_url()))
+            response["Content-Type"]=""
+            response['X-Accel-Redirect'] = asset.thumb_redirect_url()
+            return response
+        img=Image.open(asset.thumb_path)
+        mimetype,savetype=self.get_image_format()
+        response = HttpResponse(content_type=mimetype)
+        img.save(response, savetype)
+        img.close()
+        return response
+
 class Filter(object):
 
     def __init__(self,name,q_name):

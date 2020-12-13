@@ -10,6 +10,10 @@ urlpatterns = [
     url( r'^$',views.PhotoListView.as_view(),name="index" ),
     url( r'^photo/?$',views.PhotoListView.as_view(),name="photo_list" ),
     url( r'^photo/(?P<pk>\d+)/?$',DetailView.as_view(model=models.Photo),name="photo_detail" ),
-    url( r'^photo/(?P<pk>\d+)\.thumb\.jpeg/?$',views.PhotoThumbView.as_view(),name="photo_thumb" ),
-    url( r'^photo/(?P<pk>\d+)\.(?P<ext>[^.]*)/?$',views.PhotoImageView.as_view(model=models.Photo),name="photo_image" ),
+    url( r'^photo/(?P<pk>\d+)\.thumb\.jpeg/?$',
+         views.PhotoThumbView.as_view(),name="photo_thumb" ),
+    url( r'^photo/(?P<pk>\d+)\.(?P<ext>[^.]*)/?$',
+         views.PhotoImageView.as_view(model=models.Photo),name="photo_image" ),
+    url( r'^document_asset/(?P<pk>\d+)\.thumb\.jpeg/?$',
+         views.DocumentAssetThumbView.as_view(),name="document_asset_thumb" ),
 ]
