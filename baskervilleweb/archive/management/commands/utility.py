@@ -13,7 +13,7 @@ def store_asset(doc,asset_path,thumb_path):
     ext=ext.lower()
     try:
         im = Image.open(asset_path)
-        im.thumbnail( (128,128) )
+        im.convert("RGB").thumbnail( (128,128),Image.LANCZOS )
         im.save(thumb_path, "JPEG")
         im.close()
     except IOError:
