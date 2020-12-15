@@ -115,7 +115,7 @@ class Album(models.Model):
 
 class Document(models.Model):
     label = models.SlugField(max_length=50,unique=True)
-    name = models.CharField(max_length=1024)
+    name = models.CharField(max_length=4096,default="",blank=True)
     
     def __str__(self): return self.name
 
