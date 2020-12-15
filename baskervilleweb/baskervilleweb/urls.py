@@ -29,6 +29,7 @@ import recipebook.urls
 import bibliography.urls
 import foods.urls
 import archive.urls
+import warehouse.urls
 
 urlpatterns += [
     path(r'',TemplateView.as_view(template_name="home/index.html"),name="home" ),
@@ -38,6 +39,7 @@ urlpatterns += [
     path(r'foods/',include(foods.urls)),
     path(r'bibliography/',include(bibliography.urls)),
     path(r'archive/',include(archive.urls)),
+    path(r'warehouse/',include(warehouse.urls)),
 ]
 
 if settings.DEBUG_TOOLBAR:

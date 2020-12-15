@@ -4,7 +4,8 @@ from django.shortcuts import render,redirect
 from django.urls import reverse
 from django.http import HttpResponse
 from django.core import paginator
-
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 from django.views.generic import TemplateView,ListView,View,CreateView,DetailView
 from django.views.generic.detail import SingleObjectMixin
@@ -385,6 +386,7 @@ class JsonTreeView(ListView):
 
 ### Create Publisher
 
+@method_decorator(login_required, name='dispatch')
 class PublisherCreateView(CreateView):
     form_class=forms.PublisherForm
     model=Publisher
@@ -460,6 +462,7 @@ class PublisherCreateView(CreateView):
         return publisher_obj
 
 
+@method_decorator(login_required, name='dispatch')
 class JsonPublisherCreateView(PublisherCreateView):
     form_class=forms.PublisherForm
     model=Publisher
@@ -490,6 +493,7 @@ class JsonPublisherCreateView(PublisherCreateView):
 
 ### Create Author
 
+@method_decorator(login_required, name='dispatch')
 class AuthorCreateView(CreateView):
     form_class=forms.AuthorForm
     model=Author
@@ -531,6 +535,7 @@ class AuthorCreateView(CreateView):
 
         return author_obj
 
+@method_decorator(login_required, name='dispatch')
 class JsonAuthorCreateView(AuthorCreateView):
     form_class=forms.AuthorForm
     model=Author
@@ -578,6 +583,7 @@ class BookByIsbnPubListView(ListView):
 
 ### Create Book
 
+@method_decorator(login_required, name='dispatch')
 class BookCreateView(CreateView):
     form_class=forms.BookForm
     model=Book
@@ -623,6 +629,7 @@ class BookCreateView(CreateView):
             pos+=1
         return book_obj
 
+@method_decorator(login_required, name='dispatch')
 class JsonBookCreateView(BookCreateView):
     form_class=forms.BookForm
     model=Book
@@ -651,6 +658,7 @@ class JsonBookCreateView(BookCreateView):
                       {"book": book_obj},
                       content_type='application/json')
 
+@method_decorator(login_required, name='dispatch')
 class JsonBookChangeCategoriesView(View):
     template_name_response="bibliography/book_detail.json"
 
@@ -691,6 +699,7 @@ class JsonBookChangeCategoriesView(View):
                       {"book": book_obj},
                       content_type='application/json')
 
+@method_decorator(login_required, name='dispatch')
 class JsonCategoryChangeParentsView(View):
     template_name_response="bibliography/category_detail.json"
 
@@ -741,6 +750,7 @@ class JsonCategoryChangeParentsView(View):
 
 
 ### Insert
+@method_decorator(login_required, name='dispatch')
 class BooksInsertView(View): 
     template_name_isbn = "bibliography/isbn_form.html"
     template_name_insert = "bibliography/insert_tool.html"
@@ -914,6 +924,7 @@ class AuthorSearchView(View):
             return redirect(L[0])
         return render(request,self.template_name_list,{"object_list":L})
 
+@method_decorator(login_required, name='dispatch')
 class AuthorInsertView(AuthorSearchView):
     template_name_not_found="bibliography/author_form.html"
 
@@ -977,6 +988,7 @@ class PublicationIssuesAuthorChoiceView(View,SingleObjectMixin):
                                             kwargs={"pk":publication.id})
                       })
 
+@method_decorator(login_required, name='dispatch')
 class PublicationIssuesAuthorCreateView(View,SingleObjectMixin):
     template_name = "bibliography/author_form.html"
     template_name_add = "bibliography/publication_issues_author_add.html"
@@ -1122,6 +1134,7 @@ class PublicationIssuesAuthorSearchView(View,SingleObjectMixin):
                                                     'action': reverse("bibliography:publication-issues-author-add",
                                         kwargs={"pk":publication.id})})
 
+@method_decorator(login_required, name='dispatch')
 class PublicationIssuesAuthorAddView(View,SingleObjectMixin):
     template_name = "bibliography/publication_issues_author_add.html"
     model=Publication

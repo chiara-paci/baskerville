@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+
+{% block content %}
+
+<section class="area-index">
+
+  <header>
+    <i class="fas fa-archive"></i>
+    <h1>{% trans "Archive" %}</h1>
+  </header>
+
+  <ul class="sub-boxes">
+    <li>
+      <a href="{% url 'archive:photo_list' %}"><i class="fas fa-camera-retro"></i></a>
+      {% trans "Photos" %}
+    </li>
+    <li>
+      <a href="{% url 'archive:photo_list' %}"><i class="fas fa-file-alt"></i></a>
+      {% trans "Documents" %}
+    </li>
+  </ul>
+
+</section>
+
+{% endblock %}
+
+{% block script %}
+
+
+{% endblock %}

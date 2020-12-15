@@ -31,20 +31,21 @@ section.boxed {
 	margin: auto;
 	margin-top: 1em;
 
+	position: relative;
 
 	&.box3 {
-	    div.box {
+	    .box {
 		width: 30%;
 	    }
 	}
 
 	&.box4 {
-	    div.box {
+	    .box {
 		width: 22%;
 	    }
 	}
 
-	div.box {
+	section.box {
 	    min-width: 300px;
 	    margin-top: .5em;
 
@@ -65,16 +66,48 @@ section.boxed {
 		margin-bottom: .2em;
 	    }
 
-	    h2 {
+	    h2, h3 {
 		background: none;
 		border: none;
 		padding-left: 0;
 		padding: 0;
 	    }
 
+	    ul.sub-boxes {
+		width: 90%;
+		margin: auto;
+		list-style-type: none;
+		display: flex;
+		flex-direction: column;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		align-items: flex-start;
+		align-content: flex-start;
+
+		
+		li {
+		    width: 100%;
+		    text-align: left;
+		    padding: .5em;
+		    .fas {
+			font-size: 120%;
+		    }
+		    a {
+			display: inline-block;
+			text-align: center;
+			margin-right: 1em;
+		    }
+
+		}
+
+	    }
+
 
 	}
 
     }
+
+
+
 
 }

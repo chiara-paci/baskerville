@@ -114,6 +114,7 @@ class Album(models.Model):
         return self.photos.count()
 
 class Document(models.Model):
+    label = models.SlugField(max_length=50,default="a")
     name = models.CharField(max_length=1024)
     
     def __str__(self): return self.name

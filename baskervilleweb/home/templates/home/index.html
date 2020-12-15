@@ -10,41 +10,60 @@
 
   <div class="boxes">
     
-    <div class="box">
+    <section class="box">
       <a href="{% url 'bibliography:index' %}"><i class="fas fa-university"></i></a>
       
       <h2>{% trans "Library" %}</h2>
       
       <p>La nostra biblioteca.</p>
       
-    </div>
+    </section>
 
-    <div class="box">
+    <section class="box">
       <a href="{% url 'recipebook:index' %}"><i class="fas fa-book"></i></a>
       
       <h2>{% trans "Recipe Book" %}</h2>
       
       <p>Il nostro libro di ricette.</p>
       
-    </div>
+    </section>
 
-    <div class="box">
+    <section class="box">
       <a href="{% url 'archive:index' %}"><i class="fas fa-archive"></i></a>
       
       <h2>{% trans "Archive" %}</h2>
       
-      <p>Foto e altro.</p>
-      
-    </div>
+      <ul class="sub-boxes">
 
-    <div class="box">
+	<li>
+	  <a href="{% url 'archive:photo_list' %}"><i class="fas fa-camera-retro"></i></a>
+	  {% trans "Photos" %}
+	</li>
+	<li>
+	  <a href="{% url 'archive:photo_list' %}"><i class="fas fa-file-alt"></i></a>
+	  {% trans "Documents" %}
+	</li>
+
+      </ul>
+
+    </section>
+
+    <section class="box">
+      <i class="fas fa-warehouse"></i>
+      
+      <h2>{% trans "Warehouse" %}</h2>
+      
+    </section>
+
+
+    <section class="box">
       <i class="fas fa-wrench"></i>
       
       <h2>{% trans "Tools" %}</h2>
       
       <p>Tools vari.</p>
       
-    </div>
+    </section>
 
 
   </div>

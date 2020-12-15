@@ -1,10 +1,82 @@
 {% extends "base.html" %}
+{% load i18n %}
+{% load static %}
 
 {% block content %}
 
-<p><a href="">Case editrici con ISBN non numerico</a></p>
-<p><a href="">Libri con ISBN non numerico</a></p>
-<p><a href="">Collane senza ISBN</a></p>
+<section class="area-index">
+
+  <header>
+    <i class="fas fa-university"></i>
+    <h1>{% trans "Library" %}</h1>
+  </header>
+
+  <ul class="sub-boxes">
+    <li>
+      <a href="{% url 'archive:photo_list' %}"><i class="fas fa-camera-retro"></i></a>
+      {% trans "Photos" %}
+    </li>
+    <li>
+      <a href="{% url 'archive:photo_list' %}"><i class="fas fa-file-alt"></i></a>
+      {% trans "Documents" %}
+    </li>
+    
+    <li>
+      <a href="{% url 'bibliography:catalog' %}">{% trans "Catalog" %}</a>
+      <a href="{% url 'bibliography:categories' %}">{% trans "Categories" %}</a>
+    </li>
+    
+    <li>
+      <a href="{% url 'bibliography:publisher-list' %}">{% trans "Publishers" %}</a>
+      <a href="{% url 'bibliography:publisherisbn-list' %}">ISBN Case editrici</a>
+      <a href="{% url 'bibliography:publisherisbn-alpha' %}">Case editrici con ISBN non numerico</a>
+    </li>
+    
+    <li>
+      <a href="{% url 'bibliography:author-list' %}">{% trans "Authors" %}</a>
+      <a href="{% url 'bibliography:nameformatcollection-list' %}">{% trans "Name Format Collections" %}</a>
+    </li>
+    
+    <li>
+      <a href="{% url 'bibliography:book-list-alpha' %}">Libri con ISBN non numerico</a>
+      <a href="{% url 'bibliography:book-serie-without-isbn' %}">Collane senza ISBN</a>
+    </li>
+    
+    <li>
+      <a href="{% url 'bibliography:publication-list' %}">{% trans "Publications" %}</a>
+      <a href="{% url 'bibliography:publication-list-alpha' %}">{% trans "Publications without ISSN" %}</a>
+      
+    </li>
+    
+    <li>
+      
+      
+      <a href="{% url 'bibliography:insert' %}">{% trans "Insert book" %}</a>
+      <a href="{% url 'bibliography:book-create' %}">{% trans "Create book" %}</a>
+    </li>
+    
+    <li>
+      <a href="{% url 'bibliography:author-search' %}">{% trans "Search author" %}</a>
+      <a href="{% url 'bibliography:author-insert' %}">{% trans "Insert author" %}</a>
+      <a href="{% url 'bibliography:author-create' %}">{% trans "Create author" %}</a>
+    </li>
+    
+    <li>
+      <a href="{% url 'bibliography:publisher-create' %}">{% trans "Create publisher" %}</a>
+    </li>
+    
+    <li>
+      <a href="{% url 'bibliography:categories-categorizer' %}">
+	{% trans "Categorizer: category to category" %}</a>
+      <a href="{% url 'bibliography:books-categorizer' %}">{% trans "Categorizer: book to category" %}</a>
+      
+    </li>
+
+  </ul>
+
+
+</section>
+
 
 {% endblock %}
 
