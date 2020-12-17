@@ -386,24 +386,24 @@ header {
   align-items: baseline;
   align-content: flex-start;
 }
-header div#title {
+header div.title {
   padding: 1vmin;
+  height: 16vmin;
+  max-height: 72px;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
   align-content: center;
   justify-content: stretch;
-  height: 16vmin;
-  max-height: 72px;
 }
-header div#title img {
+header div.title img {
   flex-grow: 0;
   flex-shrink: 0;
   height: 15vmin;
   max-height: 72px;
 }
-header div#title h1 {
+header div.title h1 {
   flex-grow: 1;
   flex-shrink: 0;
   flex-basis: 1px;
@@ -421,120 +421,90 @@ header nav {
   flex-grow: 0;
   flex-shrink: 0;
   flex-basis: auto;
+  width: 100%;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  justify-content: center;
-  align-items: baseline;
+  align-items: flex-start;
+  justify-content: space-around;
   align-content: flex-start;
-  background-color: #669100;
-  color: #ddf0b2;
+  color: #669100;
   margin-bottom: .5em;
   height: 2.4em;
   line-height: 2em;
   text-align: center;
 }
-header nav a {
+@media (min-width: 1000px) {
+  header nav {
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+header nav section {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  text-align: left;
+  width: 40%;
+}
+header nav section button {
+  align-self: center;
+  border-radius: 1.4em;
+  -moz-border-radius: 1.4em;
+  -webkit-border-radius: 1.4em;
+  box-shadow: 0 0 3px 0 #669100;
+  padding: 0em 2em;
+}
+header nav section button:active {
+  box-shadow: 0 0 10px 0 #669100 inset;
+}
+header nav section a,
+header nav section button {
+  display: inline-block;
+  color: #669100;
+  background-color: #c1d989;
+  border: 1px solid #669100;
+  line-height: 2em;
+  height: 2.2em;
+}
+header nav section a {
+  padding: 0em 1em;
   flex-grow: 0;
   flex-shrink: 0;
-  color: #ddf0b2;
-  border-radius: 1em;
-  -moz-border-radius: 1em;
-  -webkit-border-radius: 1em;
   text-decoration: none;
-  text-align: center;
-  padding: .2em;
 }
-header nav a:hover {
-  background-color: #ddf0b2;
-  color: #669100;
+@media (max-width: 1000px) {
+  header nav section a {
+    display: none;
+  }
 }
-header nav .submenu {
-  background-color: #669100;
-  color: #ddf0b2;
-  width: 10em;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  align-items: flex-start;
-  align-content: flex-start;
-  border-bottom-left-radius: 1em;
-  border-bottom-right-radius: 1em;
-  -moz-border-bottom-left-radius: 1em;
-  -moz-border-bottom-right-radius: 1em;
-  -webkit-border-bottom-left-radius: 1em;
-  -webkit-border-bottom-right-radius: 1em;
+@media (max-width: 1000px) {
+  header nav section a:hover,
+  header nav section button:hover {
+    color: #ddf0b2;
+    background-color: #669100;
+  }
 }
-header nav .submenu h1 {
-  font-size: 1em;
-  font-weight: normal;
-  border-top-left-radius: 1em;
-  border-top-right-radius: 1em;
-  -moz-border-top-left-radius: 1em;
-  -moz-border-top-right-radius: 1em;
-  -webkit-border-top-left-radius: 1em;
-  -webkit-border-top-right-radius: 1em;
-  text-align: center;
-  width: 100%;
-}
-header nav .submenu h1:hover {
-  background-color: #ddf0b2;
-  color: #669100;
-}
-header nav .submenu .items {
-  border-bottom-left-radius: 1em;
-  border-bottom-right-radius: 1em;
-  -moz-border-bottom-left-radius: 1em;
-  -moz-border-bottom-right-radius: 1em;
-  -webkit-border-bottom-left-radius: 1em;
-  -webkit-border-bottom-right-radius: 1em;
-  padding-bottom: 1em;
-  padding-top: .2em;
-  display: none;
-  position: relative;
-  background-color: #669100;
-  font-size: .9em;
-  line-height: 1em;
-  text-align: left;
-  width: 100%;
-}
-header nav .submenu .items a,
-header nav .submenu .items h2 {
-  width: 100%;
-  padding: .3em;
-  margin: 0;
-  margin-top: .2em;
-  margin-bottom: .2em;
-  border-radius: 0;
-  -moz-border-radius: 0;
-  -webkit-border-radius: 0;
-}
-header nav .submenu .items hr {
-  height: .2em;
-  border-radius: 0.2em;
-  -moz-border-radius: 0.2em;
-  -webkit-border-radius: 0.2em;
-  width: 100%;
-  margin: auto;
-  background: linear-gradient(to right, #669100, #ddf0b2, #669100);
-  border: 0px;
-}
-header nav .submenu:hover {
-  z-index: 200;
-}
-header nav .submenu:hover .items {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  align-items: flex-start;
-  align-content: flex-start;
-  z-index: 200;
-}
-header nav .submenu:hover h1 {
-  background-color: #ddf0b2;
-  color: #669100;
+@media (min-width: 1000px) {
+  header nav section {
+    flex-direction: row;
+    text-align: center;
+    width: auto;
+  }
+  header nav section button {
+    display: none;
+  }
+  header nav section a {
+    border-radius: 1.4em;
+    -moz-border-radius: 1.4em;
+    -webkit-border-radius: 1.4em;
+    box-shadow: 0 0 3px 0 #669100;
+    margin: 0 1em;
+  }
+  header nav section a:active,
+  header nav section a:hover {
+    box-shadow: 0 0 10px 0 #669100 inset;
+  }
 }
 main {
   order: 2;
@@ -604,6 +574,10 @@ main section.boxed div.boxes section.box h3 {
   border: none;
   padding-left: 0;
   padding: 0;
+}
+main section.boxed div.boxes section.box a:hover .fas {
+  background-color: #9b8a00;
+  color: white;
 }
 main section.boxed div.boxes section.box ul.sub-boxes {
   width: 90%;
@@ -685,37 +659,28 @@ main section.area-index ul.sub-boxes li a {
 }
 main h1 {
   color: #9b8a00;
-  background-color: #fff8be;
   font-size: 1.5em;
   padding-top: .5em;
   padding-bottom: .5em;
   padding-left: 1em;
-  border: 1px solid #9b8a00;
-  border-radius: 1em;
-  -moz-border-radius: 1em;
-  -webkit-border-radius: 1em;
   margin-bottom: 1em;
   margin-top: 1em;
 }
 main h2 {
   color: #9b8a00;
-  background-color: #fff8be;
   font-size: 1.2em;
   padding-top: .1em;
   padding-bottom: .1em;
   padding-left: 1em;
-  border-bottom: 1px solid #9b8a00;
   margin-bottom: 1em;
   margin-top: 1em;
 }
 main h3 {
   color: #9b8a00;
-  background-color: #fff8be;
   font-size: 1em;
   padding-top: .1em;
   padding-bottom: .1em;
   padding-left: 1em;
-  border-bottom: 1px solid #9b8a00;
   margin-bottom: 1em;
   margin-top: 1em;
 }

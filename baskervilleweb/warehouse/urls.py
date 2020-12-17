@@ -8,6 +8,7 @@ app_name="warehouse"
 
 urlpatterns = [
     # url( r'^$',views.PhotoListView.as_view(),name="index" ),
+    url( r'',TemplateView.as_view(template_name="warehouse/index.html"),name="index" ),
     url( r'^container/?$',ListView.as_view(model=models.Container),name="container_list" ),
     url( r'^container/(?P<pk>\d+)/?$',DetailView.as_view(model=models.Container),name="container_detail" ),
     # url( r'^photo/(?P<pk>\d+)/?$',DetailView.as_view(model=models.Photo),name="photo_detail" ),

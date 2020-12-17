@@ -21,9 +21,10 @@ header {
     align-items: baseline;
     align-content: flex-start;
 
-    div#title {
-
+    div.title {
 	padding: 1vmin;
+	height: 16vmin;
+	max-height: 72px;
 
 	display: flex;
 	flex-direction: row;
@@ -32,10 +33,6 @@ header {
 	align-content: center;
 	justify-content: stretch;
 	
-	height: 16vmin;
-
-	max-height: 72px;
-
 	img {
 	    flex-grow: 0;
 	    flex-shrink: 0;
@@ -64,118 +61,96 @@ header {
 	flex-shrink: 0;
 	flex-basis: auto;
 
+	width: 100%;
+
 	display: flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
-	justify-content: center;
-	align-items: baseline;
+
+	align-items: flex-start;
+	justify-content: space-around;
 	align-content: flex-start;
 
-	background-color: @secahard4;
-	color: @seca2;
+	@media (min-width: 1000px) {
+	    align-items: center;
+	    justify-content: space-between;
+	}
+
+	color: @secahard4;
 	margin-bottom: .5em;
 	height: 2.4em;
 	line-height: 2em;
 	text-align: center;
-	
-	a {
-	    flex-grow: 0;
-	    flex-shrink: 0;
-	    color: @seca2;
-	    .borderradius(1em);
-	    text-decoration: none;
-	    //width: 10em;
-	    text-align: center;
-	    padding: .2em;
-	}
-	
-	a:hover {
-	    background-color: @seca2;
-	    color: @secahard4;
-	}
-	
-	.submenu {
-	    background-color: @secahard4;
-	    color: @seca2;
-	    width: 10em;
+
+	section {
 
 	    display: flex;
 	    flex-direction: column;
 	    flex-wrap: nowrap;
-	    justify-content: flex-start;
-	    align-items: flex-start;
-	    align-content: flex-start;
+	    text-align: left;
+	    width: 40%;
 
-	    .borderradiusbottom(1em);
+	    button {
+		align-self: center;
+		.borderradius(1.4em);
+		box-shadow: 0 0 3px 0 @secahard4;
+		padding: 0em 2em;
+	    }
 
-	    h1 {
-		font-size: 1em;
-		font-weight: normal;
-		.borderradiustop(1em);
+	    button:active {
+		box-shadow: 0 0 10px 0 @secahard4 inset;
+	    }
+
+	    a, button {
+		display: inline-block;
+		color: @secahard4;
+		background-color: @seca0;
+		border: 1px solid @secahard4;
+		line-height: 2em;
+		height: 2.2em;
+	    }
+	
+	    a {
+		padding: 0em 1em;
+		flex-grow: 0;
+		flex-shrink: 0;
+		text-decoration: none;
+		@media (max-width: 1000px) {
+		    display: none;
+		}
+	    }
+	
+	    @media (max-width: 1000px) {
+		a:hover, button:hover {
+		    color: @seca2;
+		    background-color: @secahard4;
+		}
+	    }
+
+	    @media (min-width: 1000px) {
+		flex-direction: row;
 		text-align: center;
-		width: 100%;
-	    }
+		width: auto;
 
-	    h1:hover {
-		background-color: @seca2;
-		color: @secahard4;
-	    }
-
-	    .items {
-		.borderradiusbottom(1em);
-		padding-bottom: 1em;
-		padding-top: .2em;
-		display: none;
-		position: relative;
-		background-color: @secahard4;
-		font-size: .9em;
-		line-height: 1em;
-		text-align: left;
-		width: 100%;
-
-		a,h2 {
-		    width: 100%;
-		    padding: .3em;
-		    margin: 0;
-		    margin-top: .2em;
-		    margin-bottom: .2em;
-		    .borderradius(0);
+		button {
+		    display: none;
 		}
 
-		hr {
-		    height: .2em;
-		    .borderradius(.2em);
-		    width: 100%;
-		    margin: auto;
-		    background: linear-gradient(to right, @secahard4 , @seca2, @secahard4);
-		    border: 0px;
+		a {
+		    .borderradius(1.4em);
+		    box-shadow: 0 0 3px 0 @secahard4;
+		    margin: 0 1em;
+		}
+
+		a:active, a:hover {
+		    box-shadow: 0 0 10px 0 @secahard4 inset;
 		}
 
 	    }
 
-	}
 
-	.submenu:hover {
-	    .items {
-		display: flex;
-		flex-direction: column;
-		flex-wrap: nowrap;
-		justify-content: flex-start;
-		align-items: flex-start;
-		align-content: flex-start;
-		z-index: 200;
-	    }
-
-	    h1 {
-		background-color: @seca2;
-		color: @secahard4;
-	    }
-
-	    z-index: 200;
 	    
 	}
-
     }
-
-
 }
+	

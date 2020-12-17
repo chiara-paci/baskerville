@@ -1,14 +1,17 @@
 $(".menu-opener").click(function(event){
     event.preventDefault();
     var target=$( $(this).data("target") );
+    console.log( $(this),target);
     target.children("a").each(function(){
-	if ($(this).css("visibility")=="visible") {
+	console.log($(this),$(this).css("display"));
+	
+	if ($(this).css("display")=="none") {
 	    $(this).css({ 
-		"visibility": "hidden"
+		"display": "inline-block"
 	    });
 	} else { 
 	    $(this).css({ 
-		"visibility": "visible"
+		"display": "none"
 	    });
 	};
     });

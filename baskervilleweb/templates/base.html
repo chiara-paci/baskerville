@@ -41,95 +41,66 @@
      ----------------------------
 -->
 
-  <header>
-    <div id="title">
-      <a href="{% url 'home' %}">
-	<img src="{% static "images/logo-baskerville.png" %}" alt="home"/>
-      </a>
-      <h1>Baskerville</h1>
-    </div>
+<header>
+  <div class="title">
+    <a href="{% url 'home' %}">
+      <img src="{% static "images/logo-baskerville.png" %}" alt="home"/>
+    </a>
+    <h1>Baskerville</h1>
+  </div>
 
   <nav>
-    <section id="viewmenu">
+    <section id="sitemenu">
       <button id="sitemenu-open" data-target="#sitemenu" 
 	      class="menu-opener" aria-label="site menu">
 	<i class="fas fa-bars"></i>
       </button>
+
       <h2 class="hidden">{% trans "View menu" %}</h2>
-      <a href="/">{% trans "Home" %}</a>
-      <a href="{% url "bibliography:index" %}">{% trans "Library" %}</a>
-      <a href="{% url "archive:index" %}">{% trans "Archive" %}</a>
-      <a href="{% url "recipebook:index" %}">{% trans "Recipe Book" %}</a>
+
+      <a href="/">
+	<i class="fa fa-home"></i> 
+	{% trans "Home" %}
+      </a>
+
+      <a href="{% url "bibliography:index" %}">
+	<i class="fa fa-university"></i> 
+	{% trans "Library" %}
+      </a>
+
+      <a href="{% url "archive:index" %}">
+	<i class="fa fa-archive"></i> 
+	{% trans "Archive" %}
+      </a>
+
+      <a href="{% url "recipebook:index" %}">
+	<i class="fa fa-book"></i> 
+	{% trans "Recipe Book" %}
+      </a>
+
+      <a href="{% url "warehouse:index" %}">
+	<i class="fa fa-warehouse"></i> 
+	{% trans "Warehouse" %}
+      </a>
+
     </section>
     
     <section id="usermenu">
-      <button id="usermenu-open" data-target="#usermenu" class="menu-opener"  aria-label="site menu">
+      <button id="usermenu-open" data-target="#usermenu" 
+	      class="menu-opener"  aria-label="site menu">
 	<i class="fas fa-user"></i>
       </button>
       <h2 class="hidden">{% trans "User navigation" %}</h2>
       {% include "baskervilleauth/includes/user_links.html" %}
     </section>
-
-
-    <div class="submenu">
-      <h1><i class="fa fa-university"></i> {% trans "Library" %}</h1>
-      <div class="items">
-	<a href="{% url 'bibliography:catalog' %}">{% trans "Catalog" %}</a>
-	<a href="{% url 'bibliography:categories' %}">{% trans "Categories" %}</a>
-	<hr/>
-	<a href="{% url 'bibliography:publisher-list' %}">{% trans "Publishers" %}</a>
-	<a href="{% url 'bibliography:publisherisbn-list' %}">ISBN Case editrici</a>
-	<a href="{% url 'bibliography:publisherisbn-alpha' %}">Case editrici con ISBN non numerico</a>
-	<hr/>
-	<a href="{% url 'bibliography:author-list' %}">{% trans "Authors" %}</a>
-	<a href="{% url 'bibliography:nameformatcollection-list' %}">{% trans "Name Format Collections" %}</a>
-	<hr/>
-	<a href="{% url 'bibliography:book-list-alpha' %}">Libri con ISBN non numerico</a>
-	<a href="{% url 'bibliography:book-serie-without-isbn' %}">Collane senza ISBN</a>
-	<hr/>
-	<a href="{% url 'bibliography:publication-list' %}">{% trans "Publications" %}</a>
-	<a href="{% url 'bibliography:publication-list-alpha' %}">{% trans "Publications without ISSN" %}</a>
-      </div>
-    </div>
-
-    <a href="{% url 'recipebook:recipecategory_list' %}">
-      <i class="fa fa-book"></i> {% trans "Recipe Book" %}</a>
-
-    <div class="submenu">
-      <h1><i class="fa fa-archive"></i> {% trans "Archive" %}</h1>
-      <div class="items">
-	<a href="{% url 'archive:photo_list' %}"><i class="fa fa-camera-retro"></i> {% trans "Photos" %}</a>
-      </div>
-    </div>
-
-
-    <div class="submenu">
-      <h1><i class="fa fa-wrench"></i> {% trans "Tools" %}</h1>
-      <div class="items">
-	<a href="{% url 'bibliography:insert' %}">{% trans "Insert book" %}</a>
-	<a href="{% url 'bibliography:book-create' %}">{% trans "Create book" %}</a>
-	<hr/>
-	<a href="{% url 'bibliography:author-search' %}">{% trans "Search author" %}</a>
-	<a href="{% url 'bibliography:author-insert' %}">{% trans "Insert author" %}</a>
-	<a href="{% url 'bibliography:author-create' %}">{% trans "Create author" %}</a>
-	<hr/>
-	<a href="{% url 'bibliography:publisher-create' %}">{% trans "Create publisher" %}</a>
-	<hr/>
-	<a href="{% url 'bibliography:categories-categorizer' %}">
-	  {% trans "Categorizer: category to category" %}</a>
-	<a href="{% url 'bibliography:books-categorizer' %}">{% trans "Categorizer: book to category" %}</a>
-      </div>
-    </div>
-
-    {% comment %}<a href="{% url 'admin:index' %}"><i class="fa fa-key"></i> {% trans "Admin" %}</a>{% endcomment %}
-
+    
   </nav>
+  
+</header>
 
-  </header>
-
-  <main>
-    {% block content %}{% endblock %}
-  </main>
+<main>
+  {% block content %}{% endblock %}
+</main>
 
 <!-- 
      ----------------------------
@@ -138,65 +109,15 @@
 -->
   
 
-
-<!-- <script type="text/javascript" src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-     <script type="text/javascript" src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/luxon@1.18.0/build/global/luxon.min.js"></script>
-     <script src="https://d3js.org/d3.v5.min.js"></script>
--->
-
 <script type="text/javascript" src='{% static "others/jquery-3.5.1.min.js" %}'></script> 
 <script type="text/javascript" src='{% static "others/jquery-ui.min.js" %}'></script>
 <script type="text/javascript" src='{% static "others/luxon.min.js" %}'></script>
 <script type="text/javascript" src='{% static "others/d3.v5.min.js" %}'></script>
+<script type="text/javascript" src='{% static "js/jquery-ui-santaclara-widgets.js" %}'></script>
 
-<!-- 
-     <script type="text/javascript" src='{% static "js/jcanvas-14.08.16.min.js" %}'></script>
--->
-     <script type="text/javascript" src='{% static "js/jquery-ui-santaclara-widgets.js" %}'></script>
+{% block script %}
+<script type="text/javascript" src='{% static "js/default.min.js" %}'></script>
+{% endblock script %}
 
-<script>//<![CDATA[    
-$(document).ready(function() {
-    jQuery(document).ajaxSend(function(event, xhr, settings) {
-	function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie != '') {
-		var cookies = document.cookie.split(';');
-		for (var i = 0; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i]);
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
-			cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-			break;
-                    }
-		}
-            }
-            return cookieValue;
-	}
-	function sameOrigin(url) {
-            // url could be relative or scheme relative or absolute
-            var host = document.location.host; // host + port
-            var protocol = document.location.protocol;
-            var sr_origin = '//' + host;
-            var origin = protocol + sr_origin;
-            // Allow absolute or scheme relative URLs to same origin
-            return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
-		(url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
-		// or any other URL that isn't scheme relative or absolute i.e relative.
-		!(/^(\/\/|http:|https:).*/.test(url));
-	}
-	function safeMethod(method) {
-            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-	}
-	
-	if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
-            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-	}
-    });
-    {% block script %}{% endblock script %}
-});
-
-//]]></script>
-				
 </body>
 </html>

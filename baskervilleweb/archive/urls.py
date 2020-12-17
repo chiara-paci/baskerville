@@ -21,4 +21,12 @@ urlpatterns = [
     url( r'^document_asset/(?P<pk>\d+)\.thumb\.jpeg/?$',
          views.DocumentAssetThumbView.as_view(),name="document_asset_thumb" ),
 
+    url( r'document/by_label/(?P<slug>\w+)/?$',
+         DetailView.as_view(model=models.Document,slug_field="label"),
+         name="document_detail_by_label"),
+    url( r'document/(?P<pk>\d+)/?$',
+         DetailView.as_view(model=models.Document),
+         name="document_detail"),
+    
+
 ]
