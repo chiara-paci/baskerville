@@ -37,6 +37,7 @@ class ExifLabel(models.Model):
         return self.type+" "+str(self.exif_id)
 
 class PhotoDManager(models.Manager):
+
     def get_years(self):
         return list(map(lambda x: x.year,self.all().dates("datetime","year")))
 
@@ -50,6 +51,7 @@ class PhotoD(models.Model):
     description = models.CharField(max_length=8192,blank=True)
     cover = models.ForeignKey('Photo',on_delete=models.PROTECT,blank=True,null=True)
     datetime = models.DateTimeField(default=timezone.now)
+    objects=PhotoDManager()
 
     def __str__(self): return self.label
         
