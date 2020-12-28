@@ -146,9 +146,9 @@ class PhotoDAdmin(admin.ModelAdmin):
     #inlines=(PhotoAlbumPhotoInline,PhotoMetaDatumInline,ExifDatumInline,)
     #actions=["add_to_album"]
     #actions_on_bottom = True
-    #date_hierarchy = "datetime"
+    date_hierarchy = "datetime"
     save_on_top = True
-    #list_filter=[YearListFilter,AlbumListFilter,"mimetype","mode","width","height"]
+    list_filter=[YearListFilter] #,AlbumListFilter,"mimetype","mode","width","height"]
 
     def thumbnail(self,obj):
         return mark_safe('<img src="%s" />' % obj.thumb_url())
@@ -181,9 +181,9 @@ class PhotoAdmin(admin.ModelAdmin):
     inlines=(PhotoAlbumPhotoInline,PhotoMetaDatumInline,ExifDatumInline,)
     actions=["add_to_album"]
     actions_on_bottom = True
-    date_hierarchy = "datetime"
+    #date_hierarchy = "datetime"
     save_on_top = True
-    list_filter=[YearListFilter,AlbumListFilter,"mimetype","mode","width","height"]
+    list_filter=[AlbumListFilter,"mimetype","mode","width","height"]
 
     def thumbnail(self,obj):
         return mark_safe('<img src="%s" />' % obj.thumb_url())

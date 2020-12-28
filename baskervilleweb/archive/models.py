@@ -38,7 +38,7 @@ class ExifLabel(models.Model):
 
 class PhotoDManager(models.Manager):
     def get_years(self):
-        return list(map(lambda x: x.year,Photo.objects.all().dates("datetime","year")))
+        return list(map(lambda x: x.year,self.all().dates("datetime","year")))
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -54,7 +54,7 @@ class PhotoD(models.Model):
     def __str__(self): return self.label
         
     class Meta:
-        ordering = [ "cover" ]
+        ordering = [ "datetime" ]
 
     def thumb_url(self): return self.cover.thumb_url()
     def image_url(self): return self.cover.image_url()
@@ -90,8 +90,6 @@ class PhotoD(models.Model):
     @cached_property
     def mimetype(self): return self.cover.mimetype
 
-    #@cached_property
-    #def datetime(self): return self.cover.datetime
 
     @cached_property
     def rotated(self): return self.cover.rotated
@@ -101,7 +99,7 @@ class PhotoD(models.Model):
 
 class PhotoManager(models.Manager):
     def get_years(self):
-        return list(map(lambda x: x.year,self.all().dates("datetime","year")))
+        return list(map(lambda x: x.year,PhotoD.objects.dates("datetime","year")))
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -116,7 +114,7 @@ class Photo(models.Model):
     format = models.ForeignKey(ImageFormat,on_delete=models.PROTECT)
     mode = models.CharField(max_length=1024)
     mimetype = models.CharField(max_length=1024)
-    datetime = models.DateTimeField(default=timezone.now)
+    #datetime = models.DateTimeField(default=timezone.now)
     rotated = models.CharField(max_length=128, 
                                choices=( ("no","no"),("90 ccw","90 ccw"),
                                          ("90 cw","90 cw"),  ("180","180") ), 
@@ -131,7 +129,11 @@ class Photo(models.Model):
     @cached_property
     def description(self): return self.photo.description
 
+    @cached_property
+    def datetime(self): return self.photo.datetime
+
     def __str__(self): return self.full_path
+
 
     def thumb_url(self):
         return "/archive/photo/%d.thumb.jpeg" % self.id
@@ -156,7 +158,7 @@ class Photo(models.Model):
         return ",".join(L)
         
     class Meta:
-        ordering = [ "datetime" ]
+        ordering = [ "photo" ]
 
 class PhotoMetaDatum(models.Model):
     photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
