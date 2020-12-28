@@ -138,6 +138,8 @@ class PhotoAlbumPhotoInline(admin.TabularInline):
     model = models.Album.photos.through
     extra = 0
 
+
+
 class PhotoAdmin(admin.ModelAdmin):
     list_display=["full_path","albums","thumbnail","mimetype","format","width","height",
                   "mode","datetime","rotated","mirrored"]
@@ -173,8 +175,6 @@ class PhotoAdmin(admin.ModelAdmin):
     add_to_album.short_description = 'Add to album'
 
 admin.site.register(models.Photo,PhotoAdmin)
-
-
 
 admin.site.register(models.Document)
 

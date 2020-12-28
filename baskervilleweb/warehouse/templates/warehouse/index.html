@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<section class="area-index">
+
+  <header>
+    <i class="fas fa-warehouse"></i>
+    <h1>{% trans "Warehouse" %}</h1>
+  </header>
+
+  <ul class="sub-boxes">
+    {% for c in roots %}
+    <li><a href='{% url "warehouse:container_detail" c.pk %}'>{{ c }}</li>
+    {% endfor %}
+  </ul>
+
+</section>
+{% endblock %}
+

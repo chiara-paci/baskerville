@@ -8,9 +8,15 @@ app_name="warehouse"
 
 urlpatterns = [
     # url( r'^$',views.PhotoListView.as_view(),name="index" ),
-    url( r'',TemplateView.as_view(template_name="warehouse/index.html"),name="index" ),
+    url( r'^$',views.IndexView.as_view(),name="index" ),
     url( r'^container/?$',ListView.as_view(model=models.Container),name="container_list" ),
-    url( r'^container/(?P<pk>\d+)/?$',DetailView.as_view(model=models.Container),name="container_detail" ),
+    url( r'^container/(?P<pk>\d+)/?$',
+         DetailView.as_view(model=models.Container),
+         name="container_detail" ),
+    url( r'^container/by_label/(?P<slug>\w+)/?$',
+         DetailView.as_view(model=models.Container,slug_field="label"),
+         name="container_detail_by_label" ),
+
     # url( r'^photo/(?P<pk>\d+)/?$',DetailView.as_view(model=models.Photo),name="photo_detail" ),
     # url( r'^photo/(?P<pk>\d+)\.thumb\.jpeg/?$',
     #      views.PhotoThumbView.as_view(),name="photo_thumb" ),

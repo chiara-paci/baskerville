@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<section class="area-index">
+
+  <header>
+    <i class="fas fa-warehouse"></i>
+    <h1>{{ container }}</h1>
+  </header>
+
+  <ul class="sub-boxes">
+    {% for c in container.children %}
+    <li><a href='{{ c.get_absolute_url }}'>{% include "warehouse/includes/type2fas.html" with obj=c %} {{ c }}</a></li>
+    {% endfor %}
+    {% for c in container.items %}
+    <li><a href='{{ c.get_absolute_url }}'>{{ c }}</a></li>
+    {% endfor %}
+  </ul>
+
+</section>
+{% endblock %}
+

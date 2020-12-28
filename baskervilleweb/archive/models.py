@@ -13,6 +13,31 @@ class ImageFormat(models.Model):
         if not self.description: return self.name
         return self.description
 
+class MetaLabel(models.Model):
+    name = models.CharField(max_length=1024)
+
+    def __str__(self): return self.name
+
+class ExifType(models.Model):
+    name = models.CharField(max_length=1024)
+    exif_id = models.IntegerField(blank=True,default=-1)
+    short = models.CharField(max_length=128)
+    
+    def __str__(self): return self.name
+
+class ExifLabel(models.Model):
+    category = models.CharField(max_length=128)
+    name = models.CharField(max_length=1024,blank=True)
+    type = models.ForeignKey(ExifType,on_delete=models.PROTECT)
+    exif_id = models.IntegerField(blank=True,default=-1)
+
+    def __str__(self):
+        if self.name: return self.name
+        return self.type+" "+str(self.exif_id)
+
+class PhotoD(models.Model):
+    description = models.CharField(max_length=8192,blank=True)
+
 class PhotoManager(models.Manager):
     def get_years(self):
         return list(map(lambda x: x.year,self.all().dates("datetime","year")))
@@ -65,11 +90,6 @@ class Photo(models.Model):
     class Meta:
         ordering = [ "datetime" ]
 
-class MetaLabel(models.Model):
-    name = models.CharField(max_length=1024)
-
-    def __str__(self): return self.name
-
 class PhotoMetaDatum(models.Model):
     photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
     label = models.ForeignKey(MetaLabel,on_delete=models.PROTECT)
@@ -77,22 +97,6 @@ class PhotoMetaDatum(models.Model):
 
     def __str__(self): return str(self.photo)+"/"+str(self.label)
 
-class ExifType(models.Model):
-    name = models.CharField(max_length=1024)
-    exif_id = models.IntegerField(blank=True,default=-1)
-    short = models.CharField(max_length=128)
-    
-    def __str__(self): return self.name
-
-class ExifLabel(models.Model):
-    category = models.CharField(max_length=128)
-    name = models.CharField(max_length=1024,blank=True)
-    type = models.ForeignKey(ExifType,on_delete=models.PROTECT)
-    exif_id = models.IntegerField(blank=True,default=-1)
-
-    def __str__(self):
-        if self.name: return self.name
-        return self.type+" "+str(self.exif_id)
 
 class ExifDatum(models.Model):
     photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
