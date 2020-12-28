@@ -68,7 +68,7 @@ class PhotoD(models.Model):
     #    return "/archive/photo/%d/" % (self.cover.id,)
 
     def albums(self):
-        L=list(map(lambda x: x["name"], self.cover.album_set.all().values("name")))
+        L=list(map(lambda x: x["name"], self.album_set.all().values("name")))
         return ",".join(L)
 
     @cached_property
@@ -91,7 +91,6 @@ class PhotoD(models.Model):
 
     @cached_property
     def mimetype(self): return self.cover.mimetype
-
 
     @cached_property
     def rotated(self): return self.cover.rotated
@@ -134,6 +133,9 @@ class Photo(models.Model):
     def datetime(self): return self.photo.datetime
 
     def albums(self): return self.photo.albums()
+
+    @cached_property
+    def album_set(self): return self.photo.album_set
 
     def __str__(self): return self.full_path
 
