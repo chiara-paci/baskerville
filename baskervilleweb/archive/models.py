@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.utils.functional import cached_property
 
 ARCHIVE_PATH = settings.ARCHIVE_PATH
 ARCHIVE_REDIRECT_URL = settings.ARCHIVE_REDIRECT_URL
@@ -53,7 +54,7 @@ class Photo(models.Model):
     photo = models.ForeignKey(PhotoD,on_delete=models.PROTECT,blank=True,null=True)
     full_path =  models.FilePathField(path=ARCHIVE_PATH["photo"]["full"],recursive=True,max_length=1024)
     thumb_path = models.FilePathField(path=ARCHIVE_PATH["photo"]["thumb"],recursive=True,max_length=1024)
-    description = models.CharField(max_length=8192,blank=True)
+    #description = models.CharField(max_length=8192,blank=True)
     width = models.IntegerField()
     height = models.IntegerField()
     format = models.ForeignKey(ImageFormat,on_delete=models.PROTECT)
@@ -70,6 +71,9 @@ class Photo(models.Model):
                                default="no")
 
     objects=PhotoManager()
+
+    @cached_property
+    def description(self): return self.photo.description
 
     def __str__(self): return self.full_path
 
