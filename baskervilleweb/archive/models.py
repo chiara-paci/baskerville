@@ -148,18 +148,30 @@ class Photo(models.Model):
         return "/archive/photo/%d.%s" % (self.id,t[1])
 
     def image_redirect_url(self):
-        url=self.full_path.replace(ARCHIVE_PATH["photo"]["full"],ARCHIVE_REDIRECT_URL["photo"]["full"])
+        url=self.full_path.replace(ARCHIVE_PATH["photo"]["full"],
+                                   ARCHIVE_REDIRECT_URL["photo"]["full"])
         return url
 
     def thumb_redirect_url(self):
-        url=self.thumb_path.replace(ARCHIVE_PATH["photo"]["thumb"],ARCHIVE_REDIRECT_URL["photo"]["thumb"])
+        url=self.thumb_path.replace(ARCHIVE_PATH["photo"]["thumb"],
+                                    ARCHIVE_REDIRECT_URL["photo"]["thumb"])
         return url
         
     def get_absolute_url(self):
         return "/archive/photo/%d/" % (self.id,)
         
     class Meta:
-        ordering = [ "photo" ]
+        ordering = [ "photo" ]    
+
+# QUI
+# class PhotoAssetMetaDatum(models.Model):
+#     asset = models.ForeignKey(Photo,on_delete=models.PROTECT)
+#     #photod = models.ForeignKey(PhotoD,on_delete=models.PROTECT)
+#     label = models.ForeignKey(MetaLabel,on_delete=models.PROTECT)
+#     value = models.CharField(max_length=8192)
+
+#     def __str__(self): return str(self.photo)+"/"+str(self.label)
+
 
 class PhotoMetaDatum(models.Model):
     photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
@@ -169,10 +181,9 @@ class PhotoMetaDatum(models.Model):
 
     def __str__(self): return str(self.photo)+"/"+str(self.label)
 
-
 class ExifDatum(models.Model):
     photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
-    photod = models.ForeignKey(PhotoD,on_delete=models.PROTECT)
+    #photod = models.ForeignKey(PhotoD,on_delete=models.PROTECT)
     label = models.ForeignKey(ExifLabel,on_delete=models.PROTECT)
     value = models.CharField(max_length=8192)
 
@@ -198,8 +209,10 @@ class Document(models.Model):
 
 class DocumentAsset(models.Model):
     document = models.ForeignKey(Document,on_delete=models.CASCADE)
-    full_path =  models.FilePathField(path=ARCHIVE_PATH["document_asset"]["full"],recursive=True,max_length=1024)
-    thumb_path = models.FilePathField(path=ARCHIVE_PATH["document_asset"]["thumb"],recursive=True,max_length=1024)
+    full_path =  models.FilePathField(path=ARCHIVE_PATH["document_asset"]["full"],
+                                      recursive=True,max_length=1024)
+    thumb_path = models.FilePathField(path=ARCHIVE_PATH["document_asset"]["thumb"],
+                                      recursive=True,max_length=1024)
     mimetype = models.CharField(max_length=1024)
     datetime = models.DateTimeField(default=timezone.now)
 

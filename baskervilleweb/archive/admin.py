@@ -15,7 +15,7 @@ class PhotoMetaDatumInline(admin.TabularInline):
     extra = 0
 
 class PhotoMetaDatumAdmin(admin.ModelAdmin):
-    list_display=["photo","label","value"]
+    list_display=["photod","label","value"]
 
 admin.site.register(models.PhotoMetaDatum,PhotoMetaDatumAdmin)
 
@@ -48,17 +48,6 @@ class ExifTypeAdmin(admin.ModelAdmin):
     list_display=["name","short","exif_id"]
 admin.site.register(models.ExifType,ExifTypeAdmin)
 
-# class AlbumAlbumOldPhotoInline(admin.TabularInline):
-#     model = models.Album.photos.through
-#     extra = 0
-#     fields = ( "photo","thumbnail" )
-#     readonly_fields = ("thumbnail",)
-
-#     def thumbnail(self,obj):
-#         return mark_safe('<img src="%s" />' % obj.photo.thumb_url())
-#     thumbnail.short_description = 'Thumbnail'
-#     #thumbnail.allow_tags = True
-
 class AlbumAlbumPhotoInline(admin.TabularInline):
     model = models.Album.photos.through
     extra = 0
@@ -71,7 +60,7 @@ class AlbumAlbumPhotoInline(admin.TabularInline):
     #thumbnail.allow_tags = True
 
 class AlbumAdmin(admin.ModelAdmin):
-    inlines=(AlbumAlbumPhotoInline,) #,AlbumAlbumDPhotoInline,)
+    inlines=(AlbumAlbumPhotoInline,) 
     filter_horizontal=["photos"]
     list_display = [ "name","photos_count" ]
     save_on_top = True
@@ -152,7 +141,7 @@ class PhotoAlbumPhotoInline(admin.TabularInline):
 class PhotoDAdmin(admin.ModelAdmin):
     list_display=["full_path","albums","thumbnail","mimetype","format","width","height",
                   "mode","datetime","rotated","mirrored"]
-    inlines=(PhotoAlbumPhotoInline,)#PhotoMetaDatumInline,ExifDatumInline,)
+    inlines=(PhotoAlbumPhotoInline,PhotoMetaDatumInline) 
     #actions=["add_to_album"]
     #actions_on_bottom = True
     date_hierarchy = "datetime"
@@ -187,10 +176,10 @@ admin.site.register(models.PhotoD,PhotoDAdmin)
 class PhotoAdmin(admin.ModelAdmin):
     list_display=["full_path","thumbnail","mimetype","format","width","height",
                   "mode","datetime","rotated","mirrored"]
-    inlines=(PhotoMetaDatumInline,ExifDatumInline,)
-    #actions=["add_to_album"]
+    #inlines=(PhotoMetaDatumInline,ExifDatumInline,)
+    inlines=(ExifDatumInline,)
     actions_on_bottom = True
-    #date_hierarchy = "datetime"
+    date_hierarchy = "photo__datetime"
     save_on_top = True
     list_filter=["mimetype","mode","width","height"]
 

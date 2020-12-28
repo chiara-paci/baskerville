@@ -35,10 +35,10 @@ class Command(BaseCommand):
             p.photod=p.photo.photo
             p.save()
             print(p.photo.photo.label,p.label)
-        for p in models.ExifDatum.objects.all():
-            p.photod=p.photo.photo
-            p.save()
-            print(p.photo.photo.label,p.label)
+        # for p in models.ExifDatum.objects.all():
+        #     p.photod=p.photo.photo
+        #     p.save()
+        #     print(p.photo.photo.label,p.label)
 
         # for photo in models.Photo.objects.all():
         #     photo.photo.datetime=photo.datetime
