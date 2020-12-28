@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include "includes/pagination.html" %}
+
+<div class="filter">
+<ul>
+  {% for filter in filter_list %}
+  <li><h1>Filter by {{ filter.name }}</h1>
+    <ul>
+    {% for label,selected,query in filter.params %}
+    {% if selected %}
+    <li class="selected"><div>{{ label }}</div></li>
+    {% else %}
+    <li><a href="{% url 'archive:photo_list' %}?{{ query }}"><div>{{ label }}</div></a></li>
+    {% endif %}
+    {% endfor %}
+    </ul>
+  </li>
+  {% endfor %}
+</ul>
+</div>
+
+<table class="images">
+{% for photoasset in photoasset_list %}
+<tbody>
+<tr>
+  <td rowspan="4" class="center">
+    <a href="{{ photoasset.get_absolute_url }}">
+      <img {% if photoasset.rotated != "no" %}class='{% if photoasset.rotated == "180" %}rotate180{% elif photoasset.rotated == "90 cw" %}rotate90{% else %}rotate270{% endif %}'{% endif %}
+	   src="{{ photoasset.thumb_url }}"/>
+    </a>
+  </td>
+  <td>{{ photoasset.width }}x{{ photoasset.height }}</td>
+  <td rowspan="4">{{ photoasset.description }}</td>
+</tr>
+<tr><td>{{ photoasset.full_path }}</td></tr>
+<tr><td>{{ photoasset.datetime }}</td></tr>
+<tr><td>{{ photoasset.mimetype }}</td></tr>
+<tr><td>{{ photoasset.format }}</td></tr>
+</tbody>
+{% endfor %}
+</table>
+
+{% include "includes/pagination.html" %}
+
+{% endblock %}
+

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<article class="archivephoto">
+
+<section class="detail">
+
+  <figure>
+    <div>
+      <img 
+	{% if photoasset.rotated != "no" %}class='{% if photoasset.rotated == "180" %}rotate180{% elif photoasset.rotated == "90 cw" %}rotate90{% else %}rotate270{% endif %}'{% endif %}
+	src="{{ photoasset.image_url }}"
+	/>
+    </div>
+    <figcaption>{{ photoasset.description }}</figcaption>
+  </figure>
+
+    <table>
+    <tr><td colspan=2>{{ photoasset.full_path }}</td></tr>
+    <tr><td colspan=2>{{ photoasset.datetime }}</td></tr>
+    <tr><td colspan=2>{{ photoasset.width }}x{{ photoasset.height }}</td></tr>
+    <tr><td>rotated:</td><td>{{ photoasset.rotated }}</td></tr>
+    <tr><td>mirrored:</td><td>{{ photoasset.mirrored }}</td></tr>
+    <tr><td colspan=2>{{ photoasset.mimetype }} {{ photoasset.format }} </td></tr>
+    </table>
+
+</section>
+
+<section class="metadata">
+<h2>Metadata</h2>
+
+<table>
+{% for datum in photoasset.photo.photometadatum_set.all %}
+<tbody>
+<tr>
+  <td class="top">{{ datum.label }}</td>
+  <td class="top">{{ datum.value }}</td>
+</tr>
+</tbody>
+{% endfor %}
+{% for datum in photoasset.exifdatum_set.all %}
+<tbody>
+<tr>
+  <td class="top">{{ datum.label }}</td>
+  <td class="top">{{ datum.value }}</td>
+</tr>
+</tbody>
+{% endfor %}
+</table>
+</section>
+
+</article>
+
+{% endblock %}
+
+
+{% block script %}
+
+var reshape_parent =function(){
+    var parent=$(this).parent();
+    var w=$(this).width();
+    var h=$(this).height();
+
+    
+    parent.width(h);
+    parent.height(w);
+
+    $(this).offset(parent.offset());
+
+    var section=$(this).parents("section.detail");
+    section.css("flex-direction", "row");
+
+    console.log(section);
+
+};
+
+$("img.rotate90").each(reshape_parent);
+$("img.rotate270").each(reshape_parent);
+
+{% endblock script %}
