@@ -31,16 +31,12 @@ class Command(BaseCommand):
     requires_migrations_checks = True
 
     def handle(self, *args, **options):
-        for p in models.PhotoMetaDatum.objects.all():
-            p.photod=p.photo.photo
-            p.save()
-            print(p.photo.photo.label,p.label)
-        # for p in models.ExifDatum.objects.all():
-        #     p.photod=p.photo.photo
-        #     p.save()
-        #     print(p.photo.photo.label,p.label)
-
-        # for photo in models.Photo.objects.all():
-        #     photo.photo.datetime=photo.datetime
-        #     photo.photo.save()
-        #     print(photo.photo.label)
+        for md in models.PhotoMetaDatum.objects.all():
+            if md.label.name != "dpi": continue
+            asset_md,created=models.PhotoAssetMetaDatum.objects.get_or_create(
+                asset=md.photo.cover,
+                label=md.label,
+                value=md.value
+            )
+            print(md,asset_md)
+            md.delete()

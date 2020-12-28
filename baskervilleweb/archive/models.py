@@ -165,16 +165,6 @@ class PhotoAsset(models.Model):
     class Meta:
         ordering = [ "photo" ]    
 
-# QUI
-# class PhotoAssetMetaDatum(models.Model):
-#     asset = models.ForeignKey(Photo,on_delete=models.PROTECT)
-#     #photod = models.ForeignKey(Photo,on_delete=models.PROTECT)
-#     label = models.ForeignKey(MetaLabel,on_delete=models.PROTECT)
-#     value = models.CharField(max_length=8192)
-
-#     def __str__(self): return str(self.photo)+"/"+str(self.label)
-
-
 class PhotoMetaDatum(models.Model):
     #photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
     photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
@@ -182,6 +172,14 @@ class PhotoMetaDatum(models.Model):
     value = models.CharField(max_length=8192)
 
     def __str__(self): return str(self.photo)+"/"+str(self.label)
+
+# QUI
+class PhotoAssetMetaDatum(models.Model):
+    asset = models.ForeignKey(PhotoAsset,on_delete=models.PROTECT)
+    label = models.ForeignKey(MetaLabel,on_delete=models.PROTECT)
+    value = models.CharField(max_length=8192)
+
+    def __str__(self): return str(self.asset)+"/"+str(self.label)
 
 class ExifDatum(models.Model):
     asset = models.ForeignKey(PhotoAsset,on_delete=models.PROTECT)

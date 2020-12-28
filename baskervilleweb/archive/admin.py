@@ -14,10 +14,19 @@ class PhotoMetaDatumInline(admin.TabularInline):
     model = models.PhotoMetaDatum
     extra = 0
 
+class PhotoAssetMetaDatumInline(admin.TabularInline):
+    model = models.PhotoAssetMetaDatum
+    extra = 0
+
 class PhotoMetaDatumAdmin(admin.ModelAdmin):
     list_display=["photo","label","value"]
 
 admin.site.register(models.PhotoMetaDatum,PhotoMetaDatumAdmin)
+
+class PhotoAssetMetaDatumAdmin(admin.ModelAdmin):
+    list_display=["asset","label","value"]
+
+admin.site.register(models.PhotoAssetMetaDatum,PhotoAssetMetaDatumAdmin)
 
 class ExifDatumInline(admin.TabularInline):
     model = models.ExifDatum
@@ -34,7 +43,7 @@ class ImageFormatAdmin(admin.ModelAdmin):
 admin.site.register(models.ImageFormat,ImageFormatAdmin)
 
 class MetaLabelAdmin(admin.ModelAdmin):
-    inlines=(PhotoMetaDatumInline,)
+    inlines=(PhotoMetaDatumInline,PhotoAssetMetaDatumInline,)
 
 admin.site.register(models.MetaLabel,MetaLabelAdmin)
 
@@ -176,7 +185,7 @@ admin.site.register(models.Photo,PhotoAdmin)
 class PhotoAssetAdmin(admin.ModelAdmin):
     list_display=["full_path","thumbnail","mimetype","format","width","height",
                   "mode","datetime","rotated","mirrored"]
-    inlines=(ExifDatumInline,)
+    inlines=(ExifDatumInline,PhotoAssetMetaDatumInline)
     actions_on_bottom = True
     date_hierarchy = "photo__datetime"
     save_on_top = True
