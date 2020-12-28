@@ -39,6 +39,14 @@
 </tr>
 </tbody>
 {% endfor %}
+{% for datum in photoasset.photoassetmetadatum_set.all %}
+<tbody>
+<tr>
+  <td class="top">{{ datum.label }}</td>
+  <td class="top">{{ datum.value }}</td>
+</tr>
+</tbody>
+{% endfor %}
 {% for datum in photoasset.exifdatum_set.all %}
 <tbody>
 <tr>
