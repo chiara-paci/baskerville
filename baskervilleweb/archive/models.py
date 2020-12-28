@@ -157,16 +157,13 @@ class Photo(models.Model):
         
     def get_absolute_url(self):
         return "/archive/photo/%d/" % (self.id,)
-
-    # def albums(self):
-    #     L=list(map(lambda x: x["name"], self.album_set.all().values("name")))
-    #     return ",".join(L)
         
     class Meta:
         ordering = [ "photo" ]
 
 class PhotoMetaDatum(models.Model):
     photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
+    photod = models.ForeignKey(PhotoD,on_delete=models.PROTECT)
     label = models.ForeignKey(MetaLabel,on_delete=models.PROTECT)
     value = models.CharField(max_length=8192)
 
@@ -175,6 +172,7 @@ class PhotoMetaDatum(models.Model):
 
 class ExifDatum(models.Model):
     photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
+    photod = models.ForeignKey(PhotoD,on_delete=models.PROTECT)
     label = models.ForeignKey(ExifLabel,on_delete=models.PROTECT)
     value = models.CharField(max_length=8192)
 
@@ -186,10 +184,6 @@ class Album(models.Model):
 
     class Meta:
         ordering = ["name"]
-
-    #@cached_property
-    #def photos(self): return self.dphotos
-
 
     def __str__(self): return self.name
 

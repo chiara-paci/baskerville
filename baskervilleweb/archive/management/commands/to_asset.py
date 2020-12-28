@@ -31,10 +31,14 @@ class Command(BaseCommand):
     requires_migrations_checks = True
 
     def handle(self, *args, **options):
-        for album in models.Album.objects.all():
-            for photo in album.photos.all():
-                album.dphotos.add(photo.photo)
-                print(album,photo.photo.label)
+        for p in models.PhotoMetaDatum.objects.all():
+            p.photod=p.photo.photo
+            p.save()
+            print(p.photo.photo.label,p.label)
+        for p in models.ExifDatum.objects.all():
+            p.photod=p.photo.photo
+            p.save()
+            print(p.photo.photo.label,p.label)
 
         # for photo in models.Photo.objects.all():
         #     photo.photo.datetime=photo.datetime
