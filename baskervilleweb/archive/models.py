@@ -114,7 +114,6 @@ class Photo(models.Model):
     format = models.ForeignKey(ImageFormat,on_delete=models.PROTECT)
     mode = models.CharField(max_length=1024)
     mimetype = models.CharField(max_length=1024)
-    #datetime = models.DateTimeField(default=timezone.now)
     rotated = models.CharField(max_length=128, 
                                choices=( ("no","no"),("90 ccw","90 ccw"),
                                          ("90 cw","90 cw"),  ("180","180") ), 
@@ -178,6 +177,7 @@ class ExifDatum(models.Model):
 class Album(models.Model):
     name = models.CharField(max_length=1024)
     photos = models.ManyToManyField(Photo,blank=True)
+    dphotos = models.ManyToManyField(PhotoD,blank=True)
 
     class Meta:
         ordering = ["name"]

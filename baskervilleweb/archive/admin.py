@@ -86,7 +86,7 @@ class YearListFilter(admin.SimpleListFilter):
         in the right sidebar.
         """
 
-        ret=[ (str(x),str(x)) for x in models.Photo.objects.get_years() ]
+        ret=[ (str(x),str(x)) for x in models.PhotoD.objects.get_years() ]
         return ret
 
     def queryset(self, request, queryset):
