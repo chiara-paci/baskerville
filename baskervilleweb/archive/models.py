@@ -43,6 +43,7 @@ class PhotoManager(models.Manager):
         return list(map(lambda x: x.year,self.all().dates("datetime","year")))
 
 class Photo(models.Model):
+    photo = models.ForeignKey(PhotoD,on_delete=models.PROTECT,blank=True,null=True)
     full_path =  models.FilePathField(path=ARCHIVE_PATH["photo"]["full"],recursive=True,max_length=1024)
     thumb_path = models.FilePathField(path=ARCHIVE_PATH["photo"]["thumb"],recursive=True,max_length=1024)
     description = models.CharField(max_length=8192,blank=True)

@@ -138,8 +138,6 @@ class PhotoAlbumPhotoInline(admin.TabularInline):
     model = models.Album.photos.through
     extra = 0
 
-
-
 class PhotoAdmin(admin.ModelAdmin):
     list_display=["full_path","albums","thumbnail","mimetype","format","width","height",
                   "mode","datetime","rotated","mirrored"]
