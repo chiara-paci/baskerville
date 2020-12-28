@@ -20,15 +20,26 @@ import dateutil.parser
 import datetime,pytz
 import shutil
 
+def myslug(x):
+    x,ext=os.path.splitext(x)
+    x=x.replace("/",".")
+    x=x.replace("%",".")
+    return x
+
 class Command(BaseCommand):
     help = 'Migrate to asset.'
     requires_migrations_checks = True
 
     def handle(self, *args, **options):
-        for photo in models.Photo.objects.all():
-            relname=os.path.relpath(photo.full_path,
-                                    settings.ARCHIVE_PATH["photo"]["full"])
-            photo_d,created=models.PhotoD.objects.get_or_create(label=relname,defaults={"description": photo.description})
-            photo.photo=photo_d
-            photo.save()
+        for photo_d in models.PhotoD.objects.all():
+            photo_d.label=myslug(photo_d.label)
+            photo_d.save()
             print(photo_d.label)
+
+        # for photo in models.Photo.objects.all():
+        #     relname=os.path.relpath(photo.full_path,
+        #                             settings.ARCHIVE_PATH["photo"]["full"])
+        #     photo_d,created=models.PhotoD.objects.get_or_create(label=relname,defaults={"description": photo.description})
+        #     photo.photo=photo_d
+        #     photo.save()
+        #     print(photo_d.label)
