@@ -60,7 +60,7 @@ admin.site.register(models.ExifType,ExifTypeAdmin)
 #     #thumbnail.allow_tags = True
 
 class AlbumAlbumPhotoInline(admin.TabularInline):
-    model = models.Album.dphotos.through
+    model = models.Album.photos.through
     extra = 0
     fields = ( "photod","thumbnail" )
     readonly_fields = ("thumbnail",)
@@ -72,7 +72,7 @@ class AlbumAlbumPhotoInline(admin.TabularInline):
 
 class AlbumAdmin(admin.ModelAdmin):
     inlines=(AlbumAlbumPhotoInline,) #,AlbumAlbumDPhotoInline,)
-    filter_horizontal=["dphotos"]
+    filter_horizontal=["photos"]
     list_display = [ "name","photos_count" ]
     save_on_top = True
 
@@ -146,7 +146,7 @@ class AlbumListFilter(admin.SimpleListFilter):
         return queryset.filter(album__id=val)
 
 class PhotoAlbumPhotoInline(admin.TabularInline):
-    model = models.Album.dphotos.through
+    model = models.Album.photos.through
     extra = 0
 
 class PhotoDAdmin(admin.ModelAdmin):

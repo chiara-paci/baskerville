@@ -182,16 +182,19 @@ class ExifDatum(models.Model):
 
 class Album(models.Model):
     name = models.CharField(max_length=1024)
-    #photos = models.ManyToManyField(Photo,blank=True)
-    dphotos = models.ManyToManyField(PhotoD,blank=True)
+    photos = models.ManyToManyField(PhotoD,blank=True)
 
     class Meta:
         ordering = ["name"]
 
+    #@cached_property
+    #def photos(self): return self.dphotos
+
+
     def __str__(self): return self.name
 
     def photos_count(self):
-        return self.dphotos.count()
+        return self.photos.count()
 
 class Document(models.Model):
     label = models.SlugField(max_length=50,unique=True)
