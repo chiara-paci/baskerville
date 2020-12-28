@@ -36,6 +36,7 @@ class ExifLabel(models.Model):
         return self.type+" "+str(self.exif_id)
 
 class PhotoD(models.Model):
+    label = models.SlugField(max_length=1024,unique=True)
     description = models.CharField(max_length=8192,blank=True)
 
 class PhotoManager(models.Manager):

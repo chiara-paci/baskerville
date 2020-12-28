@@ -10,6 +10,8 @@ from django.utils.safestring import mark_safe
 
 from . import models
 
+admin.site.register(models.PhotoD)
+
 class PhotoMetaDatumInline(admin.TabularInline):
     model = models.PhotoMetaDatum
     extra = 0
