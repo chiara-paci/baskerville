@@ -38,6 +38,12 @@ class ExifLabel(models.Model):
 class PhotoD(models.Model):
     label = models.SlugField(max_length=1024,unique=True)
     description = models.CharField(max_length=8192,blank=True)
+    cover = models.ForeignKey('Photo',on_delete=models.PROTECT,blank=True,null=True)
+
+    def __str__(self): return self.label
+
+    def thumb_url(self):
+        return self.cover.thumb_url()
 
 class PhotoManager(models.Manager):
     def get_years(self):

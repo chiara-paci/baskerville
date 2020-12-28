@@ -10,8 +10,6 @@ from django.utils.safestring import mark_safe
 
 from . import models
 
-admin.site.register(models.PhotoD)
-
 class PhotoMetaDatumInline(admin.TabularInline):
     model = models.PhotoMetaDatum
     extra = 0
@@ -139,6 +137,15 @@ class AlbumListFilter(admin.SimpleListFilter):
 class PhotoAlbumPhotoInline(admin.TabularInline):
     model = models.Album.photos.through
     extra = 0
+
+class PhotoDAdmin(admin.ModelAdmin):
+    list_display=["label","thumbnail"]
+
+    def thumbnail(self,obj):
+        return mark_safe('<img src="%s" />' % obj.thumb_url())
+    thumbnail.short_description = 'Thumbnail'
+
+admin.site.register(models.PhotoD,PhotoDAdmin)
 
 class PhotoAdmin(admin.ModelAdmin):
     list_display=["full_path","albums","thumbnail","mimetype","format","width","height",
