@@ -86,7 +86,7 @@ class YearListFilter(admin.SimpleListFilter):
         in the right sidebar.
         """
 
-        ret=[ (str(x),str(x)) for x in models.PhotoD.objects.get_years() ]
+        ret=[ (str(x),str(x)) for x in models.Photo.objects.get_years() ]
         return ret
 
     def queryset(self, request, queryset):
@@ -138,7 +138,7 @@ class PhotoAlbumPhotoInline(admin.TabularInline):
     model = models.Album.photos.through
     extra = 0
 
-class PhotoDAdmin(admin.ModelAdmin):
+class PhotoAdmin(admin.ModelAdmin):
     list_display=["full_path","albums","thumbnail","mimetype","format","width","height",
                   "mode","datetime","rotated","mirrored"]
     inlines=(PhotoAlbumPhotoInline,PhotoMetaDatumInline) 
@@ -171,7 +171,7 @@ class PhotoDAdmin(admin.ModelAdmin):
                       context={'objects': queryset, 'form': form, 'path':request.get_full_path()})
     add_to_album.short_description = 'Add to album'
 
-admin.site.register(models.PhotoD,PhotoDAdmin)
+admin.site.register(models.Photo,PhotoAdmin)
 
 class PhotoAssetAdmin(admin.ModelAdmin):
     list_display=["full_path","thumbnail","mimetype","format","width","height",

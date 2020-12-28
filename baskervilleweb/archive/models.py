@@ -36,7 +36,7 @@ class ExifLabel(models.Model):
         if self.name: return self.name
         return self.type+" "+str(self.exif_id)
 
-class PhotoDManager(models.Manager):
+class PhotoManager(models.Manager):
 
     def get_years(self):
         return list(map(lambda x: x.year,self.all().dates("datetime","year")))
@@ -45,12 +45,13 @@ class PhotoDManager(models.Manager):
         qs = super().get_queryset()
         return qs.select_related('cover')
 
-class PhotoD(models.Model):
+class Photo(models.Model):
     label = models.SlugField(max_length=1024,unique=True)
     description = models.CharField(max_length=8192,blank=True)
-    cover = models.ForeignKey('PhotoAsset',on_delete=models.PROTECT,blank=True,null=True)
+    cover = models.ForeignKey('PhotoAsset',related_name="as_cover",
+                              on_delete=models.PROTECT,blank=True,null=True)
     datetime = models.DateTimeField(default=timezone.now)
-    objects=PhotoDManager()
+    objects=PhotoManager()
 
     def __str__(self): return self.label
         
@@ -99,14 +100,14 @@ class PhotoD(models.Model):
 
 class PhotoAssetManager(models.Manager):
     def get_years(self):
-        return list(map(lambda x: x.year,PhotoD.objects.dates("datetime","year")))
+        return list(map(lambda x: x.year,Photo.objects.dates("datetime","year")))
 
     def get_queryset(self):
         qs = super().get_queryset()
         return qs.select_related('photo','format')
 
 class PhotoAsset(models.Model):
-    photo = models.ForeignKey(PhotoD,on_delete=models.PROTECT,blank=True,null=True)
+    photo = models.ForeignKey(Photo,on_delete=models.PROTECT,blank=True,null=True)
     full_path =  models.FilePathField(path=ARCHIVE_PATH["photo"]["full"],
                                       recursive=True,max_length=1024)
     thumb_path = models.FilePathField(path=ARCHIVE_PATH["photo"]["thumb"],
@@ -167,7 +168,7 @@ class PhotoAsset(models.Model):
 # QUI
 # class PhotoAssetMetaDatum(models.Model):
 #     asset = models.ForeignKey(Photo,on_delete=models.PROTECT)
-#     #photod = models.ForeignKey(PhotoD,on_delete=models.PROTECT)
+#     #photod = models.ForeignKey(Photo,on_delete=models.PROTECT)
 #     label = models.ForeignKey(MetaLabel,on_delete=models.PROTECT)
 #     value = models.CharField(max_length=8192)
 
@@ -176,7 +177,7 @@ class PhotoAsset(models.Model):
 
 class PhotoMetaDatum(models.Model):
     #photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
-    photo = models.ForeignKey(PhotoD,on_delete=models.PROTECT)
+    photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
     label = models.ForeignKey(MetaLabel,on_delete=models.PROTECT)
     value = models.CharField(max_length=8192)
 
@@ -191,7 +192,7 @@ class ExifDatum(models.Model):
 
 class Album(models.Model):
     name = models.CharField(max_length=1024)
-    photos = models.ManyToManyField(PhotoD,blank=True)
+    photos = models.ManyToManyField(Photo,blank=True)
 
     class Meta:
         ordering = ["name"]
