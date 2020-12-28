@@ -36,25 +36,81 @@ class ExifLabel(models.Model):
         if self.name: return self.name
         return self.type+" "+str(self.exif_id)
 
+class PhotoDManager(models.Manager):
+    def get_years(self):
+        return list(map(lambda x: x.year,Photo.objects.all().dates("datetime","year")))
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.select_related('cover')
+
+
 class PhotoD(models.Model):
     label = models.SlugField(max_length=1024,unique=True)
     description = models.CharField(max_length=8192,blank=True)
     cover = models.ForeignKey('Photo',on_delete=models.PROTECT,blank=True,null=True)
+    datetime = models.DateTimeField(default=timezone.now)
 
     def __str__(self): return self.label
+        
+    class Meta:
+        ordering = [ "cover" ]
 
-    def thumb_url(self):
-        return self.cover.thumb_url()
+    def thumb_url(self): return self.cover.thumb_url()
+    def image_url(self): return self.cover.image_url()
+
+    def image_redirect_url(self): return self.cover.image_redirect_url()
+    def thumb_redirect_url(self): return self.cover.thumb_redirect_url()
+        
+    #def get_absolute_url(self):
+    #    return "/archive/photo/%d/" % (self.cover.id,)
+
+    def albums(self):
+        L=list(map(lambda x: x["name"], self.cover.album_set.all().values("name")))
+        return ",".join(L)
+
+    @cached_property
+    def full_path(self): return self.cover.full_path
+
+    @cached_property
+    def thumb_path(self): return self.cover.thumb_path
+
+    @cached_property
+    def width(self): return self.cover.width
+
+    @cached_property
+    def height(self): return self.cover.height
+
+    @cached_property
+    def format(self): return self.cover.format
+
+    @cached_property
+    def mode(self): return self.cover.mode
+
+    @cached_property
+    def mimetype(self): return self.cover.mimetype
+
+    #@cached_property
+    #def datetime(self): return self.cover.datetime
+
+    @cached_property
+    def rotated(self): return self.cover.rotated
+
+    @cached_property
+    def mirrored(self): return self.cover.mirrored
 
 class PhotoManager(models.Manager):
     def get_years(self):
         return list(map(lambda x: x.year,self.all().dates("datetime","year")))
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.select_related('photo','format')
+
 class Photo(models.Model):
     photo = models.ForeignKey(PhotoD,on_delete=models.PROTECT,blank=True,null=True)
     full_path =  models.FilePathField(path=ARCHIVE_PATH["photo"]["full"],recursive=True,max_length=1024)
     thumb_path = models.FilePathField(path=ARCHIVE_PATH["photo"]["thumb"],recursive=True,max_length=1024)
-    #description = models.CharField(max_length=8192,blank=True)
     width = models.IntegerField()
     height = models.IntegerField()
     format = models.ForeignKey(ImageFormat,on_delete=models.PROTECT)

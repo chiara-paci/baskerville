@@ -32,6 +32,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for photo in models.Photo.objects.all():
-            photo.photo.cover=photo
+            photo.photo.datetime=photo.datetime
             photo.photo.save()
             print(photo.photo.label)

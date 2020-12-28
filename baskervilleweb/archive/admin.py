@@ -141,9 +141,37 @@ class PhotoAlbumPhotoInline(admin.TabularInline):
 class PhotoDAdmin(admin.ModelAdmin):
     list_display=["label","thumbnail"]
 
+    list_display=["full_path","albums","thumbnail","mimetype","format","width","height",
+                  "mode","datetime","rotated","mirrored"]
+    #inlines=(PhotoAlbumPhotoInline,PhotoMetaDatumInline,ExifDatumInline,)
+    #actions=["add_to_album"]
+    #actions_on_bottom = True
+    #date_hierarchy = "datetime"
+    save_on_top = True
+    #list_filter=[YearListFilter,AlbumListFilter,"mimetype","mode","width","height"]
+
     def thumbnail(self,obj):
         return mark_safe('<img src="%s" />' % obj.thumb_url())
     thumbnail.short_description = 'Thumbnail'
+
+    def add_to_album(self,request,queryset):
+        class MyForm(forms.Form):
+            _selected_action = forms.CharField(widget=forms.MultipleHiddenInput) 
+            album = forms.ModelChoiceField(queryset=models.Album.objects.all(),empty_label=None)
+        succ_msg='{% load humanize %}{{ count|apnumber}} object{{ count|pluralize }} updated'
+        if request.POST and ("post" in request.POST):
+            form = MyForm(request.POST)
+            if form.is_valid():
+                album=form.cleaned_data["album"]
+                for obj in queryset:
+                    album.photos.add(obj)
+                self.message_user(request, Template(succ_msg).render(Context({'count':queryset.count()})))
+                return HttpResponseRedirect(request.get_full_path())
+
+        form = MyForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+        return render(request,'admin/archive/add_to_album.html', 
+                      context={'objects': queryset, 'form': form, 'path':request.get_full_path()})
+    add_to_album.short_description = 'Add to album'
 
 admin.site.register(models.PhotoD,PhotoDAdmin)
 
