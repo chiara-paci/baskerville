@@ -176,18 +176,18 @@ class PhotoAsset(models.Model):
 
 class PhotoMetaDatum(models.Model):
     #photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
-    photod = models.ForeignKey(PhotoD,on_delete=models.PROTECT)
+    photo = models.ForeignKey(PhotoD,on_delete=models.PROTECT)
     label = models.ForeignKey(MetaLabel,on_delete=models.PROTECT)
     value = models.CharField(max_length=8192)
 
-    def __str__(self): return str(self.photod)+"/"+str(self.label)
+    def __str__(self): return str(self.photo)+"/"+str(self.label)
 
 class ExifDatum(models.Model):
-    photo = models.ForeignKey(PhotoAsset,on_delete=models.PROTECT)
+    asset = models.ForeignKey(PhotoAsset,on_delete=models.PROTECT)
     label = models.ForeignKey(ExifLabel,on_delete=models.PROTECT)
     value = models.CharField(max_length=8192)
 
-    def __str__(self): return str(self.photo)+"/"+str(self.label)
+    def __str__(self): return str(self.asset)+"/"+str(self.label)
 
 class Album(models.Model):
     name = models.CharField(max_length=1024)

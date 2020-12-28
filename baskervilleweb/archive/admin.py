@@ -15,7 +15,7 @@ class PhotoMetaDatumInline(admin.TabularInline):
     extra = 0
 
 class PhotoMetaDatumAdmin(admin.ModelAdmin):
-    list_display=["photod","label","value"]
+    list_display=["photo","label","value"]
 
 admin.site.register(models.PhotoMetaDatum,PhotoMetaDatumAdmin)
 
@@ -24,7 +24,7 @@ class ExifDatumInline(admin.TabularInline):
     extra = 0
 
 class ExifDatumAdmin(admin.ModelAdmin):
-    list_display=["photo","label","value"]
+    list_display=["asset","label","value"]
 
 admin.site.register(models.ExifDatum,ExifDatumAdmin)
 
@@ -51,11 +51,11 @@ admin.site.register(models.ExifType,ExifTypeAdmin)
 class AlbumAlbumPhotoInline(admin.TabularInline):
     model = models.Album.photos.through
     extra = 0
-    fields = ( "photod","thumbnail" )
+    fields = ( "photo","thumbnail" )
     readonly_fields = ("thumbnail",)
 
     def thumbnail(self,obj):
-        return mark_safe('<img src="%s" />' % obj.photod.thumb_url())
+        return mark_safe('<img src="%s" />' % obj.photo.thumb_url())
     thumbnail.short_description = 'Thumbnail'
     #thumbnail.allow_tags = True
 
