@@ -31,7 +31,7 @@
 <h2>Metadata</h2>
 
 <table>
-{% for datum in photo.photometadatum_set.all %}
+{% for datum in photo.photo.photometadatum_set.all %}
 <tbody>
 <tr>
   <td class="top">{{ datum.label }}</td>

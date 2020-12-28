@@ -108,8 +108,10 @@ class PhotoManager(models.Manager):
 
 class Photo(models.Model):
     photo = models.ForeignKey(PhotoD,on_delete=models.PROTECT,blank=True,null=True)
-    full_path =  models.FilePathField(path=ARCHIVE_PATH["photo"]["full"],recursive=True,max_length=1024)
-    thumb_path = models.FilePathField(path=ARCHIVE_PATH["photo"]["thumb"],recursive=True,max_length=1024)
+    full_path =  models.FilePathField(path=ARCHIVE_PATH["photo"]["full"],
+                                      recursive=True,max_length=1024)
+    thumb_path = models.FilePathField(path=ARCHIVE_PATH["photo"]["thumb"],
+                                      recursive=True,max_length=1024)
     width = models.IntegerField()
     height = models.IntegerField()
     format = models.ForeignKey(ImageFormat,on_delete=models.PROTECT)
@@ -174,16 +176,15 @@ class Photo(models.Model):
 
 
 class PhotoMetaDatum(models.Model):
-    photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
+    #photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
     photod = models.ForeignKey(PhotoD,on_delete=models.PROTECT)
     label = models.ForeignKey(MetaLabel,on_delete=models.PROTECT)
     value = models.CharField(max_length=8192)
 
-    def __str__(self): return str(self.photo)+"/"+str(self.label)
+    def __str__(self): return str(self.photod)+"/"+str(self.label)
 
 class ExifDatum(models.Model):
     photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
-    #photod = models.ForeignKey(PhotoD,on_delete=models.PROTECT)
     label = models.ForeignKey(ExifLabel,on_delete=models.PROTECT)
     value = models.CharField(max_length=8192)
 
