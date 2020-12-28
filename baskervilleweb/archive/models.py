@@ -131,6 +131,8 @@ class Photo(models.Model):
     @cached_property
     def datetime(self): return self.photo.datetime
 
+    def albums(self): return self.photo.albums()
+
     def __str__(self): return self.full_path
 
 
@@ -152,9 +154,9 @@ class Photo(models.Model):
     def get_absolute_url(self):
         return "/archive/photo/%d/" % (self.id,)
 
-    def albums(self):
-        L=list(map(lambda x: x["name"], self.album_set.all().values("name")))
-        return ",".join(L)
+    # def albums(self):
+    #     L=list(map(lambda x: x["name"], self.album_set.all().values("name")))
+    #     return ",".join(L)
         
     class Meta:
         ordering = [ "photo" ]
@@ -176,7 +178,7 @@ class ExifDatum(models.Model):
 
 class Album(models.Model):
     name = models.CharField(max_length=1024)
-    photos = models.ManyToManyField(Photo,blank=True)
+    #photos = models.ManyToManyField(Photo,blank=True)
     dphotos = models.ManyToManyField(PhotoD,blank=True)
 
     class Meta:
@@ -185,7 +187,7 @@ class Album(models.Model):
     def __str__(self): return self.name
 
     def photos_count(self):
-        return self.photos.count()
+        return self.dphotos.count()
 
 class Document(models.Model):
     label = models.SlugField(max_length=50,unique=True)

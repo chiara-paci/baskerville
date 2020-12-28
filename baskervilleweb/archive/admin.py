@@ -48,20 +48,31 @@ class ExifTypeAdmin(admin.ModelAdmin):
     list_display=["name","short","exif_id"]
 admin.site.register(models.ExifType,ExifTypeAdmin)
 
+# class AlbumAlbumOldPhotoInline(admin.TabularInline):
+#     model = models.Album.photos.through
+#     extra = 0
+#     fields = ( "photo","thumbnail" )
+#     readonly_fields = ("thumbnail",)
+
+#     def thumbnail(self,obj):
+#         return mark_safe('<img src="%s" />' % obj.photo.thumb_url())
+#     thumbnail.short_description = 'Thumbnail'
+#     #thumbnail.allow_tags = True
+
 class AlbumAlbumPhotoInline(admin.TabularInline):
-    model = models.Album.photos.through
+    model = models.Album.dphotos.through
     extra = 0
-    fields = ( "photo","thumbnail" )
+    fields = ( "photod","thumbnail" )
     readonly_fields = ("thumbnail",)
 
     def thumbnail(self,obj):
-        return mark_safe('<img src="%s" />' % obj.photo.thumb_url())
+        return mark_safe('<img src="%s" />' % obj.photod.thumb_url())
     thumbnail.short_description = 'Thumbnail'
     #thumbnail.allow_tags = True
 
 class AlbumAdmin(admin.ModelAdmin):
-    inlines=(AlbumAlbumPhotoInline,)
-    filter_horizontal=["photos"]
+    inlines=(AlbumAlbumPhotoInline,) #,AlbumAlbumDPhotoInline,)
+    filter_horizontal=["dphotos"]
     list_display = [ "name","photos_count" ]
     save_on_top = True
 
@@ -135,20 +146,18 @@ class AlbumListFilter(admin.SimpleListFilter):
         return queryset.filter(album__id=val)
 
 class PhotoAlbumPhotoInline(admin.TabularInline):
-    model = models.Album.photos.through
+    model = models.Album.dphotos.through
     extra = 0
 
 class PhotoDAdmin(admin.ModelAdmin):
-    list_display=["label","thumbnail"]
-
     list_display=["full_path","albums","thumbnail","mimetype","format","width","height",
                   "mode","datetime","rotated","mirrored"]
-    #inlines=(PhotoAlbumPhotoInline,PhotoMetaDatumInline,ExifDatumInline,)
+    inlines=(PhotoAlbumPhotoInline,)#PhotoMetaDatumInline,ExifDatumInline,)
     #actions=["add_to_album"]
     #actions_on_bottom = True
     date_hierarchy = "datetime"
     save_on_top = True
-    list_filter=[YearListFilter] #,AlbumListFilter,"mimetype","mode","width","height"]
+    list_filter=[YearListFilter,AlbumListFilter]
 
     def thumbnail(self,obj):
         return mark_safe('<img src="%s" />' % obj.thumb_url())
@@ -176,38 +185,38 @@ class PhotoDAdmin(admin.ModelAdmin):
 admin.site.register(models.PhotoD,PhotoDAdmin)
 
 class PhotoAdmin(admin.ModelAdmin):
-    list_display=["full_path","albums","thumbnail","mimetype","format","width","height",
+    list_display=["full_path","thumbnail","mimetype","format","width","height",
                   "mode","datetime","rotated","mirrored"]
-    inlines=(PhotoAlbumPhotoInline,PhotoMetaDatumInline,ExifDatumInline,)
-    actions=["add_to_album"]
+    inlines=(PhotoMetaDatumInline,ExifDatumInline,)
+    #actions=["add_to_album"]
     actions_on_bottom = True
     #date_hierarchy = "datetime"
     save_on_top = True
-    list_filter=[AlbumListFilter,"mimetype","mode","width","height"]
+    list_filter=["mimetype","mode","width","height"]
 
     def thumbnail(self,obj):
         return mark_safe('<img src="%s" />' % obj.thumb_url())
     thumbnail.short_description = 'Thumbnail'
     #thumbnail.allow_tags = True
 
-    def add_to_album(self,request,queryset):
-        class MyForm(forms.Form):
-            _selected_action = forms.CharField(widget=forms.MultipleHiddenInput) 
-            album = forms.ModelChoiceField(queryset=models.Album.objects.all(),empty_label=None)
-        succ_msg='{% load humanize %}{{ count|apnumber}} object{{ count|pluralize }} updated'
-        if request.POST and ("post" in request.POST):
-            form = MyForm(request.POST)
-            if form.is_valid():
-                album=form.cleaned_data["album"]
-                for obj in queryset:
-                    album.photos.add(obj)
-                self.message_user(request, Template(succ_msg).render(Context({'count':queryset.count()})))
-                return HttpResponseRedirect(request.get_full_path())
+    # def add_to_album(self,request,queryset):
+    #     class MyForm(forms.Form):
+    #         _selected_action = forms.CharField(widget=forms.MultipleHiddenInput) 
+    #         album = forms.ModelChoiceField(queryset=models.Album.objects.all(),empty_label=None)
+    #     succ_msg='{% load humanize %}{{ count|apnumber}} object{{ count|pluralize }} updated'
+    #     if request.POST and ("post" in request.POST):
+    #         form = MyForm(request.POST)
+    #         if form.is_valid():
+    #             album=form.cleaned_data["album"]
+    #             for obj in queryset:
+    #                 album.photos.add(obj)
+    #             self.message_user(request, Template(succ_msg).render(Context({'count':queryset.count()})))
+    #             return HttpResponseRedirect(request.get_full_path())
 
-        form = MyForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
-        return render(request,'admin/archive/add_to_album.html', 
-                      context={'objects': queryset, 'form': form, 'path':request.get_full_path()})
-    add_to_album.short_description = 'Add to album'
+    #     form = MyForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+    #     return render(request,'admin/archive/add_to_album.html', 
+    #                   context={'objects': queryset, 'form': form, 'path':request.get_full_path()})
+    # add_to_album.short_description = 'Add to album'
 
 admin.site.register(models.Photo,PhotoAdmin)
 

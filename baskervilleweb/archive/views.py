@@ -207,13 +207,37 @@ class AlbumFilter(Filter):
     def apply_filter(self,selected,queryset):
         return queryset.filter(album__id__in=selected)
 
+class PhotoYearFilter(Filter):
+    def __init__(self):
+        Filter.__init__(self,"year","year")
+
+    def values(self): 
+        return models.Photo.objects.get_years()
+
+    def apply_filter(self,selected,queryset):
+        return queryset.filter(photo__datetime__year__in=selected)
+
+class PhotoAlbumFilter(Filter):
+    def __init__(self):
+        Filter.__init__(self,"album","album")
+
+    def to_param(self,x): return str(x.id)
+
+    def values(self): 
+        return models.Album.objects.all()
+
+    def apply_filter(self,selected,queryset):
+        return queryset.filter(photo__album__id__in=selected)
+
 class PhotoListView(ListView):
     model=models.Photo
     paginate_by=100
 
     filter_list=[
-        AlbumFilter(),
-        YearFilter(),
+        PhotoAlbumFilter(),
+        #AlbumFilter(),
+        #YearFilter(),
+        PhotoYearFilter(),
         FieldFilter("width"),
         FieldFilter("height"),
         FieldFilter("mimetype"),
