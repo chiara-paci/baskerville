@@ -45,11 +45,10 @@ class PhotoDManager(models.Manager):
         qs = super().get_queryset()
         return qs.select_related('cover')
 
-
 class PhotoD(models.Model):
     label = models.SlugField(max_length=1024,unique=True)
     description = models.CharField(max_length=8192,blank=True)
-    cover = models.ForeignKey('Photo',on_delete=models.PROTECT,blank=True,null=True)
+    cover = models.ForeignKey('PhotoAsset',on_delete=models.PROTECT,blank=True,null=True)
     datetime = models.DateTimeField(default=timezone.now)
     objects=PhotoDManager()
 
@@ -98,7 +97,7 @@ class PhotoD(models.Model):
     @cached_property
     def mirrored(self): return self.cover.mirrored
 
-class PhotoManager(models.Manager):
+class PhotoAssetManager(models.Manager):
     def get_years(self):
         return list(map(lambda x: x.year,PhotoD.objects.dates("datetime","year")))
 
@@ -106,7 +105,7 @@ class PhotoManager(models.Manager):
         qs = super().get_queryset()
         return qs.select_related('photo','format')
 
-class Photo(models.Model):
+class PhotoAsset(models.Model):
     photo = models.ForeignKey(PhotoD,on_delete=models.PROTECT,blank=True,null=True)
     full_path =  models.FilePathField(path=ARCHIVE_PATH["photo"]["full"],
                                       recursive=True,max_length=1024)
@@ -126,7 +125,7 @@ class Photo(models.Model):
                                          ("vertical","vertical") ), 
                                default="no")
 
-    objects=PhotoManager()
+    objects=PhotoAssetManager()
 
     @cached_property
     def description(self): return self.photo.description
@@ -184,7 +183,7 @@ class PhotoMetaDatum(models.Model):
     def __str__(self): return str(self.photod)+"/"+str(self.label)
 
 class ExifDatum(models.Model):
-    photo = models.ForeignKey(Photo,on_delete=models.PROTECT)
+    photo = models.ForeignKey(PhotoAsset,on_delete=models.PROTECT)
     label = models.ForeignKey(ExifLabel,on_delete=models.PROTECT)
     value = models.CharField(max_length=8192)
 
@@ -227,7 +226,8 @@ class DocumentAsset(models.Model):
         return "/archive/document_asset/%d.%s" % (self.id,t[1])
 
     def image_redirect_url(self):
-        url=self.full_path.replace(ARCHIVE_PATH["document_asset"]["full"],ARCHIVE_REDIRECT_URL["document_asset"]["full"])
+        url=self.full_path.replace(ARCHIVE_PATH["document_asset"]["full"],
+                                   ARCHIVE_REDIRECT_URL["document_asset"]["full"])
         return url
 
     def thumb_redirect_url(self):

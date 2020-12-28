@@ -173,7 +173,7 @@ class PhotoDAdmin(admin.ModelAdmin):
 
 admin.site.register(models.PhotoD,PhotoDAdmin)
 
-class PhotoAdmin(admin.ModelAdmin):
+class PhotoAssetAdmin(admin.ModelAdmin):
     list_display=["full_path","thumbnail","mimetype","format","width","height",
                   "mode","datetime","rotated","mirrored"]
     inlines=(ExifDatumInline,)
@@ -186,7 +186,7 @@ class PhotoAdmin(admin.ModelAdmin):
         return mark_safe('<img src="%s" />' % obj.thumb_url())
     thumbnail.short_description = 'Thumbnail'
 
-admin.site.register(models.Photo,PhotoAdmin)
+admin.site.register(models.PhotoAsset,PhotoAssetAdmin)
 
 admin.site.register(models.Document)
 

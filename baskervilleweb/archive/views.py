@@ -43,7 +43,7 @@ from django.conf import settings
 #         return response
 
 class PhotoImageView(DetailView):
-    model = models.Photo
+    model = models.PhotoAsset
 
     def get_image_format(self,ext):
         if ext in [ "jpg", "jpeg" ]: return "image/jpeg","JPEG"
@@ -73,7 +73,7 @@ class PhotoImageView(DetailView):
         return response
 
 class PhotoThumbView(DetailView):
-    model = models.Photo
+    model = models.PhotoAsset
 
     def get_image_format(self):
         mimetype="image/jpeg"
@@ -177,7 +177,8 @@ class FieldFilter(Filter):
         self.field=field
 
     def values(self):
-        return list(map(lambda x: x[self.field],models.Photo.objects.all().values(self.field).order_by(self.field).distinct()))
+        return list(map(lambda x: x[self.field],
+                        models.PhotoAsset.objects.all().values(self.field).order_by(self.field).distinct()))
 
     def apply_filter(self,selected,queryset):
         kwargs={
@@ -190,7 +191,7 @@ class YearFilter(Filter):
         Filter.__init__(self,"year","year")
 
     def values(self): 
-        return models.Photo.objects.get_years()
+        return models.PhotoAsset.objects.get_years()
 
     def apply_filter(self,selected,queryset):
         return queryset.filter(datetime__year__in=selected)
@@ -212,7 +213,7 @@ class PhotoYearFilter(Filter):
         Filter.__init__(self,"year","year")
 
     def values(self): 
-        return models.Photo.objects.get_years()
+        return models.PhotoAsset.objects.get_years()
 
     def apply_filter(self,selected,queryset):
         return queryset.filter(photo__datetime__year__in=selected)
@@ -230,7 +231,7 @@ class PhotoAlbumFilter(Filter):
         return queryset.filter(photo__album__id__in=selected)
 
 class PhotoListView(ListView):
-    model=models.Photo
+    model=models.PhotoAsset
     paginate_by=100
 
     filter_list=[
@@ -251,7 +252,7 @@ class PhotoListView(ListView):
 
     def get_context_data(self,*args,**kwargs):
         ctx=ListView.get_context_data(self,*args,**kwargs)
-        # ret=[ (str(x),False,"year="+str(x)) for x in models.Photo.objects.get_years() ]
+        # ret=[ (str(x),False,"year="+str(x)) for x in models.PhotoAsset.objects.get_years() ]
         ctx["filter_list"]=[]
         for f in self.filter_list:
             ctx["filter_list"].append({
